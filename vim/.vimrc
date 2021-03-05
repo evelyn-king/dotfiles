@@ -1,5 +1,4 @@
-" .vimrc
-" Cameron King
+" .vimrc - Cameron King
 
 " Turn off the classic vi compatiblity layer
 set nocompatible
@@ -26,7 +25,6 @@ set softtabstop=4
 set shiftwidth=4
 set shiftround
 set expandtab
-set nowrap
 
 " Remappings
 :inoremap jk <Esc>
