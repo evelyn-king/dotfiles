@@ -19,11 +19,9 @@ set incsearch
 set ruler
 
 " Common formatting
-set autoindent
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set shiftround
 set expandtab
 
 " Remappings
