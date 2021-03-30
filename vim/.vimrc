@@ -12,8 +12,12 @@ syntax enable
 " UTF-8 encoding
 set encoding=utf-8
 
+" One colorscheme
+colorscheme one
 " Dark background
 set background=dark
+" Terminal colors
+set termguicolors
 
 " Visual settings
 set number
