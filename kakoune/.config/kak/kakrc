@@ -1,0 +1,25 @@
+# kakrc - Cameron King
+
+# Line numbers
+add-highlighter global/ number-lines
+
+# Initialize plug.kak
+source "%val{config}/plugins/plug.kak/rc/plug.kak"
+plug "andreyorst/plug.kak" noload
+
+# Tree viewer
+plug "andreyorst/kaktree" config %{
+    hook global WinSetOption filetype=kaktree %{
+        remove-highlighter buffer/numbers
+        remove-highlighter buffer/matching
+        remove-highlighter buffer/wrap
+        remove-highlighter buffer/show-whitespace
+    }
+    kaktree-enable
+}
+
+# Kak Language Server Protocol
+plug "kak-lsp/kak-lsp" do %{
+    cargo install --locked --force --path .
+}
+
