@@ -18,8 +18,3 @@ plug "andreyorst/kaktree" config %{
     kaktree-enable
 }
 
-# Kak Language Server Protocol
-plug "kak-lsp/kak-lsp" do %{
-    cargo install --locked --force --path .
-}
-
