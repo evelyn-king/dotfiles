@@ -6,6 +6,9 @@ set nocompatible
 " File type detection
 filetype plugin indent on
 
+" Backspace settings
+set backspace=indent,eol,start
+
 " Turn on syntax highlighting
 syntax enable
 
