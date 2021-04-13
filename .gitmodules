@@ -1,9 +1,10 @@
-[submodule "vim/.vim/pack/vendor/start/nerdtree"]
-	path = vim/.vim/pack/vendor/start/nerdtree
+[submodule "vim/.vim/pack/plugins/start/nerdtree"]
+	path = vim/.vim/pack/plugins/start/nerdtree
 	url = https://github.com/preservim/nerdtree.git
-[submodule "vim/.vim/pack/vendor/start/lightline.vim"]
-	path = vim/.vim/pack/vendor/start/lightline.vim
+[submodule "vim/.vim/pack/plugins/start/lightline.vim"]
+	path = vim/.vim/pack/plugins/start/lightline.vim
 	url = https://github.com/itchyny/lightline.vim
 [submodule "kakoune/.config/kak/plugins/plug.kak"]
 	path = kakoune/.config/kak/plugins/plug.kak
-	url = https://github.com/andreyorst/plug.kak.git
+    url = https://github.com/andreyorst/plug.kak.git
+

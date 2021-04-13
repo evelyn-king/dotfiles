@@ -15,6 +15,13 @@ syntax enable
 " UTF-8 encoding
 set encoding=utf-8
 
+" One colorscheme
+colorscheme one
+" Dark background
+set background=dark
+" Terminal colors
+set termguicolors
+
 " Visual settings
 set number
 set nohlsearch
@@ -29,4 +36,11 @@ set expandtab
 
 " Remappings
 :inoremap jk <Esc>
+
+" Lightline.vim
+set laststatus=2
+set noshowmode
+let g:lightline = {
+      \ 'colorscheme': 'one',
+      \ }
 
