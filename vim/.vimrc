@@ -17,8 +17,6 @@ set encoding=utf-8
 
 " Dark background
 set background=dark
-" Terminal colors
-set termguicolors
 
 " Visual settings
 set number
