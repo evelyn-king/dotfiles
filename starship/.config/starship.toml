@@ -1,0 +1,9 @@
+# starship.toml - Cameron King
+
+add_newline = false
+
+[shell]
+bash_indicator = ""  # bash is my default, no indicator
+style = "cyan bold"
+disabled = false
+
