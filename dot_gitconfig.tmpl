@@ -2,7 +2,14 @@
   name = Cameron King
   email = {{ .email | quote }}
 
-{{ if (eq .chezmoi.os "darwin") }}
+{{- if (eq .chezmoi.os "darwin") }}
 [credential]
-  helper = "osxkeychain"
-{{ end }}
+    helper = "osxkeychain"
+{{- else if (and (eq .chezmoi.os "linux") (contains "WSL2" .chezmoi.kernel.osrelease)) }}
+[credential]
+    helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager-core.exe
+{{- end }}
+{{- if (eq .chezmoi.hostname "QTM-KINGCAME-01") }}
+[credential "https://dev.azure.com"]
+    useHttpPath = true
+{{- end }}
