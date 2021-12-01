@@ -1,6 +1,7 @@
 [user]
-	name = Cameron King
+  name = Cameron King
   email = {{ .email | quote }}
+
 {{ if (eq .chezmoi.os "darwin") }}
 [credential]
   helper = "osxkeychain"
