@@ -1,0 +1,13 @@
+[".vim/pack/plugins/start/lightline"]
+  type = "archive"
+  url = "https://github.com/itchyny/lightline.vim/archive/master.tar.gz"
+  exact = true
+  stripComponents = 1
+  refreshPeriod = "168h"
+[".vim/pack/plugins/start/nerdtree"]
+  type = "archive"
+  url = "https://github.com/preservim/nerdtree/archive/master.tar.gz"
+  exact = true
+  stripComponents = 1
+  refreshPeriod = "168h"
+
