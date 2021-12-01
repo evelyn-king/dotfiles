@@ -3,17 +3,23 @@
 # Line numbers
 add-highlighter global/ number-lines
 
-# Initialize plug.kak
-source "%val{config}/plugins/plug.kak/rc/plug.kak"
+# Plugins
+# Auto-install plug.kak
+evaluate-commands %sh{
+    plugins="$kak_config/plugins"
+    mkdir -p "$plugins"
+    [ ! -e "$plugins/plug.kak" ] && \
+        git clone -q https://github.com/andreyorst/plug.kak.git "$plugins/plug.kak"
+    printf "%s\n" "source '$plugins/plug.kak/rc/plug.kak'"
+}
 plug "andreyorst/plug.kak" noload
 
-# Tree viewer
 plug "andreyorst/kaktree" config %{
     hook global WinSetOption filetype=kaktree %{
         remove-highlighter buffer/numbers
         remove-highlighter buffer/matching
         remove-highlighter buffer/wrap
-        remove-highlighter buffer/show-whitespace
+        remove-highlighter buffer/show-whitespaces
     }
     kaktree-enable
 }

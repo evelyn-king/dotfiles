@@ -1,3 +1,0 @@
-[submodule "kakoune/.config/kak/plugins/plug.kak"]
-	path = kakoune/.config/kak/plugins/plug.kak
-    url = https://github.com/andreyorst/plug.kak.git
