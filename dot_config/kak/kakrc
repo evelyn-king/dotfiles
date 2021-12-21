@@ -24,3 +24,7 @@ plug "andreyorst/kaktree" config %{
     kaktree-enable
 }
 
+plug "kak-lsp/kak-lsp" do %{
+    cargo install --locked --force --path .
+}
+
