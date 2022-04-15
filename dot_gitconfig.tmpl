@@ -2,14 +2,23 @@
   name = Cameron King
   email = {{ .email | quote }}
 
+[init]
+  defaultBranch = main
+
 {{- if (eq .chezmoi.os "darwin") }}
+[core]
+  editor = vim
+
 [credential]
-    helper = "osxkeychain"
+  helper = "osxkeychain"
 {{- else if (and (eq .chezmoi.os "linux") (contains "WSL2" .chezmoi.kernel.osrelease)) }}
+[core]
+  editor = vim
+
 [credential]
-    helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager-core.exe
+  helper = /mnt/c/Program\\ Files/Git/mingw64/libexec/git-core/git-credential-manager-core.exe
 {{- end }}
 {{- if (eq .chezmoi.hostname "QTM-KINGCAME-01") }}
 [credential "https://dev.azure.com"]
-    useHttpPath = true
+  useHttpPath = true
 {{- end }}
