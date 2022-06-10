@@ -12,7 +12,7 @@
   refreshPeriod = "168h"
 [".vim/pack/plugins/start/nerdcommenter"]
   type = "archive"
-  url = "https://github.com/preservim/archive/master.tar.gz"
+  url = "https://github.com/preservim/nerdcommenter/archive/master.tar.gz"
   exact = true
   stripComponents = 1
   refreshPeriod = "168h"
