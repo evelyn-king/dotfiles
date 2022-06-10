@@ -10,6 +10,12 @@
   exact = true
   stripComponents = 1
   refreshPeriod = "168h"
+[".vim/pack/plugins/start/nerdcommenter"]
+  type = "archive"
+  url = "https://github.com/preservim/archive/master.tar.gz"
+  exact = true
+  stripComponents = 1
+  refreshPeriod = "168h"
 [".vim/pack/plugins/start/julia-vim"]
   type = "archive"
   url = "https://github.com/JuliaEditorSupport/julia-vim/archive/master.tar.gz"
