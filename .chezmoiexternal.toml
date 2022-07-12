@@ -1,3 +1,9 @@
+[".vim/pack/plugins/start/gruvbox"]
+  type = "archive"
+  url = "https://github.com/morhetz/gruvbox/archive/master.tar.gz"
+  exact = true
+  stripComponents = 1
+  refreshPeriod = "168h"
 [".vim/pack/plugins/start/lightline"]
   type = "archive"
   url = "https://github.com/itchyny/lightline.vim/archive/master.tar.gz"
@@ -13,12 +19,6 @@
 [".vim/pack/plugins/start/nerdcommenter"]
   type = "archive"
   url = "https://github.com/preservim/nerdcommenter/archive/master.tar.gz"
-  exact = true
-  stripComponents = 1
-  refreshPeriod = "168h"
-[".vim/pack/plugins/start/julia-vim"]
-  type = "archive"
-  url = "https://github.com/JuliaEditorSupport/julia-vim/archive/master.tar.gz"
   exact = true
   stripComponents = 1
   refreshPeriod = "168h"
