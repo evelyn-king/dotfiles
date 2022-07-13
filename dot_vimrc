@@ -1,15 +1,19 @@
-" vimrc - Cameron King
+" .vimrc - Cameron King
 
+" Turn off classic vi compatibility layer
 set nocompatible
 
+" Filetype and syntax detection
 filetype plugin indent on
-
-set backspace=indent,eol,start
-
 syntax enable
 
+" Reasonable backspace settings
+set backspace=indent,eol,start
+
+" UTF-8 encoding
 set encoding=utf-8
 
+" Editor styling settings
 set number
 set nohlsearch
 set incsearch
@@ -21,6 +25,7 @@ set softtabstop=2
 set shiftwidth=2
 set expandtab
 
+" Map jk to escape
 :inoremap jk <Esc>
 
 " Lightline settings
