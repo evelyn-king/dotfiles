@@ -31,10 +31,10 @@ set expandtab
 " Lightline settings
 set laststatus=2
 set noshowmode
-let g:lightline = {'colorscheme': "gruvbox"}
+let g:lightline = {'colorscheme': "nord"}
 
 " Gruvbox theme
-autocmd vimenter * ++nested colorscheme gruvbox
+autocmd vimenter * ++nested colorscheme nord
 set background=dark
-colorscheme gruvbox
+colorscheme nord
 
