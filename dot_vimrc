@@ -15,6 +15,7 @@ set encoding=utf-8
 
 " Editor styling settings
 set number
+set relativenumber
 set nohlsearch
 set incsearch
 set ruler
