@@ -2,6 +2,10 @@
   type = "git-repo"
   url = "https://github.com/morhetz/gruvbox.git"
   refreshPeriod = "168h"
+[".vim/pack/plugins/start/surround"]
+  type = "git-repo"
+  url = "https://github.com/tpope/vim-surround.git"
+  refreshPeriod = "168h"
 [".vim/pack/plugins/start/nord"]
   type = "git-repo"
   url = "https://github.com/nordtheme/vim.git"
