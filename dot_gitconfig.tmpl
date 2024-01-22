@@ -19,10 +19,6 @@
 [credential]
   helper = /mnt/c/Program\\ Files/Git/mingw64/bin/git-credential-manager-core.exe
 {{- end }}
-{{- if (eq .chezmoi.hostname "QTM-KINGCAME-01") }}
-[credential "https://dev.azure.com"]
-  useHttpPath = true
-{{- end }}
 
 [filter "lfs"]
   required = true
