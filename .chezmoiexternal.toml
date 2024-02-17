@@ -22,10 +22,6 @@
   type = "git-repo"
   url = "https://github.com/preservim/nerdcommenter.git"
   refreshPeriod = "168h"
-[".local/share/nvim/site/pack/packer/start/packer.nvim"]
-  type="git-repo"
-  url = "https://github.com/wbthomason/packer.nvim"
-  refreshPeriod = "168h"
 [".tmux/plugins/tpm"]
   type="git-repo"
   url = "https://github.com/tmux-plugins/tpm"
