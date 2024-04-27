@@ -1,6 +1,6 @@
 [".vim/pack/plugins/start/fugitive"]
   type = "git-repo"
-  url = "https://tpope.io/vim/fugitive.git"
+  url = "https://github.com/tpope/vim-fugitive.git"
   refreshPeriod = "168h"
 [".vim/pack/plugins/start/gruvbox"]
   type = "git-repo"
