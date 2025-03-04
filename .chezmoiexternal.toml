@@ -2,17 +2,13 @@
   type = "git-repo"
   url = "https://github.com/tpope/vim-fugitive.git"
   refreshPeriod = "168h"
-[".vim/pack/plugins/start/gruvbox"]
+[".vim/pack/plugins/start/catppuccin"]
   type = "git-repo"
-  url = "https://github.com/morhetz/gruvbox.git"
+  url = "https://github.com/catppuccin/vim.git"
   refreshPeriod = "168h"
 [".vim/pack/plugins/start/surround"]
   type = "git-repo"
   url = "https://github.com/tpope/vim-surround.git"
-  refreshPeriod = "168h"
-[".vim/pack/plugins/start/nord"]
-  type = "git-repo"
-  url = "https://github.com/nordtheme/vim.git"
   refreshPeriod = "168h"
 [".vim/pack/plugins/start/lightline"]
   type = "git-repo"
