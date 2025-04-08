@@ -23,5 +23,11 @@
   "buffer_font_family": "CaskaydiaCove Nerd Font",
   "buffer_font_fallbacks": ["FiraCode Nerd Font", "Zed Plex Mono"],
   "remove_trailing_whitespace_on_save": true,
-  "relative_line_numbers": true
+  "relative_line_numbers": true,
+  "language_overrides": {
+    "Lua": {
+      "tab_size": 2
+    }
+  }
 }
+

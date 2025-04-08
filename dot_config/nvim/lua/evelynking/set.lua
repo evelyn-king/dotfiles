@@ -1,32 +1,69 @@
+-- Set.lua for Evelyn King
+
+-- Set the leader at the start
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
+
+vim.g.have_nerd_font = true
+
+-- set linenumbers
+vim.opt.number = true
+-- Use relative line numbers
+vim.opt.relativenumber = true
+
+-- Enable mouse mode, for emergencies
+vim.opt.mouse = "a"
+
+-- Don't show the mode
+vim.opt.showmode = false
 vim.opt.guicursor = ""
 
-vim.opt.nu = true
+-- Enable break indent
+vim.opt.breakindent = true
 
-vim.opt.tabstop = 4
-vim.opt.softtabstop = 4
-vim.opt.shiftwidth = 4
-vim.opt.expandtab = true
-
-vim.wo.relativenumber = true
-
-vim.opt.smartindent = true
-
-vim.opt.wrap = false
-
+-- Save undo history
 vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.opt.undofile = true
 
-vim.opt.hlsearch = false
-vim.opt.incsearch = true
+-- Case-insensitive searching unless \C or one or more capital letters are in
+-- the search term
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
 
-vim.opt.termguicolors = true
+-- Keep the signcolumn on
+vim.opt.signcolumn = "yes"
 
-vim.opt.scrolloff = 8
-
+-- Decrease update time
 vim.opt.updatetime = 50
 
-vim.opt.colorcolumn = "80"
+-- Decrease mapped sequence wait time
+vim.opt.timeoutlen = 200
 
-vim.g.mapleader = " "
+-- Configure how new splits should be opened
+vim.opt.splitright = true
+vim.opt.splitbelow = true
+
+-- Set how whitespace is displayed
+vim.opt.list = true
+vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+
+-- Preview substitutions live!
+vim.opt.inccommand = "split"
+
+-- Show which line your cursor is on
+vim.opt.cursorline = true
+
+-- Minimal number of lines to keep above and below cursor
+vim.opt.scrolloff = 10
+
+-- if performing an operation that could fail, get confirmation
+vim.opt.confirm = true
+
+-- Expand tabs to spaces
+vim.opt.expandtab = true
+
+-- terminalguicolors
+vim.opt.termguicolors = true
+
