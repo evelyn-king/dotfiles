@@ -14,8 +14,8 @@
   "restore_on_startup": "last_session",
   "theme": {
     "mode": "system",
-    "dark": "Catppuccin Mocha",
-    "light": "Catppuccin Latte"
+    "dark": "Rosé Pine",
+    "light": "Rosé Pine Dawn"
   },
   "vim_mode": true,
   "ui_font_size": 14,
@@ -24,10 +24,8 @@
   "buffer_font_fallbacks": ["FiraCode Nerd Font", "Zed Plex Mono"],
   "remove_trailing_whitespace_on_save": true,
   "relative_line_numbers": true,
-  "language_overrides": {
-    "Lua": {
-      "tab_size": 2
-    }
+  "auto_install_extensions": {
+    "rose-pine-theme": true,
   }
 }
 
