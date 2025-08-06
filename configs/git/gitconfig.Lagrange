@@ -1,0 +1,26 @@
+[user]
+  name = "Evelyn King"
+  email = evelyn@evieking.com
+
+[credential]
+  helper = "osxkeychain"
+  credentialStore = keychain
+
+[core]
+  editor = vim
+  autocrlf = false
+
+[pull]
+  rebase = true
+
+[fetch]
+  prune = true
+
+[init]
+  defaultBranch = main
+
+[filter "lfs"]
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
