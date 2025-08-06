@@ -4,12 +4,8 @@ add_newline = false
 command_timeout = 1000
 
 [shell]
-{{- if (eq .chezmoi.os "darwin") }}
-# in this case, zsh is the default
-zsh_indicator = ""
-{{- else }}
-bash_indicator = ""  # bash is my default, no indicator
-{{- end }}
+bash_indicator = ""
+
 fish_indicator = "🐟"
 style = "cyan bold"
 disabled = false

@@ -1,5 +1,0 @@
-{{ if or (eq .chezmoi.os "darwin") (eq .chezmoi.os "linux") -}}
-#!/bin/sh
-# ~/.tmux.conf hash: {{ include "dot_tmux.conf" | sha256sum }}
-~/.tmux/plugins/tpm/bin/install_plugins
-{{ end -}}

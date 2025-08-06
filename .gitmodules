@@ -1,0 +1,24 @@
+[submodule "submodules/dotbot"]
+	path = submodules/dotbot
+	url = https://github.com/anishathalye/dotbot
+[submodule "submodules/vim/fugitive"]
+	path = submodules/vim/fugitive
+	url = https://github.com/tpope/vim-fugitive.git
+[submodule "submodules/vim/rose-pine"]
+	path = submodules/vim/rose-pine
+	url = https://github.com/rose-pine/vim
+[submodule "submodules/vim/surround"]
+	path = submodules/vim/surround
+	url = https://github.com/tpope/vim-surround.git
+[submodule "submodules/vim/lightline"]
+	path = submodules/vim/lightline
+	url = https://github.com/itchyny/lightline.vim.git
+[submodule "submodules/vim/nerdtree"]
+	path = submodules/vim/nerdtree
+	url = https://github.com/preservim/nerdtree.git
+[submodule "submodules/vim/nerdcommenter"]
+	path = submodules/vim/nerdcommenter
+	url = https://github.com/preservim/nerdcommenter.git
+[submodule "submodules/tmux/tpm"]
+	path = submodules/tmux/tpm
+	url = https://github.com/tmux-plugins/tpm
