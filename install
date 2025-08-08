@@ -15,10 +15,9 @@ cd "${BASEDIR}"
 git -C "${DOTBOT_DIR}" submodule sync --quiet --recursive
 git submodule update --init --recursive "${DOTBOT_DIR}"
 
+INSTALL_CONFIG=${CONFIG}
 if [ -f "${PER_HOST_CONFIG}" ]; then
-  CONFIGS="${CONFIG} ${PER_HOST_CONFIG}"
-else
-  CONFIGS="${CONFIG}"
+  INSTALL_CONFIG=${PER_HOST_CONFIG}
 fi
 
-"${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" -c ${CONFIGS} "$@"
+"${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" -c ${INSTALL_CONFIG} "$@"
