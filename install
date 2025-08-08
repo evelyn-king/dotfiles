@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -e
+
+CONFIG="install.conf.yaml"
+DOTBOT_DIR="submodules/dotbot"
+
+DOTBOT_BIN="bin/dotbot"
+BASEDIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+HOSTNAME=$(hostname -s)
+PER_HOST_CONFIG="install.${HOSTNAME}.yaml"
+
+cd "${BASEDIR}"
+git -C "${DOTBOT_DIR}" submodule sync --quiet --recursive
+git submodule update --init --recursive "${DOTBOT_DIR}"
+
+INSTALL_CONFIG=${CONFIG}
+if [ -f "${PER_HOST_CONFIG}" ]; then
+  INSTALL_CONFIG=${PER_HOST_CONFIG}
+fi
+
+"${BASEDIR}/${DOTBOT_DIR}/${DOTBOT_BIN}" -d "${BASEDIR}" -c ${INSTALL_CONFIG} "$@"
