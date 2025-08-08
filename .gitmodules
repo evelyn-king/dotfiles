@@ -22,3 +22,6 @@
 [submodule "submodules/tmux/tpm"]
 	path = submodules/tmux/tpm
 	url = https://github.com/tmux-plugins/tpm
+[submodule "submodules/vim/everforest"]
+	path = submodules/vim/everforest
+	url = https://github.com/sainnhe/everforest.git
