@@ -13,7 +13,7 @@
     - ~/local-journal
 
 - link:
-    ~/.gitconfig: configs/git/gitconfig
+    ~/.gitconfig: configs/git/gitconfig.rabi
     ~/.condarc: configs/conda/condarc
     ~/.config/:
       glob: true
@@ -27,7 +27,7 @@
         - configs/conda/**
         - configs/starship/**
     ~/.config/starship.toml: configs/starship/starship.toml
-    ~/.vimrc: configs/vim/rabi.vimrc
+    ~/.vimrc: configs/vim/vimrc.rabi
     ~/.vim/pack/plugins/start/:
       glob: true
       path: submodules/vim/**
