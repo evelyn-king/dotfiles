@@ -1,0 +1,18 @@
+# starship.toml - Evelyn King
+
+add_newline = false
+command_timeout = 1000
+
+[shell]
+zsh_indicator = ""  # MacOS default is Lagrange
+
+fish_indicator = "🐟"
+style = "cyan bold"
+disabled = false
+
+[python]
+detect_extensions = []
+
+[conda]
+ignore_base = false
+

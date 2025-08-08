@@ -1,0 +1,8 @@
+- link:
+    ~/.gitconfig: configs/git/gitconfig.Lagrange
+    ~/.config/starship.toml: configs/starship/starship.toml.Lagrange
+
+- shell:
+    # Install tmux plugins
+    - [~/.tmux/plugins/tpm/bin/install_plugins, Install tmux plugins]
+
