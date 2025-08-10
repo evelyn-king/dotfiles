@@ -20,13 +20,18 @@
       path: configs/**
       exclude:
         - configs/btop/**
+        - configs/conda/**
         - configs/git/**
+        - configs/hypr/**
+        - configs/nvim/**
+        - configs/starship/**
         - configs/tmux/**
         - configs/vim/**
-        - configs/nvim/**
-        - configs/conda/**
-        - configs/starship/**
     ~/.config/starship.toml: configs/starship/starship.toml
+    ~/.config/hypr/autostart.conf: configs/hypr/autostart.rabi.conf
+    ~/.config/hypr/bindings.conf: configs/hypr/bindings.conf
+    ~/.config/hypr/envs.conf: configs/hypr/envs.conf
+    ~/.config/hypr/monitors.conf: configs/hypr/monitors.rabi.conf
     ~/.vimrc: configs/vim/vimrc.rabi
     ~/.vim/pack/plugins/start/:
       glob: true
