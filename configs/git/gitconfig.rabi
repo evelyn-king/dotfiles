@@ -10,6 +10,9 @@
 [commit]
   gpgsign = true
 
+[gpg]
+  format = openpgp
+
 [pull]
   rebase = true
 
@@ -18,9 +21,6 @@
 
 [init]
   defaultBranch = main
-
-[gpg]
-  format = openpgp
 
 [filter "lfs"]
   required = true
