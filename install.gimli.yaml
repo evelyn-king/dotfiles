@@ -31,6 +31,7 @@
     ~/.config/hypr/autostart.conf: configs/hypr/autostart.gimli.conf
     ~/.config/hypr/bindings.conf: configs/hypr/bindings.conf
     ~/.config/hypr/envs.conf: configs/hypr/envs.conf
+    ~/.config/hypr/hypridle.conf: configs/hypr/hypridle.gimli.conf
     ~/.vimrc: configs/vim/vimrc.gimli
     ~/.vim/pack/plugins/start/:
       glob: true
