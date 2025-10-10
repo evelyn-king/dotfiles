@@ -37,4 +37,3 @@ let g:lightline = {"colorscheme": "rosepine"}
 " Everforest theme
 packadd! everforest
 set background=dark
-

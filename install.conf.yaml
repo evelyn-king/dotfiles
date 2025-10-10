@@ -2,16 +2,13 @@
     link:
       create: true
       relink: true
-
 - clean: ["~"]
-
 - create:
     - ~/.vim/pack/plugins/start
     - ~/.tmux/plugins
     - ~/local-codex
     - ~/local-praxis
     - ~/local-journal
-
 - link:
     ~/.gitconfig: configs/git/gitconfig
     ~/.condarc: configs/conda/condarc
@@ -31,7 +28,8 @@
       path: submodules/vim/*
     ~/.tmux.conf: configs/tmux/tmux.conf
     ~/.tmux/plugins/tpm: submodules/tmux/tpm
-
 - shell:
     - git submodule sync --recursive
     - git submodule update --init --recursive --remote
+    - command: uvx dotbins sync
+      description: Installing managed binaries with dotbins

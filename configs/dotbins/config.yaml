@@ -1,0 +1,16 @@
+tools_dir: ~/.local/opt/dotbins
+platforms:
+  linux:
+    - amd64
+  macos:
+    - arm64
+tools:
+  starship:
+    repo: starship/starship
+    binary_name: starship
+    arch_map:
+      amd64: x86_64
+      arm64: aarch64
+    asset_patterns:
+      linux: starship-{arch}-unknown-linux-musl.tar.gz
+      macos: starship-{arch}-apple-darwin.tar.gz

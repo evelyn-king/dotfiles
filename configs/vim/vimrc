@@ -37,4 +37,3 @@ let g:lightline = {"colorscheme": "rosepine"}
 " Gruvbox theme
 set background=dark
 colorscheme rosepine
-
