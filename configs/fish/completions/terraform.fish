@@ -6,4 +6,3 @@ function __complete_terraform
     /opt/homebrew/bin/terraform
 end
 complete -f -c terraform -a "(__complete_terraform)"
-

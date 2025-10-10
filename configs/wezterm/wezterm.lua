@@ -28,7 +28,7 @@ config.font = wezterm.font_with_fallback(
         stretch = 'Normal',
         style = 'Normal'
     },
-    { 
+    {
         family = 'CaskaydiaCove Nerd Font',
         weight = 'Regular',
         stretch = 'Normal',
@@ -40,4 +40,3 @@ config.font = wezterm.font_with_fallback(
 config.font_size = 13.0
 
 return config
-

@@ -25,3 +25,6 @@
 [submodule "submodules/vim/everforest"]
 	path = submodules/vim/everforest
 	url = https://github.com/sainnhe/everforest.git
+[submodule "submodules/dotbins"]
+	path = submodules/dotbins
+	url = https://github.com/basnijholt/dotbins.git

@@ -15,4 +15,3 @@ detect_extensions = []
 
 [conda]
 ignore_base = false
-
