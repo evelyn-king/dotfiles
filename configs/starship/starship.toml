@@ -6,7 +6,7 @@ add_newline = false
 command_timeout = 1000
 
 [shell]
-zsh_indicator = ""  # MacOS default is Lagrange
+zsh_indicator = ""  # MacOS default is zsh
 
 fish_indicator = "🐟"
 style = "cyan bold"
