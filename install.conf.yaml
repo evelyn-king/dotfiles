@@ -10,7 +10,7 @@
     - ~/local-praxis
     - ~/local-journal
 - link:
-    ~/.gitconfig: configs/git/gitconfig.Lagrange
+    ~/.gitconfig: configs/git/gitconfig
     ~/.condarc: configs/conda/condarc
     ~/.config/:
       glob: true
@@ -21,7 +21,7 @@
         - configs/vim
         - configs/conda
         - configs/starship
-    ~/.config/starship.toml: configs/starship/starship.toml.Lagrange
+    ~/.config/starship.toml: configs/starship/starship.toml
     ~/.vimrc: configs/vim/vimrc
     ~/.vim/pack/plugins/start/:
       glob: true
