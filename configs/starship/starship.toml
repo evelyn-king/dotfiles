@@ -1,10 +1,12 @@
 # starship.toml - Evelyn King
 
+"$schema" = 'https://starship.rs/config-schema.json'
+
 add_newline = false
 command_timeout = 1000
 
 [shell]
-bash_indicator = ""
+zsh_indicator = ""  # MacOS default is Lagrange
 
 fish_indicator = "🐟"
 style = "cyan bold"
