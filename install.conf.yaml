@@ -10,22 +10,22 @@
     - ~/local-praxis
     - ~/local-journal
 - link:
-    ~/.gitconfig: configs/git/gitconfig
+    ~/.gitconfig: configs/git/gitconfig.Lagrange
     ~/.condarc: configs/conda/condarc
-    ~/.config/*:
+    ~/.config/:
       glob: true
-      path: configs/*
+      path: configs/**
       exclude:
         - configs/git
         - configs/tmux
         - configs/vim
         - configs/conda
         - configs/starship
-    ~/.config/starship.toml: configs/starship/starship.toml
+    ~/.config/starship.toml: configs/starship/starship.toml.Lagrange
     ~/.vimrc: configs/vim/vimrc
-    ~/.vim/pack/plugins/start/*:
+    ~/.vim/pack/plugins/start/:
       glob: true
-      path: submodules/vim/*
+      path: submodules/vim/**
     ~/.tmux.conf: configs/tmux/tmux.conf
     ~/.tmux/plugins/tpm: submodules/tmux/tpm
 - shell:
