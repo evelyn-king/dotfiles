@@ -16,12 +16,16 @@
       glob: true
       path: configs/**
       exclude:
+        - configs/doom-emacs
         - configs/git
         - configs/tmux
         - configs/vim
         - configs/conda
         - configs/starship
     ~/.config/starship.toml: configs/starship/starship.toml
+    ~/.doom.d/:
+      glob: true
+      path: configs/doom-emacs/**
     ~/.vimrc: configs/vim/vimrc
     ~/.vim/pack/plugins/start/:
       glob: true
