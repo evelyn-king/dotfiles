@@ -1,0 +1,4 @@
+always_yes: true
+show_channel_urls: true
+channels: [conda-forge]
+use_lockfiles: false

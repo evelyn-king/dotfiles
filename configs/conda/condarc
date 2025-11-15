@@ -1,5 +1,10 @@
+always_yes: true
+show_channel_urls: true
+solver: libmamba
 channels:
   - conda-forge
   - nodefaults
+pkgs_dirs:
+  - ~/.conda/pkgs
 channel_priority: strict
 changeps1: false
