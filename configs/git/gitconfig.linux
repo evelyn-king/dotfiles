@@ -1,0 +1,2 @@
+# Linux-specific git settings
+# Credential helper uses GPG agent or system keyring

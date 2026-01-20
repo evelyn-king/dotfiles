@@ -4,9 +4,6 @@
 [submodule "submodules/vim/fugitive"]
 	path = submodules/vim/fugitive
 	url = https://github.com/tpope/vim-fugitive.git
-[submodule "submodules/vim/rose-pine"]
-	path = submodules/vim/rose-pine
-	url = https://github.com/rose-pine/vim
 [submodule "submodules/vim/surround"]
 	path = submodules/vim/surround
 	url = https://github.com/tpope/vim-surround.git

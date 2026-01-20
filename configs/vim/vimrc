@@ -32,8 +32,9 @@ set expandtab
 " Lightline settings
 set laststatus=2
 set noshowmode
-let g:lightline = {"colorscheme": "rosepine"}
+let g:lightline = {"colorscheme": "everforest"}
 
-" Gruvbox theme
+" Everforest theme
+packadd! everforest
 set background=dark
-colorscheme rosepine
+colorscheme everforest
