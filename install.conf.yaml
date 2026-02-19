@@ -2,16 +2,48 @@
     link:
       create: true
       relink: true
+
 - clean: ["~"]
+
 - create:
     - ~/.vim/pack/plugins/start
     - ~/.tmux/plugins
     - ~/local-codex
     - ~/local-praxis
     - ~/local-journal
+
 - link:
+    # Git (with native includeIf for platform-specific)
     ~/.gitconfig: configs/git/gitconfig
+    ~/.gitconfig.platform:
+      if: '[ "$(uname)" = "Darwin" ]'
+      path: configs/git/gitconfig.macos
+    ~/.gitconfig.platform:
+      if: '[ "$(uname)" = "Linux" ]'
+      path: configs/git/gitconfig.linux
+
+    # Conda
     ~/.condarc: configs/conda/condarc
+
+    # Starship (platform-conditional)
+    ~/.config/starship.toml:
+      if: '[ "$(uname)" = "Darwin" ]'
+      path: configs/starship/starship.toml.macos
+    ~/.config/starship.toml:
+      if: '[ "$(uname)" = "Linux" ]'
+      path: configs/starship/starship.toml
+
+    # Vim
+    ~/.vimrc: configs/vim/vimrc
+    ~/.vim/pack/plugins/start/*:
+      glob: true
+      path: submodules/vim/*
+
+    # Tmux
+    ~/.tmux.conf: configs/tmux/tmux.conf
+    ~/.tmux/plugins/tpm: submodules/tmux/tpm
+
+    # Config directory (glob with exclusions)
     ~/.config/*:
       glob: true
       path: configs/*
@@ -21,13 +53,13 @@
         - configs/vim
         - configs/conda
         - configs/starship
-    ~/.config/starship.toml: configs/starship/starship.toml
-    ~/.vimrc: configs/vim/vimrc
-    ~/.vim/pack/plugins/start/*:
-      glob: true
-      path: submodules/vim/*
-    ~/.tmux.conf: configs/tmux/tmux.conf
-    ~/.tmux/plugins/tpm: submodules/tmux/tpm
+        - configs/hypr
+
+    # Hyprland (Linux only)
+    ~/.config/hypr:
+      if: '[ "$(uname)" = "Linux" ]'
+      path: configs/hypr
+
 - shell:
     - git submodule sync --recursive
     - git submodule update --init --recursive --remote
