@@ -51,9 +51,6 @@
     ~/.config/starship.toml:
       if: '[ "$(uname)" = "Linux" ]'
       path: configs/starship/starship.toml
-    ~/.config/hypr/bindings.conf:
-      if: '[ "$(uname)" = "Linux" ]'
-      path: configs/hypr/bindings.conf
 
 # gimli-specific links
 - link:
