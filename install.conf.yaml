@@ -27,17 +27,25 @@
     ~/.tmux/plugins/tpm: submodules/tmux/tpm
     ~/.cargo/config.toml: configs/cargo/config.toml
     ~/.local/bin/rustc-wrapper: configs/cargo/rustc-wrapper.sh
-    ~/.config/*:
+    ~/.config/bat/config:
+      path: configs/bat/config
+    ~/.config/bat/themes:
+      path: configs/bat/themes
+      force: true
+    ~/.config/btop/*:
       glob: true
-      path: configs/*
-      exclude:
-        - configs/git
-        - configs/tmux
-        - configs/vim
-        - configs/conda
-        - configs/starship
-        - configs/hypr
-        - configs/cargo
+      path: configs/btop/*
+    ~/.config/dotbins/config.yaml: configs/dotbins/config.yaml
+    ~/.config/kak/*:
+      glob: true
+      path: configs/kak/*
+    ~/.config/nvim/*:
+      glob: true
+      path: configs/nvim/*
+    ~/.config/thefuck/settings.py: configs/thefuck/settings.py
+    ~/.config/zellij/*:
+      glob: true
+      path: configs/zellij/*
 
 # macOS-specific links
 - link:
