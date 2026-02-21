@@ -2,6 +2,7 @@
     link:
       create: true
       relink: true
+      backup: true
 
 - clean:
     "~":
@@ -17,63 +18,67 @@
 
 # Common links (all platforms)
 - link:
-    ~/.gitconfig: configs/git/gitconfig
+    ~/.cargo/config.toml: configs/cargo/config.toml
+    ~/.local/bin/rustc-wrapper: configs/cargo/rustc-wrapper.sh
     ~/.condarc: configs/conda/condarc
+    ~/.gitconfig: configs/git/gitconfig
     ~/.vimrc: configs/vim/vimrc
     ~/.vim/pack/plugins/start/*:
       glob: true
       path: submodules/vim/*
     ~/.tmux.conf: configs/tmux/tmux.conf
     ~/.tmux/plugins/tpm: submodules/tmux/tpm
-    ~/.cargo/config.toml: configs/cargo/config.toml
-    ~/.local/bin/rustc-wrapper: configs/cargo/rustc-wrapper.sh
-    ~/.config/bat/config:
-      path: configs/bat/config
-    ~/.config/bat/themes:
-      path: configs/bat/themes
+    ~/.config/bat/config: configs/bat/config
+    ~/.config/bat/themes: configs/bat/themes
     ~/.config/btop/btop.conf: configs/btop/btop.conf
-    ~/.config/btop/themes:
-      path: configs/btop/themes
+    ~/.config/btop/themes: configs/btop/themes
     ~/.config/dotbins/config.yaml: configs/dotbins/config.yaml
     ~/.config/kak/kakrc: configs/kak/kakrc
-    ~/.config/nvim/*:
-      glob: true
-      path: configs/nvim/*
+    ~/.config/lazygit/config.yaml: configs/lazygit/config.yaml
+    ~/.config/nvim: configs/nvim
     ~/.config/thefuck/settings.py: configs/thefuck/settings.py
     ~/.config/zellij/config.kdl: configs/zellij/config.kdl
-
-# macOS-specific links
-- link:
-    ~/.gitconfig.platform:
-      if: '[ "$(uname)" = "Darwin" ]'
-      path: configs/git/gitconfig.macos
-    ~/.config/starship.toml:
-      if: '[ "$(uname)" = "Darwin" ]'
-      path: configs/starship/starship.toml.macos
-
-# Linux-specific links
-- link:
-    ~/.gitconfig.platform:
-      if: '[ "$(uname)" = "Linux" ]'
-      path: configs/git/gitconfig.linux
-    ~/.config/starship.toml:
-      if: '[ "$(uname)" = "Linux" ]'
-      path: configs/starship/starship.toml
-
-# gimli-specific links
-- link:
-    ~/.config/hypr/bindings.conf:
-      if: '[ "$(hostname -s)" = "gimli" ]'
-      path: configs/hypr/bindings.conf
-    ~/.config/hypr/hypridle.conf:
-      if: '[ "$(hostname -s)" = "gimli" ]'
-      path: configs/hypr/hypridle.gimli.conf
-    ~/.config/hypr/monitors.conf:
-      if: '[ "$(hostname -s)" = "gimli" ]'
-      path: configs/hypr/monitors.gimli.conf
 
 - shell:
     - git submodule sync --recursive
     - git submodule update --init --recursive --remote
     - command: uvx dotbins sync
       description: Installing managed binaries with dotbins
+
+# macOS-specific links
+- defaults:
+    link:
+      create: true
+      relink: true
+      if: '[ "$(uname)" = "Darwin" ]'
+
+- link:
+    ~/.gitconfig.platform: configs/git/gitconfig.macos
+    ~/.config/starship.toml: configs/starship/starship.toml.macos
+    ~/Library/Application\ Support/superfile/config.toml: configs/superfile/config.toml
+
+# Linux-specific links
+- defaults:
+    link:
+      create: true
+      relink: true
+      if: '[ "$(uname)" = "Linux" ]'
+
+- link:
+    ~/.gitconfig.platform: configs/git/gitconfig.linux
+    ~/.config/starship.toml: configs/starship/starship.toml
+    ~/.config/superfile/config.toml: configs/superfile/config.toml
+
+# gimli-specific links
+- defaults:
+    link:
+      create: true
+      relink: true
+      if: '[ "$(hostname -s)" = "gimli" ]'
+- link:
+    ~/.config/hypr/bindings.conf:
+      path: configs/hypr/bindings.conf
+    ~/.config/hypr/hypridle.conf:
+      path: configs/hypr/hypridle.gimli.conf
+    ~/.config/hypr/monitors.conf:
+      path: configs/hypr/monitors.gimli.conf
