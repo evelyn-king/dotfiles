@@ -25,6 +25,8 @@
       path: submodules/vim/*
     ~/.tmux.conf: configs/tmux/tmux.conf
     ~/.tmux/plugins/tpm: submodules/tmux/tpm
+    ~/.cargo/config.toml: configs/cargo/config.toml
+    ~/.local/bin/rustc-wrapper: configs/cargo/rustc-wrapper.sh
     ~/.config/*:
       glob: true
       path: configs/*
@@ -35,6 +37,7 @@
         - configs/conda
         - configs/starship
         - configs/hypr
+        - configs/cargo
 
 # macOS-specific links
 - link:
