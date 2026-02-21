@@ -1,0 +1,7 @@
+# This is `bat`s configuration file.
+# run `bat --help` to get a list of all possible configuration options.possible
+
+--theme auto:system
+--theme-dark "Everforest Dark Soft"
+--theme-light "Everforest Light Soft"
+
