@@ -31,21 +31,16 @@
       path: configs/bat/config
     ~/.config/bat/themes:
       path: configs/bat/themes
-      force: true
-    ~/.config/btop/*:
-      glob: true
-      path: configs/btop/*
+    ~/.config/btop/btop.conf: configs/btop/btop.conf
+    ~/.config/btop/themes:
+      path: configs/btop/themes
     ~/.config/dotbins/config.yaml: configs/dotbins/config.yaml
-    ~/.config/kak/*:
-      glob: true
-      path: configs/kak/*
+    ~/.config/kak/kakrc: configs/kak/kakrc
     ~/.config/nvim/*:
       glob: true
       path: configs/nvim/*
     ~/.config/thefuck/settings.py: configs/thefuck/settings.py
-    ~/.config/zellij/*:
-      glob: true
-      path: configs/zellij/*
+    ~/.config/zellij/config.kdl: configs/zellij/config.kdl
 
 # macOS-specific links
 - link:
