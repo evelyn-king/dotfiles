@@ -1,0 +1,17 @@
+LICENSE
+README.md
+TODO.md
+docs/**
+Brewfile
+
+{{- if ne .chezmoi.os "linux" }}
+dot_config/superfile/**
+{{- end }}
+
+{{- if ne .chezmoi.os "darwin" }}
+Library/Application Support/superfile/**
+{{- end }}
+
+{{- if not (and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "gimli") (eq .chezmoi.hostname "maxwell"))) }}
+dot_config/hypr/**
+{{- end }}

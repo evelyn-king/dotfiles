@@ -1,0 +1,15 @@
+layout_micromamba() {
+# Use provided env name or default to current directory name
+  local env_name=${1:-$(basename "$PWD")}
+
+  if [[ ! ${CONDA_PREFIX} =~ ${env_name} ]]; then
+    if [[ -n "${ZSH_VERSION}" ]]; then
+      eval "$(micromamba shell hook --shell=zsh)"
+    elif [[ -n "${BASH_VERSION}" ]]; then
+      eval "$(micromamba shell hook --shell=bash)"
+    else
+      echo 'Unsupported shell'
+    fi
+    micromamba activate "${env_name}"
+  fi
+}
