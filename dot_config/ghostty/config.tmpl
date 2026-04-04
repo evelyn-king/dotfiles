@@ -9,7 +9,13 @@ theme = light:"Nord Light",dark:Nordfox
 # Font
 font-family = "CaskaydiaCove Nerd Font"
 font-style = Regular
+{{- if and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "gimli") (eq .chezmoi.hostname "maxwell")) }}
+# Hyprland scaling
 font-size = 9
+{{- else }}
+# Decent MacOS size for my screen
+font-size = 14
+{{- end }}
 
 # Window
 window-theme = ghostty
