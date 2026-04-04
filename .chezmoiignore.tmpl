@@ -9,7 +9,7 @@ dot_config/superfile/**
 {{- end }}
 
 {{- if ne .chezmoi.os "darwin" }}
-Library/Application Support/superfile/**
+Library/**
 {{- end }}
 
 {{- if not (and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "gimli") (eq .chezmoi.hostname "maxwell"))) }}
