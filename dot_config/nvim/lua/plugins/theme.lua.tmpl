@@ -1,13 +1,5 @@
 {{- if and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "gimli") (eq .chezmoi.hostname "maxwell")) }}
 return dofile(vim.fn.expand("~/.config/omarchy/current/theme/neovim.lua"))
 {{- else }}
-return {
-  { "EdenEast/nightfox.nvim" },
-  {
-    "LazyVim/LazyVim",
-    opts = {
-      colorscheme = "nordfox",
-    },
-  },
-}
+return dofile(vim.fn.expand("~/.config/themes/current/neovim.lua"))
 {{- end }}
