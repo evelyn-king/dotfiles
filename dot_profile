@@ -1,0 +1,30 @@
+if [ -f "${HOME}/.config/shell/00_options.sh" ]; then
+  . "${HOME}/.config/shell/00_options.sh"
+fi
+
+if [ -f "${HOME}/.config/shell/05_prefer_zsh.sh" ]; then
+  . "${HOME}/.config/shell/05_prefer_zsh.sh"
+  shell_exec_preferred_zsh -l
+fi
+
+if { [ -n "${BASH_VERSION:-}" ] || [ -n "${ZSH_VERSION:-}" ]; } && [ -f "${HOME}/.config/shell/main.sh" ]; then
+  . "${HOME}/.config/shell/main.sh" profile
+else
+  if [ -f "${HOME}/.config/shell/20_profile_env.sh" ]; then
+    . "${HOME}/.config/shell/20_profile_env.sh"
+  fi
+  if [ -f "${HOME}/.config/shell/40_toolchains.sh" ]; then
+    . "${HOME}/.config/shell/40_toolchains.sh"
+  fi
+  if [ -f "${HOME}/.config/shell/30_keychain.sh" ]; then
+    . "${HOME}/.config/shell/30_keychain.sh"
+  fi
+fi
+
+case "$-" in
+  *i*)
+    if [ -n "${BASH_VERSION:-}" ] && [ -f "${HOME}/.bashrc" ]; then
+      . "${HOME}/.bashrc"
+    fi
+    ;;
+esac
