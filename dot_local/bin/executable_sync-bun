@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 
-if command -v bun &> /dev/null; then
+if command -v bun &>/dev/null; then
   packages=(
-      @google/gemini-cli@latest
-      @just-every/code@latest
-      @openai/codex@latest
-      opencode-ai@latest
+    @google/gemini-cli@latest
+    @just-every/code@latest
+    @openai/codex@latest
+    opencode-ai@latest
+    @googleworkspace/cli
   )
   bun install -g "${packages[@]}"
 fi
