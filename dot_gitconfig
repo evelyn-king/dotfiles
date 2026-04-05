@@ -1,0 +1,28 @@
+[user]
+  name = "Evelyn King"
+  email = evelyn@evieking.com
+  signingkey = 08B79F9C4FA6D2E1
+[gpg]
+  format = openpgp
+[init]
+  defaultBranch = main
+[core]
+  editor = nvim
+  autocrlf = false
+[commit]
+  gpgsign = true
+[pull]
+  rebase = true
+[push]
+  autoSetupRemote = true
+[fetch]
+  prune = true
+[rerere]
+  enabled = true
+  autoupdate = true
+[filter "lfs"]
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+

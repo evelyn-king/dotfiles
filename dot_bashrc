@@ -1,0 +1,22 @@
+# If not running interactively, don't do anything (leave this at the top of this file)
+[[ $- != *i* ]] && return
+
+if [[ -f "${HOME}/.config/shell/00_options.sh" ]]; then
+  . "${HOME}/.config/shell/00_options.sh"
+fi
+
+if [[ -f "${HOME}/.config/shell/05_prefer_zsh.sh" ]]; then
+  . "${HOME}/.config/shell/05_prefer_zsh.sh"
+  shell_exec_preferred_zsh
+fi
+
+if [[ -f "${HOME}/.config/shell/main.sh" ]]; then
+  source "${HOME}/.config/shell/main.sh" interactive
+fi
+
+# source ~/.local/share/omarchy/default/bash/rc
+
+# Add your own exports, aliases, and functions here.
+#
+# Make an alias for invoking commands you use constantly
+# alias p='python'

@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+# Re-run this script when any managed Doom config file changes.
+# config.el hash: {{ include "dot_config/doom/config.el" | sha256sum }}
+# init.el hash: {{ include "dot_config/doom/init.el" | sha256sum }}
+# packages.el hash: {{ include "dot_config/doom/packages.el" | sha256sum }}
+
+if [ -x "$HOME/.config/emacs/bin/doom" ]; then
+  "$HOME/.config/emacs/bin/doom" sync
+else
+  echo "Doom Emacs not found at ~/.config/emacs"
+fi

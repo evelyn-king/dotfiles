@@ -1,0 +1,11 @@
+# If not running interactively, don't do anything.
+case "$-" in
+  *i*) ;;
+  *)
+    return
+    ;;
+esac
+
+if [ -f "${HOME}/.config/shell/main.sh" ]; then
+  . "${HOME}/.config/shell/main.sh" interactive
+fi

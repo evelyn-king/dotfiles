@@ -1,0 +1,7 @@
+- Begin with a concise list of what items you will do. Keep this high-level, do not go down into implementation details.
+- Always run `git status` before using `git add` to verify which files will be staged to prevent accidentally adding unwanted files to the commit.
+- Always validate that only the intended files for a commit are staged. Self-correct if required.
+- Never amend a commit once it is made. The project's history needs to be maintained.
+- Never run `python`, `python3`, `pip`, or `pip3` directly. I work with virtual environments exclusively, so please check.
+- Only make the minimal required changes to complete your task.
+- Avoid making changes that are not directly related to the current task.

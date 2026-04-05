@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# Ensure uv is on PATH for non-interactive shells
+. "$HOME/.local/bin/env" 2>/dev/null || true
+
+xargs -P4 -I{} sh -c 'uv tool install {}' << 'EOF'
+black
+conda-lock
+markdown-code-runner
+mypy
+pre-commit --with pre-commit-uv
+ruff
+tuitorial
+unidep[all]
+EOF
+
+uv tool upgrade --all
