@@ -17,5 +17,6 @@ shell_should_prefer_zsh() {
 
 shell_exec_preferred_zsh() {
   shell_should_prefer_zsh || return 0
-  exec zsh "$@"
+  shell_zsh_path="$(command -v zsh 2>/dev/null)" || return 0
+  exec env SHELL="${shell_zsh_path}" "${shell_zsh_path}" "$@"
 }

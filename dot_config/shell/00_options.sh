@@ -1,5 +1,5 @@
 # 00_options.sh - shared shell options
 
-# Toggle to 1 to prefer zsh when an interactive bash session starts.
-: "${SHELL_PREFER_ZSH:=0}"
+# Prefer zsh when an interactive bash session starts unless explicitly disabled.
+: "${SHELL_PREFER_ZSH:=1}"
 export SHELL_PREFER_ZSH
