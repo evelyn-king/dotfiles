@@ -32,7 +32,7 @@ shell_config_source_stage() {
 }
 
 if [[ -z "${__SHELL_CONFIG_ENV_LOADED:-}" ]]; then
-  export __SHELL_CONFIG_ENV_LOADED=1
+  __SHELL_CONFIG_ENV_LOADED=1
   shell_config_source_stage env \
     00_options.sh \
     10_init.sh \
@@ -41,13 +41,13 @@ if [[ -z "${__SHELL_CONFIG_ENV_LOADED:-}" ]]; then
 fi
 
 if [[ "${shell_config_mode}" == "profile" && -z "${__SHELL_CONFIG_LOGIN_LOADED:-}" ]]; then
-  export __SHELL_CONFIG_LOGIN_LOADED=1
+  __SHELL_CONFIG_LOGIN_LOADED=1
   shell_config_source_stage login \
     30_keychain.sh
 fi
 
 if [[ "${shell_config_mode}" == "interactive" && -z "${__SHELL_CONFIG_INTERACTIVE_LOADED:-}" ]]; then
-  export __SHELL_CONFIG_INTERACTIVE_LOADED=1
+  __SHELL_CONFIG_INTERACTIVE_LOADED=1
   shell_config_source_stage interactive \
     30_keychain.sh \
     60_exports.sh \
