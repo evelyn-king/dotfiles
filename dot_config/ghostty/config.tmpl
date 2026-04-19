@@ -1,6 +1,6 @@
 {{- if and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "gimli") (eq .chezmoi.hostname "maxwell")) }}
 # Dynamic theme colors
-# config-file = ?"~/.config/omarchy/current/theme/ghostty.conf"
+config-file = ?"~/.config/omarchy/current/theme/ghostty.conf"
 {{- else }}
 # MacOS theming
 theme = light:"Nord Light",dark:Nordfox
