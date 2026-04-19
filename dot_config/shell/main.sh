@@ -49,6 +49,7 @@ fi
 if [[ "${shell_config_mode}" == "interactive" && -z "${__SHELL_CONFIG_INTERACTIVE_LOADED:-}" ]]; then
   export __SHELL_CONFIG_INTERACTIVE_LOADED=1
   shell_config_source_stage interactive \
+    30_keychain.sh \
     60_exports.sh \
     70_python.sh \
     80_misc.sh \
