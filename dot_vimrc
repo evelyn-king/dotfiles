@@ -17,6 +17,9 @@ Plug 'vim-airline/vim-airline-themes'
 Plug 'preservim/nerdcommenter'
 Plug 'preservim/nerdtree'
 Plug 'nordtheme/vim'
+Plug 'morhetz/gruvbox'
+Plug 'sainnhe/everforest'
+Plug 'evelyn-king/retro-82.vim'
 Plug 'tpope/vim-repeat'
 Plug 'tpope/vim-surround'
 Plug 'airblade/vim-gitgutter'
@@ -113,6 +116,5 @@ let g:NERDCompactSexyComs = 1
 " GitGutter settings
 let g:gitgutter_map_keys = 0
 
-" Nord colorscheme
-let g:airline_theme = 'nord'
-colorscheme nord
+" Colorscheme from theme system
+source ~/.config/themes/current/vim.vim
