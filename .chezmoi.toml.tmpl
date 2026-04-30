@@ -1,3 +1,57 @@
-[cd]
-    command = "bash"
-    args = ["-i"]
+{{- $workingTree := .chezmoi.sourceDir -}}
+{{- if eq (base $workingTree) "home" -}}
+{{- $workingTree = clean (joinPath $workingTree "..") -}}
+{{- end -}}
+{{- $hostProfiles := dict
+    "IONQ-D0977" "work"
+    "ionq-jofre" "work"
+    "hpc01-bwi01" "work"
+    "obsidian" "personal"
+    "gimli" "personal"
+    "maxwell" "personal"
+-}}
+{{- $profileName := env "CHEZMOI_PROFILE" -}}
+{{- if eq $profileName "" -}}
+{{- if not (hasKey $hostProfiles .chezmoi.hostname) -}}
+{{- fail (printf "hostname %q has no configured profile; set CHEZMOI_PROFILE=personal or CHEZMOI_PROFILE=work explicitly" .chezmoi.hostname) -}}
+{{- end -}}
+{{- $profileName = get $hostProfiles .chezmoi.hostname -}}
+{{- end -}}
+{{- $personalAgeIdentity := env "CHEZMOI_PERSONAL_AGE_IDENTITY" | default "~/.config/chezmoi/personal-key.txt" -}}
+{{- $personalAgeRecipient := env "CHEZMOI_PERSONAL_AGE_RECIPIENT" | default "age197jc7wzxms3whemclkuq7z8mefw7r3238avljr3m6tmg76yal5ls3qtv6h" -}}
+{{- $workAgeIdentity := env "CHEZMOI_WORK_AGE_IDENTITY" | default "~/.config/chezmoi/work-key.txt" -}}
+{{- /* Public age recipients are not secret. Set this once the work key exists. */ -}}
+{{- $workAgeRecipientDefault := "" -}}
+{{- $workAgeRecipient := env "CHEZMOI_WORK_AGE_RECIPIENT" | default $workAgeRecipientDefault -}}
+{{- $ageIdentity := $personalAgeIdentity -}}
+{{- $ageRecipient := $personalAgeRecipient -}}
+{{- if eq $profileName "work" -}}
+{{- $ageIdentity = $workAgeIdentity -}}
+{{- $ageRecipient = $workAgeRecipient -}}
+{{- if eq $ageRecipient "" -}}
+{{- fail "work profile requires a committed work age recipient or CHEZMOI_WORK_AGE_RECIPIENT so work encrypted files use a deliberately separate recipient" -}}
+{{- end -}}
+{{- else if ne $profileName "personal" -}}
+{{- fail (printf "unknown chezmoi profile %q; expected personal or work" $profileName) -}}
+{{- end -}}
+{{- $hostUmasks := dict
+    "IONQ-D0977" "0o022"
+    "obsidian" "0o002"
+    "ionq-jofre" "0o002"
+    "hpc01-bwi01" "0o002"
+-}}
+workingTree = {{ $workingTree | quote }}
+sourceDir = {{ $workingTree | quote }}
+
+{{- with get $hostUmasks .chezmoi.hostname }}
+umask = {{ . }}
+{{- end }}
+
+encryption = "age"
+
+[data]
+  profile = {{ $profileName | quote }}
+
+[age]
+  identity = {{ $ageIdentity | quote }}
+  recipient = {{ $ageRecipient | quote }}

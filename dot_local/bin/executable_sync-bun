@@ -1,12 +1,19 @@
 #!/usr/bin/env bash
 
-if command -v bun &>/dev/null; then
-  packages=(
-    @google/gemini-cli@latest
-    @just-every/code@latest
-    @openai/codex@latest
-    opencode-ai@latest
-    @googleworkspace/cli
-  )
-  bun install -g "${packages[@]}"
-fi
+set -euo pipefail
+
+command -v bun >/dev/null 2>&1 || {
+  printf 'sync-bun: missing required command: bun\n' >&2
+  exit 1
+}
+
+packages=(
+  @google/gemini-cli@latest
+  @just-every/code@latest
+  @openai/codex@latest
+  opencode-ai@latest
+  tree-sitter-cli@latest
+  @googleworkspace/cli
+)
+
+bun install -g "${packages[@]}"

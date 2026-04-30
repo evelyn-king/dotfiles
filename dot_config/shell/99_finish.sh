@@ -1,25 +1,17 @@
-# 99_finish.sh - close up commands
+# 99_finish.sh - shell init that should run last
+# shellcheck shell=bash
 
-shell_config_hook_shell="${ZSH_VERSION:+zsh}"
-shell_config_hook_shell="${shell_config_hook_shell:-bash}"
-
-# starship at end
-if command -v starship >/dev/null 2>&1; then
-  eval "$(starship init "${shell_config_hook_shell}")"
+if [ "${SHELL_IS_INTERACTIVE:-0}" = "1" ] && [ -n "${SHELL_NAME:-}" ] &&
+  command -v starship >/dev/null 2>&1; then
+  eval "$(starship init "${SHELL_NAME}")"
 fi
 
-# zoxide works best at end
-if command -v zoxide >/dev/null 2>&1; then
-  eval "$(zoxide init "${shell_config_hook_shell}")"
+if [ "${SHELL_IS_INTERACTIVE:-0}" = "1" ] && [ -n "${SHELL_NAME:-}" ] &&
+  command -v zoxide >/dev/null 2>&1; then
+  eval "$(zoxide init --cmd cd "${SHELL_NAME}")"
 fi
 
-# Bash needs bash-preexec for atuin's hooks.
-if [ "${shell_config_hook_shell}" = "bash" ] && [ -f "${HOME}/.bash-preexec.sh" ]; then
-  . "${HOME}/.bash-preexec.sh"
+if [ "${SHELL_IS_INTERACTIVE:-0}" = "1" ] && [ -n "${SHELL_NAME:-}" ] &&
+  command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init "${SHELL_NAME}")"
 fi
-
-if command -v atuin >/dev/null 2>&1; then
-  eval "$(atuin init "${shell_config_hook_shell}")"
-fi
-
-unset shell_config_hook_shell

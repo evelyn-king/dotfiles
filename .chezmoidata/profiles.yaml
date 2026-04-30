@@ -1,0 +1,18 @@
+theme: nord
+
+profiles:
+  default: personal
+  personal:
+    work_extras: false
+    omarchy_desktop_allowed: true
+    git:
+      name: Evelyn King
+      email: evelyn@evieking.com
+      signingkey: 08B79F9C4FA6D2E1
+  work:
+    work_extras: true
+    omarchy_desktop_allowed: false
+    git:
+      name: Evelyn King
+      email: evelyn.king@ionq.co
+      signingkey: E66AC088846CEA8C

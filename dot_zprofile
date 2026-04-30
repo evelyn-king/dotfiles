@@ -1,3 +1,10 @@
-if [ -f "${HOME}/.config/shell/main.sh" ]; then
-  . "${HOME}/.config/shell/main.sh" profile
+# Interactive zsh shells finish initialization in ~/.zshrc so prompt setup
+# runs after /etc/zshrc resets PS1 on macOS. ~/.zprofile only loads base env.
+shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/base.sh"
+
+if [ -f "${shell_loader}" ]; then
+  # shellcheck source=/dev/null
+  . "${shell_loader}"
+else
+  printf 'Missing source file: %s\n' "${shell_loader}" >&2
 fi

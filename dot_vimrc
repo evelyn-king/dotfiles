@@ -1,120 +1,22 @@
 " .vimrc - Evelyn King
 
-" Turn off classic vi compatibility layer
 set nocompatible
-
-" Leader key to match Neovim habits
-let mapleader = ' '
-let maplocalleader = ' '
-
-" vim-plug plugin management
-call plug#begin('~/.vim/plugged')
-Plug 'tpope/vim-fugitive'
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
-Plug 'junegunn/fzf.vim'
-Plug 'vim-airline/vim-airline'
-Plug 'vim-airline/vim-airline-themes'
-Plug 'preservim/nerdcommenter'
-Plug 'preservim/nerdtree'
-Plug 'nordtheme/vim'
-Plug 'morhetz/gruvbox'
-Plug 'sainnhe/everforest'
-Plug 'evelyn-king/retro-82.vim'
-Plug 'tpope/vim-repeat'
-Plug 'tpope/vim-surround'
-Plug 'airblade/vim-gitgutter'
-call plug#end()
-
-" Filetype and syntax detection
 filetype plugin indent on
 syntax enable
-
-" Reasonable backspace settings
 set backspace=indent,eol,start
-
-" UTF-8 encoding
 set encoding=utf-8
-set hidden
-set mouse=a
-set splitbelow
-set splitright
-set ignorecase
-set smartcase
-set scrolloff=4
-set sidescrolloff=8
-set signcolumn=yes
-set wildmode=longest:full,full
-set updatetime=250
-set cursorline
-
-if exists('+termguicolors')
-  set termguicolors
-endif
-
-if exists('+clipboard')
-  set clipboard+=unnamedplus
-endif
-
-if exists('+undofile')
-  set undofile
-endif
-
-" Editor styling settings
 set number
 set relativenumber
 set nohlsearch
 set incsearch
 set ruler
-
-" Default for all formatting
 set tabstop=2
 set softtabstop=2
 set shiftwidth=2
 set expandtab
-
-" Map jk to escape
-:inoremap jk <Esc>
-:nnoremap <Esc> :nohlsearch<CR><Esc>
-
-" Window and buffer navigation
-nnoremap <C-h> <C-w>h
-nnoremap <C-j> <C-w>j
-nnoremap <C-k> <C-w>k
-nnoremap <C-l> <C-w>l
-nnoremap <S-h> :bprevious<CR>
-nnoremap <S-l> :bnext<CR>
-
-" Leader mappings
-nnoremap <leader>w :write<CR>
-nnoremap <leader>q :quit<CR>
-nnoremap <leader>bd :bdelete<CR>
-nnoremap <leader>e :NERDTreeToggle<CR>
-nnoremap <leader>fe :NERDTreeFind<CR>
-nnoremap <leader>ff :Files<CR>
-nnoremap <leader>fg :GFiles<CR>
-nnoremap <leader>fb :Buffers<CR>
-nnoremap <leader>fl :Lines<CR>
-nnoremap <leader>gs :Git<CR>
-
-" Airline settings
-set laststatus=2
-set noshowmode
-let g:airline_powerline_fonts = 1
-let g:airline#extensions#tabline#enabled = 1
-let g:airline#extensions#tabline#formatter = 'unique_tail'
-
-" NERDTree settings
-let g:NERDTreeShowHidden = 1
-let g:NERDTreeMinimalUI = 1
-let g:NERDTreeWinSize = 35
-
-" NERDCommenter settings
-let g:NERDSpaceDelims = 1
-let g:NERDDefaultAlign = 'left'
-let g:NERDCompactSexyComs = 1
-
-" GitGutter settings
-let g:gitgutter_map_keys = 0
-
-" Colorscheme from theme system
+inoremap jk <Esc>
+set undodir=~/.vim/undo-dir
+set undofile
+set termguicolors
+set background=dark
 source ~/.config/themes/current/vim.vim

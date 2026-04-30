@@ -1,0 +1,283 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_NAME="jupyter-remote-lab"
+PORT="${JUPYTER_PORT:-8888}"
+ENV_NAME="${JUPYTER_ENV_NAME:-jupyter}"
+BIND_HOST="${JUPYTER_BIND_HOST:-127.0.0.1}"
+NOTEBOOK_DIR="${JUPYTER_NOTEBOOK_DIR:-$PWD}"
+STATE_DIR="${JUPYTER_STATE_DIR:-${XDG_STATE_HOME:-${HOME}/.local/state}/jupyter-remote}"
+DETACH=0
+TOKEN_MODE="default"
+TOKEN_VALUE=""
+EXTRA_ARGS=()
+
+usage() {
+  cat <<EOF
+Usage: ${SCRIPT_NAME} [options] [-- <extra jupyter args>]
+
+Launch a headless JupyterLab server bound to localhost for SSH port forwarding.
+The lab process runs inside the selected conda/micromamba environment.
+
+Options:
+  --port PORT        Remote port to bind. Defaults to \$JUPYTER_PORT or 8888.
+  --env NAME         Conda/micromamba environment. Defaults to \$JUPYTER_ENV_NAME or jupyter.
+  --bind-host HOST   Bind address. Defaults to \$JUPYTER_BIND_HOST or 127.0.0.1.
+  --dir PATH         Notebook root directory. Defaults to \$JUPYTER_NOTEBOOK_DIR or the current directory.
+  --detach           Start JupyterLab in the background with a log and pid file.
+  --token TOKEN      Set an explicit Jupyter token.
+  --no-token         Disable token auth. Only do this if localhost binding is sufficient for your threat model.
+  -h, --help         Show this help message.
+
+Environment:
+  JUPYTER_BIND_HOST       Default bind host.
+  JUPYTER_ENV_NAME        Default environment name.
+  JUPYTER_NOTEBOOK_DIR    Default notebook directory.
+  JUPYTER_PORT            Default remote port.
+  JUPYTER_REMOTE_ENV_FILE Runtime env file written for later sourcing.
+  JUPYTER_STATE_DIR       State directory for runtime metadata.
+
+Examples:
+  ${SCRIPT_NAME}
+  ${SCRIPT_NAME} --detach --port 8899 --dir ~/work/project
+  ssh -N -L 8899:127.0.0.1:8899 <ssh-host>
+EOF
+}
+
+log() {
+  printf '[%s] %s\n' "${SCRIPT_NAME}" "$*"
+}
+
+die() {
+  printf '[%s] %s\n' "${SCRIPT_NAME}" "$*" >&2
+  exit 1
+}
+
+require_value() {
+  [ "$#" -ge 2 ] || die "Missing value for $1"
+}
+
+shell_quote() {
+  printf "'%s'" "$(printf '%s' "$1" | sed "s/'/'\\\\''/g")"
+}
+
+validate_port() {
+  case "$1" in
+    ''|*[!0-9]*)
+      return 1
+      ;;
+  esac
+
+  [ "$1" -ge 1 ] && [ "$1" -le 65535 ]
+}
+
+default_mamba_root_prefix() {
+  local host_env_file="${HOME}/.config/shell/15_host_env.sh"
+
+  if [ -f "${host_env_file}" ]; then
+    # shellcheck source=/dev/null
+    source "${host_env_file}"
+  fi
+
+  printf '%s\n' "${MAMBA_ROOT_PREFIX_DEFAULT:-}"
+}
+
+resolve_env_runner() {
+  local mamba_root_prefix
+
+  if [ -z "${MAMBA_ROOT_PREFIX:-}" ]; then
+    mamba_root_prefix="$(default_mamba_root_prefix)"
+    if [ -n "${mamba_root_prefix}" ]; then
+      export MAMBA_ROOT_PREFIX="${mamba_root_prefix}"
+    fi
+  fi
+
+  if [ -n "${MAMBA_EXE:-}" ] && [ -x "${MAMBA_EXE}" ]; then
+    ENV_RUNNER=("${MAMBA_EXE}" run -n "${ENV_NAME}")
+    return 0
+  fi
+
+  if command -v micromamba >/dev/null 2>&1; then
+    ENV_RUNNER=(micromamba run -n "${ENV_NAME}")
+    return 0
+  fi
+
+  if command -v conda >/dev/null 2>&1; then
+    ENV_RUNNER=(conda run --no-capture-output -n "${ENV_NAME}")
+    return 0
+  fi
+
+  die "Missing required command: micromamba or conda"
+}
+
+write_runtime_env() {
+  local remote_host runtime_env_file log_file pid_file remote_url remote_pid="" tmp_env_file
+
+  mkdir -p "${STATE_DIR}"
+  runtime_env_file="${JUPYTER_REMOTE_ENV_FILE:-${STATE_DIR}/current.env}"
+  mkdir -p "$(dirname "${runtime_env_file}")"
+  tmp_env_file="${runtime_env_file}.tmp"
+
+  log_file="${STATE_DIR}/jupyter-${PORT}.log"
+  pid_file="${STATE_DIR}/jupyter-${PORT}.pid"
+  remote_host="$(hostname -f 2>/dev/null || hostname)"
+  remote_url="http://${BIND_HOST}:${PORT}/lab"
+
+  if [ "${DETACH}" = "1" ] && [ -f "${pid_file}" ]; then
+    remote_pid="$(tr -d '[:space:]' < "${pid_file}")"
+  fi
+
+  {
+    printf 'export JUPYTER_BIND_HOST=%s\n' "$(shell_quote "${BIND_HOST}")"
+    printf 'export JUPYTER_ENV_NAME=%s\n' "$(shell_quote "${ENV_NAME}")"
+    printf 'export JUPYTER_NOTEBOOK_DIR=%s\n' "$(shell_quote "${NOTEBOOK_DIR}")"
+    printf 'export JUPYTER_PORT=%s\n' "$(shell_quote "${PORT}")"
+    printf 'export JUPYTER_REMOTE_ENV_FILE=%s\n' "$(shell_quote "${runtime_env_file}")"
+    printf 'export JUPYTER_REMOTE_HOST=%s\n' "$(shell_quote "${remote_host}")"
+    printf 'export JUPYTER_REMOTE_LOG_FILE=%s\n' "$(shell_quote "${log_file}")"
+    printf 'export JUPYTER_REMOTE_PID_FILE=%s\n' "$(shell_quote "${pid_file}")"
+    printf 'export JUPYTER_REMOTE_URL=%s\n' "$(shell_quote "${remote_url}")"
+    printf 'export JUPYTER_STATE_DIR=%s\n' "$(shell_quote "${STATE_DIR}")"
+    if [ -n "${remote_pid}" ]; then
+      printf 'export JUPYTER_REMOTE_PID=%s\n' "$(shell_quote "${remote_pid}")"
+    fi
+  } > "${tmp_env_file}"
+
+  mv "${tmp_env_file}" "${runtime_env_file}"
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --port)
+      require_value "$@"
+      PORT="$2"
+      shift 2
+      ;;
+    --port=*)
+      PORT="${1#*=}"
+      shift
+      ;;
+    --env)
+      require_value "$@"
+      ENV_NAME="$2"
+      shift 2
+      ;;
+    --env=*)
+      ENV_NAME="${1#*=}"
+      shift
+      ;;
+    --bind-host|--host|--ip)
+      require_value "$@"
+      BIND_HOST="$2"
+      shift 2
+      ;;
+    --bind-host=*|--host=*|--ip=*)
+      BIND_HOST="${1#*=}"
+      shift
+      ;;
+    --dir|--notebook-dir|--root-dir)
+      require_value "$@"
+      NOTEBOOK_DIR="$2"
+      shift 2
+      ;;
+    --dir=*|--notebook-dir=*|--root-dir=*)
+      NOTEBOOK_DIR="${1#*=}"
+      shift
+      ;;
+    --detach)
+      DETACH=1
+      shift
+      ;;
+    --token)
+      require_value "$@"
+      TOKEN_MODE="custom"
+      TOKEN_VALUE="$2"
+      shift 2
+      ;;
+    --token=*)
+      TOKEN_MODE="custom"
+      TOKEN_VALUE="${1#*=}"
+      shift
+      ;;
+    --no-token)
+      TOKEN_MODE="none"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      EXTRA_ARGS=("$@")
+      break
+      ;;
+    *)
+      die "Unknown argument: $1"
+      ;;
+  esac
+done
+
+validate_port "${PORT}" || die "Invalid port: ${PORT}"
+[ -d "${NOTEBOOK_DIR}" ] || die "Notebook directory not found: ${NOTEBOOK_DIR}"
+NOTEBOOK_DIR="$(cd "${NOTEBOOK_DIR}" && pwd)"
+
+export JUPYTER_BIND_HOST="${BIND_HOST}"
+export JUPYTER_ENV_NAME="${ENV_NAME}"
+export JUPYTER_NOTEBOOK_DIR="${NOTEBOOK_DIR}"
+export JUPYTER_PORT="${PORT}"
+export JUPYTER_STATE_DIR="${STATE_DIR}"
+
+resolve_env_runner
+
+JUPYTER_CMD=(
+  jupyter lab
+  --no-browser
+  --ServerApp.ip="${BIND_HOST}"
+  --ServerApp.port="${PORT}"
+  --ServerApp.port_retries=0
+  --ServerApp.root_dir="${NOTEBOOK_DIR}"
+)
+
+case "${TOKEN_MODE}" in
+  none)
+    JUPYTER_CMD+=(--IdentityProvider.token=)
+    ;;
+  custom)
+    JUPYTER_CMD+=(--IdentityProvider.token="${TOKEN_VALUE}")
+    ;;
+esac
+
+if [ "${#EXTRA_ARGS[@]}" -gt 0 ]; then
+  JUPYTER_CMD+=("${EXTRA_ARGS[@]}")
+fi
+
+if [ "${DETACH}" = "1" ]; then
+  nohup "${ENV_RUNNER[@]}" "${JUPYTER_CMD[@]}" > "${STATE_DIR}/jupyter-${PORT}.log" 2>&1 < /dev/null &
+  printf '%s\n' "$!" > "${STATE_DIR}/jupyter-${PORT}.pid"
+  write_runtime_env
+
+  log "Started JupyterLab on ${BIND_HOST}:${PORT}"
+  log "Environment: ${ENV_NAME}"
+  log "Runtime env file: ${JUPYTER_REMOTE_ENV_FILE:-${STATE_DIR}/current.env}"
+  log "Log file: ${STATE_DIR}/jupyter-${PORT}.log"
+  log "PID file: ${STATE_DIR}/jupyter-${PORT}.pid"
+  log "Tunnel from your laptop with: ssh -N -L ${PORT}:127.0.0.1:${PORT} <ssh-host>"
+  if [ "${TOKEN_MODE}" = "default" ]; then
+    log "Use the startup URL from the log file once Jupyter finishes booting."
+  fi
+  exit 0
+fi
+
+write_runtime_env
+
+log "Starting JupyterLab on ${BIND_HOST}:${PORT}"
+log "Environment: ${ENV_NAME}"
+log "Runtime env file: ${JUPYTER_REMOTE_ENV_FILE:-${STATE_DIR}/current.env}"
+log "Tunnel from your laptop with: ssh -N -L ${PORT}:127.0.0.1:${PORT} <ssh-host>"
+if [ "${TOKEN_MODE}" = "default" ]; then
+  log "Jupyter will print its tokenized URL after startup."
+fi
+
+exec "${ENV_RUNNER[@]}" "${JUPYTER_CMD[@]}"

@@ -1,0 +1,33 @@
+name: jupyter
+channels:
+  - conda-forge
+dependencies:
+  - python
+  - pip
+  - wheel
+  - batchspawner
+  - conda
+  - jupyter
+  - jupyterlab
+  - jupyterlab_widgets
+  - jupytext
+  - ipykernel
+  - ipyparallel
+  - ipywidgets
+  - nb_conda_kernels
+  - graphviz
+  - python-graphviz
+  - griffe
+  - graphviz-anywidget
+  - numpy
+  - pandas
+  - scipy
+  - scikit-learn
+  - cloudpickle
+  - dask
+  - dask-jobqueue
+  - holoviews
+  - matplotlib
+  - pip:
+    - slurm-usage
+    - submitit

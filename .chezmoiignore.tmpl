@@ -1,17 +1,62 @@
+{{- $profileName := .profile -}}
+{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
+{{- $profile := get .profiles $profileName | default dict -}}
+{{- $features := get $host "features" | default dict -}}
+{{- $personalAgeIdentity := env "CHEZMOI_PERSONAL_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/personal-key.txt") -}}
+{{- $workAgeIdentity := env "CHEZMOI_WORK_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/work-key.txt") -}}
+{{- $activeAgeIdentity := $personalAgeIdentity -}}
+{{- if eq $profileName "work" -}}
+{{- $activeAgeIdentity = $workAgeIdentity -}}
+{{- end -}}
+{{- $activeAgeIdentityExists := ne (stat $activeAgeIdentity) nil -}}
+{{- $omarchyDesktop := and
+  (eq .chezmoi.os "linux")
+  (get $profile "omarchy_desktop_allowed" | default false)
+  (get $features "omarchy_desktop" | default false)
+-}}
+
+AGENTS.md
+.mailmap
+docs/**
 LICENSE
 README.md
-TODO.md
-docs/**
-Brewfile
+scripts/**
 
-{{- if ne .chezmoi.os "linux" }}
-dot_config/superfile/**
+{{- if ne .chezmoi.os "darwin" }}
+.Brewfile
+.aerospace.toml
+.hyprspace.toml
+.local/bin/check-homebrew
+.local/bin/dump-homebrew
+.local/bin/sync-homebrew
+{{- end }}
+
+{{- if not (or (eq .chezmoi.os "darwin") $omarchyDesktop) }}
+.config/ghostty/config
+{{- end }}
+
+{{- if ne .chezmoi.os "darwin" }}
+.config/ghostty/themes/**
 {{- end }}
 
 {{- if ne .chezmoi.os "darwin" }}
 Library/**
 {{- end }}
 
-{{- if not (and (eq .chezmoi.os "linux") (or (eq .chezmoi.hostname "gimli") (eq .chezmoi.hostname "maxwell"))) }}
-dot_config/hypr/**
+{{- if ne .chezmoi.os "linux" }}
+.config/superfile/**
+{{- end }}
+
+{{- if not $omarchyDesktop }}
+.config/hypr/**
+{{- end }}
+
+{{- if eq $profileName "personal" }}
+.config/shell/work/**
+{{- else if eq $profileName "work" }}
+.config/shell/personal/**
+{{- end }}
+
+{{- if not $activeAgeIdentityExists }}
+.config/shell/{{ $profileName }}/90_extras.sh
 {{- end }}

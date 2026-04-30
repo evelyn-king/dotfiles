@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+{{- $tools := get (get .tools .chezmoi.os | default dict) .chezmoi.arch | default dict -}}
+{{- range $name, $tool := $tools }}
+{{- if ne (get $tool "type") "archive" }}
+{{- with get $tool "bin" }}
+if [ -f "${HOME}/.local/bin/{{ .target }}" ]; then
+  chmod 0755 "${HOME}/.local/bin/{{ .target }}"
+fi
+{{- else }}
+if [ -f "${HOME}/.local/bin/{{ $name }}" ]; then
+  chmod 0755 "${HOME}/.local/bin/{{ $name }}"
+fi
+{{- end }}
+
+{{- end }}
+{{- end }}

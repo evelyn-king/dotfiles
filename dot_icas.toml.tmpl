@@ -1,0 +1,8 @@
+{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
+{{- if $host.icas.home_relative }}
+cache_folder = "{{ .chezmoi.homeDir }}/{{ $host.icas.cache_path }}"
+work_folder = "{{ .chezmoi.homeDir }}/{{ $host.icas.work_path }}"
+{{- else }}
+cache_folder = "{{ $host.icas.cache_path }}"
+work_folder = "{{ $host.icas.work_path }}"
+{{- end }}

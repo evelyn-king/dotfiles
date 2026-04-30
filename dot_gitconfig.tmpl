@@ -1,0 +1,43 @@
+{{- $profileName := .profile -}}
+{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
+{{- $profile := get .profiles $profileName -}}
+{{- $profileGit := get $profile "git" -}}
+{{- $hostGit := get $host "git" | default dict -}}
+{{- $git := merge $hostGit $profileGit -}}
+[core]
+  autocrlf = false
+  editor = vim
+
+[init]
+  defaultBranch = main
+
+[pull]
+  rebase = true
+
+[fetch]
+  prune = true
+
+[filter "lfs"]
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+
+[user]
+  name = "{{ get $git "name" }}"
+  email = "{{ get $git "email" }}"
+  signingkey = {{ get $git "signingkey" }}
+
+[gpg]
+  format = openpgp
+
+[commit]
+  gpgsign = true
+
+{{- if eq .chezmoi.os "darwin" }}
+[credential]
+  helper = osxkeychain
+{{- else if and (eq .chezmoi.os "linux") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) }}
+[credential]
+  helper = "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
+{{- end }}

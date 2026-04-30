@@ -1,6 +1,9 @@
 {
-  "includeCoAuthoredBy": false,
-  "model": "opus",
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "model": "opus[1m]",
   "hooks": {
     "PreToolUse": [
       {
@@ -14,6 +17,7 @@
       }
     ]
   },
+  "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "stable",
   "effortLevel": "high"
 }

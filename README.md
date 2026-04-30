@@ -1,56 +1,78 @@
-# Dotfiles
+# dotfiles-chezmoi
 
-[Chezmoi](https://www.chezmoi.io/)-managed dotfiles for a shared Linux/macOS setup.
+Dotfiles managed directly with `chezmoi`.
 
-## Scope
+## Structure
 
-- One repo handles both platforms through chezmoi templates and conditionals.
-- Linux keeps the Omarchy/Hyprland layer, but only on hosts `gimli` and `maxwell`.
-- macOS ignores the Omarchy desktop layer and uses Homebrew for package installation.
+- `.chezmoi.toml.tmpl` bootstraps chezmoi and selects the repo root as `sourceDir`
+- the repo root contains the chezmoi source state for files under `$HOME`
+- `.chezmoidata/` keeps template data
+- top-level docs describe usage and repository conventions
 
-## Repository Structure
+## Apply
 
-```text
-.chezmoiexternal.toml.tmpl     # OS-aware external tool bootstraps
-dot_bashrc                     # Bash configuration
-dot_profile                    # POSIX login shell entrypoint
-dot_zprofile / dot_zshrc       # Zsh login + interactive configuration
-dot_config/shell/              # Shared shell modules for bash/zsh
-dot_config/hypr/               # Hyprland config, Linux-only on selected hosts
-dot_config/nvim/               # Neovim
-dot_config/doom/               # Doom Emacs config
-dot_config/tmux/               # Tmux
-dot_config/zellij/             # Zellij
-dot_local/bin/                 # Helper scripts (sync-uv, sync-bun, env)
-dot_cargo/ / dot_rustup/       # Rust user config
-run_once_before_install-*.sh   # One-time install hooks (Homebrew, rustup, etc.)
-run_onchange_after_*.sh.tmpl   # Re-sync hooks for managed tooling
+```bash
+chezmoi apply
 ```
 
-## Package Manifests
+Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes without updating pinned externals.
 
-- [Omarchy Linux package list](docs/package-lists/omarchy-linux.md)
-- [macOS package list](docs/package-lists/macos.md)
-- [Homebrew Brewfile](Brewfile)
+If you already have this repo initialized from the previous `home/` layout, run `chezmoi init` once after pulling so your generated config picks up the repo-root `sourceDir`.
 
-## Setup Notes
+## Homebrew
 
-### Linux
+On macOS, this repo now manages a global Homebrew bundle in `~/.Brewfile`.
 
-1. Install `chezmoi`.
-2. Initialize the repo with `chezmoi init <repo>`.
-3. Apply it with `chezmoi apply`.
-4. On Omarchy hosts, remove the system `rust` package first so `rustup` can own the user toolchain.
+```bash
+chezmoi edit ~/.Brewfile
+check-homebrew
+sync-homebrew
+```
 
-### macOS
+`check-homebrew`, `sync-homebrew`, and `dump-homebrew` default `HOMEBREW_NO_AUTO_UPDATE=1` so the bundle workflow does not implicitly refresh Homebrew metadata. `sync-homebrew` also uses `brew bundle --no-upgrade` by default, so it converges on the tracked top-level packages without opportunistically upgrading everything already installed. Add `--cleanup` if you want undeclared top-level packages removed as well.
 
-1. Initialize the repo with `chezmoi init <repo>`.
-2. Apply it with `chezmoi apply`.
-3. The one-time Homebrew install hook will install Homebrew if it is missing.
-4. Install packages from [`Brewfile`](Brewfile) when you want the full baseline.
+To seed the Brewfile from an existing Mac, run:
 
-## Notes
+```bash
+dump-homebrew --source-dir /path/to/this/repo
+```
 
-- The shell config is shared between `bash` and `zsh`, with `zsh` as the primary interactive shell.
-- Rust now uses machine defaults instead of a Linux-specific default target.
-- Tooling sync hooks remain command-guarded, so partial setups degrade cleanly.
+This is deterministic at the package-set level. Homebrew still resolves concrete formula and cask versions from the current state of its taps, so strict version pinning needs versioned formulae or a custom tap.
+
+## Branches
+
+- `main` contains the macOS/Linux chezmoi source tree at the repo root
+- native Windows history lives on the separate `windows` branch
+
+## Encryption
+
+Personal and work encrypted files use separate age keys. See
+`docs/encryption.md` for profile-specific key and recipient wiring.
+
+## Remote Jupyter
+
+Shell startup exports `JUPYTER_BIND_HOST`, `JUPYTER_ENV_NAME`, and `JUPYTER_PORT`
+from the host config, with defaults that bind JupyterLab to `127.0.0.1:8888`
+inside the `jupyter` environment.
+
+`jupyter-remote-lab` runs `jupyter lab` through `micromamba run -n jupyter` or
+`conda run -n jupyter` by default, so the notebook server starts inside that
+environment without depending on an interactive shell activation step.
+
+Use `jupyter-remote-lab` on the remote host to start a headless lab instance:
+
+```bash
+jupyter-remote-lab --detach --dir ~/work/project
+```
+
+Then create the SSH tunnel from your local machine with the exact port the
+launcher printed, for example:
+
+```bash
+ssh -N -L 8888:127.0.0.1:8888 <ssh-host>
+```
+
+The launcher writes its last runtime metadata to
+`${JUPYTER_REMOTE_ENV_FILE:-~/.local/state/jupyter-remote/current.env}`. Run
+`jupyter_remote_load_env` in a shell if you want that runtime state loaded back
+into your current environment after launching with overrides like `--port`.
