@@ -5,6 +5,10 @@ if command -v bun >/dev/null 2>&1; then
   alias bunx="bun x"
 fi
 
+if command -v helix >/dev/null 2>&1; then
+  alias hx='helix'
+fi
+
 if [ -n "${SHELL_NAME:-}" ] && command -v direnv >/dev/null 2>&1; then
   eval "$(direnv hook "${SHELL_NAME}")"
 fi
