@@ -10,7 +10,7 @@ command -v uv >/dev/null 2>&1 || {
 xargs -P4 -I{} uv tool install {} <<'EOF'
 black
 conda-lock
-docling
+docling-slim
 mypy
 poethepoet
 ruff
