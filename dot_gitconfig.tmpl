@@ -1,7 +1,7 @@
 [user]
-  name = "Evelyn King"
-  email = evelyn@evieking.com
-  signingkey = 08B79F9C4FA6D2E1
+  name = "{{ .name }}"
+  email = {{ .email }}
+  signingkey = {{ .signingkey }}
 [gpg]
   format = openpgp
 [init]
