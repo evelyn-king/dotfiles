@@ -46,6 +46,7 @@ set signcolumn=yes
 set wildmode=longest:full,full
 set updatetime=250
 set cursorline
+set background=dark
 
 if exists('+termguicolors')
   set termguicolors

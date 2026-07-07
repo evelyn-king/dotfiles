@@ -1,8 +1,8 @@
 [data]
-    name = {{ promptString "Name?" "Evelyn King" }}
-    email = {{ promptString "Email?" "evelyn@evieking.com" }}
-    signingkey = {{ promptString "Signing Key?" "08B79F9C4FA6D2E1" }}
-    theme = {{ promptString "Color theme?" "gruvbox" }}
+    name = {{ promptString "Name" "Evelyn King" | quote }}
+    email = {{ promptString "Email" "evelyn@evieking.com" | quote }}
+    signingkey = {{ promptString "Signing Key" "08B79F9C4FA6D2E1" | quote }}
+    theme = {{ promptString "Color theme" "gruvbox" | quote }}
 [cd]
     command = "bash"
     args = ["-i"]
