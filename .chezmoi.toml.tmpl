@@ -1,14 +1,11 @@
-{{- $workingTree := .chezmoi.sourceDir -}}
-{{- if eq (base $workingTree) "home" -}}
-{{- $workingTree = clean (joinPath $workingTree "..") -}}
-{{- end -}}
 {{- $hostProfiles := dict
     "IONQ-D0977" "work"
     "ionq-jofre" "work"
     "hpc01-bwi01" "work"
-    "obsidian" "personal"
+    "obsidian" "work"
     "gimli" "personal"
     "maxwell" "personal"
+    "lagrange" "personal"
 -}}
 {{- $profileName := env "CHEZMOI_PROFILE" -}}
 {{- if eq $profileName "" -}}
@@ -40,8 +37,7 @@
     "ionq-jofre" "0o002"
     "hpc01-bwi01" "0o002"
 -}}
-workingTree = {{ $workingTree | quote }}
-sourceDir = {{ $workingTree | quote }}
+sourceDir = {{ .chezmoi.sourceDir | quote }}
 
 {{- with get $hostUmasks .chezmoi.hostname }}
 umask = {{ . }}
@@ -51,7 +47,12 @@ encryption = "age"
 
 [data]
   profile = {{ $profileName | quote }}
+  theme = {{ promptString "Color theme" "gruvbox" | quote }}
 
 [age]
   identity = {{ $ageIdentity | quote }}
   recipient = {{ $ageRecipient | quote }}
+
+[cd]
+  command = "bash"
+  args = ["-i"]
