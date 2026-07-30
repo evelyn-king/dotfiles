@@ -7,6 +7,7 @@ if command -v bun &>/dev/null; then
     @openai/codex@latest
     opencode-ai@latest
     @googleworkspace/cli
+    @doist/todoist-cli
   )
   bun install -g "${packages[@]}"
 fi
