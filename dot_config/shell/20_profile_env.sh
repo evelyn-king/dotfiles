@@ -8,15 +8,15 @@ export __SHELL_PROFILE_ENV_LOADED
 
 shell_path_prepend() {
   case ":${PATH}:" in
-    *":$1:"*) ;;
-    *) PATH="$1:${PATH}" ;;
+  *":$1:"*) ;;
+  *) PATH="$1:${PATH}" ;;
   esac
 }
 
 shell_path_append() {
   case ":${PATH}:" in
-    *":$1:"*) ;;
-    *) PATH="${PATH}:$1" ;;
+  *":$1:"*) ;;
+  *) PATH="${PATH}:$1" ;;
   esac
 }
 
@@ -35,14 +35,14 @@ fi
 
 export BAT_THEME="ansi"
 case "${SHELL_OS}:${SHELL_HOSTNAME}" in
-  linux:gimli|linux:maxwell)
-    export SHELL_IS_OMARCHY=1
-    export OMARCHY_PATH="${HOME}/.local/share/omarchy"
-    shell_path_prepend "${OMARCHY_PATH}/bin"
-    ;;
-  *)
-    export SHELL_IS_OMARCHY=0
-    ;;
+linux:gimli | linux:maxwell)
+  export SHELL_IS_OMARCHY=1
+  export OMARCHY_PATH="${HOME}/.local/share/omarchy"
+  shell_path_prepend "${OMARCHY_PATH}/bin"
+  ;;
+*)
+  export SHELL_IS_OMARCHY=0
+  ;;
 esac
 
 if [ "${SHELL_OS}" = "darwin" ]; then
@@ -74,6 +74,10 @@ fi
 
 if [ -d "${HOME}/.bun/bin" ]; then
   shell_path_prepend "${HOME}/.bun/bin"
+fi
+
+if [ -s "${HOME}/.bun/_bun" ]; then
+  shell_path_prepend "${HOME}/.bun/_bun"
 fi
 
 if [ -d "${HOME}/.cache/.bun/bin" ]; then
