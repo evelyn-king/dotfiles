@@ -16,7 +16,7 @@
   (get $features "omarchy_desktop" | default false)
 -}}
 {{- if $omarchyDesktop -}}
-{{ .chezmoi.homeDir }}/.config/omarchy/current/theme/btop.theme
+{{ .chezmoi.homeDir }}/.local/state/omarchy/current/theme/btop.theme
 {{- else -}}
 {{ .chezmoi.homeDir }}/.config/themes/current/btop.theme
 {{- end -}}

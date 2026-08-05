@@ -16,7 +16,7 @@
   (get $features "omarchy_desktop" | default false)
 -}}
 {{- if $omarchyDesktop }}
-return dofile(vim.fn.expand("~/.config/omarchy/current/theme/neovim.lua"))
+return dofile(vim.fn.expand("~/.local/state/omarchy/current/theme/neovim.lua"))
 {{- else }}
 return dofile(vim.fn.expand("~/.config/themes/current/neovim.lua"))
 {{- end }}
