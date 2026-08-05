@@ -3,7 +3,7 @@
     "commit": "",
     "pr": ""
   },
-  "model": "opus[1m]",
+  "model": "opus",
   "hooks": {
     "PreToolUse": [
       {
@@ -17,7 +17,15 @@
       }
     ]
   },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  },
   "alwaysThinkingEnabled": true,
-  "autoUpdatesChannel": "stable",
-  "effortLevel": "high"
+  "effortLevel": "high",
+  "autoUpdatesChannel": "stable"
 }
