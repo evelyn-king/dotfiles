@@ -1,8 +1,12 @@
 {{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
-{{- if $host.icas.home_relative }}
-cache_folder = "{{ .chezmoi.homeDir }}/{{ $host.icas.cache_path }}"
-work_folder = "{{ .chezmoi.homeDir }}/{{ $host.icas.work_path }}"
+{{- $icas := get $host "icas" -}}
+{{- if not $icas -}}
+{{- fail (printf "hostname %q has no icas configuration; add an icas block for it in .chezmoidata/hosts.yaml" .chezmoi.hostname) -}}
+{{- end -}}
+{{- if $icas.home_relative }}
+cache_folder = "{{ .chezmoi.homeDir }}/{{ $icas.cache_path }}"
+work_folder = "{{ .chezmoi.homeDir }}/{{ $icas.work_path }}"
 {{- else }}
-cache_folder = "{{ $host.icas.cache_path }}"
-work_folder = "{{ $host.icas.work_path }}"
+cache_folder = "{{ $icas.cache_path }}"
+work_folder = "{{ $icas.work_path }}"
 {{- end }}
