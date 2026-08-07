@@ -1,0 +1,100 @@
+tap "homebrew/services"
+tap "mongodb/brew"
+tap "nikitabobko/tap"
+# Improved shell history for zsh, bash, fish and nushell
+brew "atuin"
+# Resource monitor. C++ version and continuation of bashtop and bpytop
+brew "btop"
+# Cloudflare Tunnel client (formerly Argo Tunnel)
+brew "cloudflared"
+# Cross-platform make
+brew "cmake"
+# Documentation for CMake
+brew "cmake-docs"
+# Modern, maintained replacement for ls
+brew "eza"
+# GNU compiler collection
+brew "gcc"
+# GitHub command-line tool
+brew "gh"
+# Git extension for versioning large files
+brew "git-lfs"
+# GNU Privacy Guard (OpenPGP)
+brew "gnupg"
+# Improved top (interactive process viewer)
+brew "htop"
+# Linux virtual machines
+brew "lima"
+# LLM inference in C/C++
+brew "llama.cpp"
+# Package manager for the Lua programming language
+brew "luarocks"
+# Ambitious Vim-fork focused on extensibility and agility
+brew "neovim"
+# Swiss-army knife of markup format conversion
+brew "pandoc"
+# Pinentry for GPG on Mac
+brew "pinentry-mac"
+# Package compiler and linker metadata toolkit
+brew "pkgconf"
+# Cross-platform library for audio I/O
+brew "portaudio"
+# Static analysis and lint tool, for (ba)sh scripts
+brew "shellcheck"
+# Editor of encrypted files
+brew "sops"
+# Send macOS User Notifications from the command-line
+brew "terminal-notifier"
+# Tool to build, change, and version infrastructure
+brew "terraform"
+# OCR (Optical Character Recognition) engine
+brew "tesseract"
+# Terminal multiplexer
+brew "tmux"
+# Extremely fast Python package installer and resolver, written in Rust
+brew "uv"
+# Vi 'workalike' with many additional features
+brew "vim"
+# Internet file retriever
+brew "wget"
+# Pluggable terminal workspace, with terminal multiplexer as the base feature
+brew "zellij"
+# High-performance, schema-free, document-oriented database
+brew "mongodb/brew/mongodb-community"
+# Command-line interface for 1Password
+cask "1password-cli"
+# View, print, and comment on PDF documents
+cask "adobe-acrobat-reader"
+# AeroSpace is an i3-like tiling window manager for macOS
+cask "nikitabobko/tap/aerospace"
+# Compact TeX distribution as alternative to the full TeX Live / MacTeX
+cask "basictex"
+# Desktop password and login vault
+cask "bitwarden"
+# Web browser
+cask "firefox"
+cask "font-hack-nerd-font"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty"
+# Free and open-source image editor
+cask "gimp"
+# Terminal emulator as alternative to Apple's Terminal app
+cask "iterm2"
+# IC design layout viewer and editor
+cask "klayout"
+# SPICE simulation software, schematic capture and waveform viewer
+cask "ltspice"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Data analysis and visualization application
+cask "paraview"
+# Kubernetes and container management on the desktop
+cask "rancher"
+# Music streaming service
+cask "spotify"
+# Open-source code editor
+cask "visual-studio-code"
+# Multiplayer code editor
+cask "zed"
+# Collect, organise, cite, and share research sources
+cask "zotero"

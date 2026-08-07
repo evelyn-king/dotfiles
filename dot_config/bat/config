@@ -1,3 +1,3 @@
 # bat config
---theme "Nord"
-
+--theme-light="gruvbox-light"
+--theme-dark="gruvbox-dark"

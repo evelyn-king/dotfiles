@@ -1,0 +1,28 @@
+{{- $tools := get (get .tools .chezmoi.os | default dict) .chezmoi.arch | default dict -}}
+{{- range $name, $tool := $tools }}
+{{- with get $tool "completions" }}
+{{- with get . "bash" }}
+{{- $completionType := get . "type" | default (get $tool "type") -}}
+{{- $completionURL := get . "url" | default (get $tool "url") -}}
+{{- $completionSHA256 := get . "sha256" | default (get $tool "sha256") -}}
+{{- $folder := get . "folder" -}}
+{{- range .files }}
+{{- $file := . -}}
+["{{ .target }}"]
+type = "{{ get $file "type" | default $completionType }}"
+url = "{{ get $file "url" | default $completionURL }}"
+{{- $path := get $file "path" -}}
+{{- $source := get $file "source" -}}
+{{- if $path }}
+path = "{{ $path }}"
+{{- else if and $folder $source }}
+path = "{{ $folder }}/{{ $source }}"
+{{- end }}
+{{- with get $file "sha256" | default $completionSHA256 }}
+checksum = { sha256 = "{{ . }}" }
+{{ end }}
+
+{{- end }}
+{{- end }}
+{{- end }}
+{{- end }}

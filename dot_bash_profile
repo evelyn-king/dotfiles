@@ -1,0 +1,11 @@
+case "$-" in
+*i*) shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/interactive.sh" ;;
+*) shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/base.sh" ;;
+esac
+
+if [ -f "${shell_loader}" ]; then
+  # shellcheck source=/dev/null
+  . "${shell_loader}"
+else
+  printf 'Missing source file: %s\n' "${shell_loader}" >&2
+fi

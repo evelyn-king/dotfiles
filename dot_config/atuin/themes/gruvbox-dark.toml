@@ -1,0 +1,79 @@
+[theme]
+name = "gruvbox-dark"
+parent = "default"
+
+[colors]
+# neutral_green
+AlertInfo = "#98971a"
+
+# neutral_orange
+AlertWarn = "#d65d0e"
+
+# neutral_red
+AlertError = "#cc241d"
+
+# neutral_blue
+Annotation = "#458588"
+
+## default foreground color
+# light1
+Base = "#ebdbb2"
+
+# light4
+Guidance = "#a89984"
+
+# neutral_yellow
+Important = "#d79921"
+
+# neutral_purple
+Title = "#b16286"
+
+
+# Gruvbox Dark color palette
+# https://github.com/mwinters0/hnjobs/blob/main/theme/gruvbox.go
+
+#bright_red
+#Foo = "#fb4934"
+#neutral_red
+#Foo = "#cc241d"
+
+#bright_orange
+#Foo = "#fe8019"
+#neutral_orange
+#Foo = "#d65d0e"
+
+#bright_yellow
+#Foo = "#fabd2f"
+#neutral_yellow
+#Foo = "#d79921"
+
+#bright_green
+#Foo = "#b8bb26"
+#neutral_green
+#Foo = "#98971a"
+
+#bright_blue
+#Foo = "#83a598"
+#neutral_blue
+#Foo = "#458588"
+
+#bright_purple
+#Foo = "#d3869b"
+#neutral_purple
+#Foo = "#b16286"
+
+#bright_aqua
+#Foo = "#8ec07c"
+#neutral_aqua
+#Foo = "#689d6a"
+
+#light0_hard
+#Foo = "#f9f5d7"
+#light1
+#Foo = "#ebdbb2"
+#light2
+#Foo = "#d5c4a1"
+#light3
+#Foo = "#bdae93"
+#light4
+#Foo = "#a89984"

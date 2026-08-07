@@ -1,22 +1,16 @@
-# If not running interactively, don't do anything (leave this at the top of this file)
-[[ $- != *i* ]] && return
-
-if [[ -f "${HOME}/.config/shell/00_options.sh" ]]; then
-  . "${HOME}/.config/shell/00_options.sh"
-fi
-
-if [[ -f "${HOME}/.config/shell/05_prefer_zsh.sh" ]]; then
-  . "${HOME}/.config/shell/05_prefer_zsh.sh"
+shell_prefer_zsh="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/05_prefer_zsh.sh"
+if [ -f "${shell_prefer_zsh}" ]; then
+  # shellcheck source=/dev/null
+  . "${shell_prefer_zsh}"
   shell_exec_preferred_zsh
 fi
+unset shell_prefer_zsh
 
-if [[ -f "${HOME}/.config/shell/main.sh" ]]; then
-  source "${HOME}/.config/shell/main.sh" interactive
+shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/interactive.sh"
+
+if [ -f "${shell_loader}" ]; then
+  # shellcheck source=/dev/null
+  . "${shell_loader}"
+else
+  printf 'Missing source file: %s\n' "${shell_loader}" >&2
 fi
-
-# source ~/.local/share/omarchy/default/bash/rc
-
-# Add your own exports, aliases, and functions here.
-#
-# Make an alias for invoking commands you use constantly
-# alias p='python'

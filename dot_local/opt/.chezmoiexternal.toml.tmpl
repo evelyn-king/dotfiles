@@ -1,0 +1,12 @@
+{{- $tools := get (get .tools .chezmoi.os | default dict) .chezmoi.arch | default dict -}}
+{{- range $name, $tool := $tools }}
+{{- if eq (get $tool "type") "archive" }}
+["{{ get $tool "target" | default $name }}"]
+type = "{{ get $tool "type" }}"
+url = "{{ get $tool "url" }}"
+exact = true
+stripComponents = {{ get $tool "stripComponents" }}
+checksum = { sha256 = "{{ get $tool "sha256" }}" }
+
+{{- end }}
+{{- end }}

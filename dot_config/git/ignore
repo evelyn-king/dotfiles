@@ -1,0 +1,4 @@
+# used for direnv, always ignore
+.envrc
+
+**/.claude/settings.local.json

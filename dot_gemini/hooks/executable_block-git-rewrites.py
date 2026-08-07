@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
-"""Hook to block dangerous git commands: amend, force push, and push to main."""
+"""Hook to block dangerous git commands: amend, force push, and push to main.
+
+Special thanks to @basnijholt for this
+
+"""
 
 import json
 import re
@@ -227,3 +231,4 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+

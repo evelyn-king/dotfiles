@@ -1,0 +1,39 @@
+name: analysis
+channels:
+  - conda-forge
+dependencies:
+  - adaptive
+  - adaptive-scheduler
+  - batchspawner
+  - cloudpickle
+  - conda
+  - dask
+  - dask-jobqueue
+  - holoviews
+  - graphviz
+  - graphviz-anywidget
+  - ipykernel
+  - ipyparallel
+  - ipywidgets
+  - jupyter
+  - jupyterlab
+  - jupyterlab_widgets
+  - jupytext
+  - loky
+  - matplotlib
+  - nb_conda_kernels
+  - numpy
+  - pandas
+  - pip
+  - pipefunc
+  - python
+  - scikit-learn
+  - scipy
+  - statsmodels
+  - wheel
+  - xarray
+  - pip:
+    - ax-platform
+    - pyro-ppl
+    - slurm-usage
+    - submitit

@@ -2,13 +2,9 @@
   "general": {
     "checkpointing": {
       "enabled": true
-    },
-    "previewFeatures": true
+    }
   },
   "security": {
-    "folderTrust": {
-      "enabled": true
-    },
     "auth": {
       "selectedType": "gemini-api-key"
     }
@@ -24,11 +20,12 @@
           {
             "name": "block-git-rewrites",
             "type": "command",
-            "command": "sh -c \"${HOME}/.gemini/hooks/block-git-rewrites.py\"",
-            "description": "Block git commit --amend and git push --force"
+            "command": "sh -c \"$HOME/.gemini/hooks/block-git-rewrites.py\"",
+            "description": "Block git commit --ammend and git push --force"
           }
         ]
       }
     ]
   }
 }
+

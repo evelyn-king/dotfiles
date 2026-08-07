@@ -1,0 +1,175 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_NAME="install-micromamba-env"
+JUPYTER_ENV_NAME="${JUPYTER_ENV_NAME:-jupyter}"
+
+usage() {
+  cat <<EOF
+Usage: ${SCRIPT_NAME} <environment.yml> [more environment files...]
+
+Recreate each micromamba environment from its YAML file, removing any existing
+user kernel first and then reinstalling the kernel from the refreshed env.
+
+Environment:
+  JUPYTER_ENV_NAME   Kernel management environment name. Defaults to "jupyter".
+  MAMBA_ROOT_PREFIX  Micromamba root prefix. Defaults to the chezmoi host config.
+EOF
+}
+
+log() {
+  printf '[%s] %s\n' "${SCRIPT_NAME}" "$*"
+}
+
+die() {
+  printf '[%s] %s\n' "${SCRIPT_NAME}" "$*" >&2
+  exit 1
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
+}
+
+default_mamba_root_prefix() {
+  host_env_file="${HOME}/.config/shell/15_host_env.sh"
+  if [ -f "${host_env_file}" ]; then
+    # shellcheck source=/dev/null
+    source "${host_env_file}"
+  else
+    printf '[%s] Missing source file: %s\n' "${SCRIPT_NAME}" "${host_env_file}" >&2
+  fi
+  printf '%s\n' "${MAMBA_ROOT_PREFIX_DEFAULT:-${HOME}/.local/opt/micromamba}"
+}
+
+env_name_from_file() {
+  local env_file="$1"
+  local env_name
+
+  env_name="$(
+    awk '
+      /^[[:space:]]*name:[[:space:]]*/ {
+        sub(/^[[:space:]]*name:[[:space:]]*/, "", $0)
+        sub(/[[:space:]]*(#.*)?$/, "", $0)
+        print
+        exit
+      }
+    ' "$env_file"
+  )"
+
+  [ -n "${env_name}" ] || die "Could not determine environment name from ${env_file}"
+  printf '%s\n' "${env_name}"
+}
+
+env_exists() {
+  local env_name="$1"
+  "${MICROMAMBA[@]}" env list | awk 'NR > 2 { print $1 }' | grep -Fxq "${env_name}"
+}
+
+jupyter_env_exists() {
+  env_exists "${JUPYTER_ENV_NAME}"
+}
+
+kernel_exists() {
+  local env_name="$1"
+
+  if ! jupyter_env_exists; then
+    return 1
+  fi
+
+  "${MICROMAMBA[@]}" run -n "${JUPYTER_ENV_NAME}" python -c \
+    'import sys; from jupyter_client.kernelspec import KernelSpecManager; raise SystemExit(0 if sys.argv[1] in KernelSpecManager().find_kernel_specs() else 1)' \
+    "${env_name}" >/dev/null 2>&1
+}
+
+remove_kernel_if_present() {
+  local env_name="$1"
+
+  if ! jupyter_env_exists; then
+    log "Skipping kernel removal for ${env_name}: ${JUPYTER_ENV_NAME} env not found"
+    return 0
+  fi
+
+  if ! kernel_exists "${env_name}"; then
+    log "Kernel ${env_name} not installed"
+    return 0
+  fi
+
+  log "Removing kernel ${env_name}"
+  if "${MICROMAMBA[@]}" run -n "${JUPYTER_ENV_NAME}" python -m ipykernel remove --name "${env_name}" --yes; then
+    return 0
+  fi
+
+  log "Falling back to jupyter kernelspec uninstall for ${env_name}"
+  "${MICROMAMBA[@]}" run -n "${JUPYTER_ENV_NAME}" jupyter kernelspec uninstall -f "${env_name}"
+}
+
+remove_env_if_present() {
+  local env_name="$1"
+
+  if ! env_exists "${env_name}"; then
+    log "Environment ${env_name} does not exist"
+    return 0
+  fi
+
+  log "Removing environment ${env_name}"
+  "${MICROMAMBA[@]}" env remove -n "${env_name}" -y
+}
+
+install_env() {
+  local env_file="$1"
+  local env_name="$2"
+
+  log "Creating environment ${env_name} from ${env_file}"
+  "${MICROMAMBA[@]}" env create -f "${env_file}" -y
+}
+
+install_kernel() {
+  local env_name="$1"
+  local display_name="Python (${env_name})"
+
+  log "Installing kernel ${env_name}"
+  "${MICROMAMBA[@]}" run -n "${env_name}" python -m ipykernel install \
+    --user \
+    --name "${env_name}" \
+    --display-name "${display_name}"
+}
+
+if [ "$#" -eq 0 ]; then
+  usage >&2
+  exit 1
+fi
+
+ENV_FILES=()
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      ENV_FILES+=("$1")
+      shift
+      ;;
+  esac
+done
+
+require_command micromamba
+
+MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$(default_mamba_root_prefix)}"
+export MAMBA_ROOT_PREFIX
+readonly MAMBA_ROOT_PREFIX
+readonly MICROMAMBA=(micromamba --root-prefix "${MAMBA_ROOT_PREFIX}")
+
+for env_file in "${ENV_FILES[@]}"; do
+  [ -f "${env_file}" ] || die "Environment file not found: ${env_file}"
+done
+
+for env_file in "${ENV_FILES[@]}"; do
+  env_name="$(env_name_from_file "${env_file}")"
+  log "Refreshing ${env_name} from ${env_file}"
+  remove_kernel_if_present "${env_name}"
+  remove_env_if_present "${env_name}"
+  install_env "${env_file}" "${env_name}"
+  install_kernel "${env_name}"
+done

@@ -1,0 +1,135 @@
+#!/bin/sh
+set -eu
+
+usage() {
+  cat >&2 <<'EOF'
+usage:
+  scripts/bootstrap-age-key [--generate] personal [key-file]
+  scripts/bootstrap-age-key [--generate] work [key-file]
+
+Import an existing age identity from key-file or stdin into the profile-specific
+chezmoi key path. With --generate, create a new identity with age-keygen.
+
+Defaults:
+  personal -> ~/.config/chezmoi/personal-key.txt
+  work     -> ~/.config/chezmoi/work-key.txt
+
+Environment overrides:
+  CHEZMOI_PERSONAL_AGE_IDENTITY
+  CHEZMOI_WORK_AGE_IDENTITY
+EOF
+}
+
+generate=0
+if [ "${1:-}" = "--generate" ]; then
+  generate=1
+  shift
+fi
+
+profile="${1:-}"
+if [ -z "$profile" ]; then
+  usage
+  exit 2
+fi
+shift
+
+host_name=$(hostname -s 2>/dev/null || hostname 2>/dev/null || printf 'unknown')
+host_profile=""
+case "$host_name" in
+  IONQ-D0977 | ionq-jofre | hpc01-bwi01)
+    host_profile="work"
+    ;;
+  obsidian | gimli | maxwell)
+    host_profile="personal"
+    ;;
+esac
+
+case "$profile" in
+  personal)
+    identity="${CHEZMOI_PERSONAL_AGE_IDENTITY:-$HOME/.config/chezmoi/personal-key.txt}"
+    ;;
+  work)
+    identity="${CHEZMOI_WORK_AGE_IDENTITY:-$HOME/.config/chezmoi/work-key.txt}"
+    ;;
+  *)
+    usage
+    exit 2
+    ;;
+esac
+
+if [ -n "$host_profile" ] && [ "$host_profile" != "$profile" ] && [ "${CHEZMOI_ALLOW_AGE_PROFILE_MISMATCH:-}" != "1" ]; then
+  printf 'refusing to install %s age identity on known %s host %s\n' "$profile" "$host_profile" "$host_name" >&2
+  printf 'set CHEZMOI_ALLOW_AGE_PROFILE_MISMATCH=1 to override deliberately\n' >&2
+  exit 1
+fi
+
+source_file="${1:-}"
+if [ $# -gt 1 ]; then
+  usage
+  exit 2
+fi
+
+if [ -e "$identity" ]; then
+  printf 'age identity already exists: %s\n' "$identity" >&2
+  exit 1
+fi
+
+identity_dir=$(dirname "$identity")
+mkdir -p "$identity_dir"
+
+tmp="${identity}.tmp.$$"
+trap 'rm -f "$tmp"' EXIT HUP INT TERM
+
+if [ "$generate" -eq 1 ]; then
+  if [ -n "$source_file" ]; then
+    printf '%s\n' '--generate does not accept a key-file argument' >&2
+    exit 2
+  fi
+  if ! command -v age-keygen >/dev/null 2>&1; then
+    printf 'missing required command for --generate: age-keygen\n' >&2
+    exit 1
+  fi
+  umask 077
+  age-keygen -o "$tmp"
+else
+  if [ -n "$source_file" ]; then
+    if [ ! -r "$source_file" ]; then
+      printf 'cannot read key file: %s\n' "$source_file" >&2
+      exit 1
+    fi
+    umask 077
+    cat "$source_file" >"$tmp"
+  else
+    if [ -t 0 ]; then
+      usage
+      exit 2
+    fi
+    umask 077
+    cat >"$tmp"
+  fi
+fi
+
+if ! grep -q '^AGE-SECRET-KEY-' "$tmp"; then
+  printf 'input does not look like an age identity file\n' >&2
+  exit 1
+fi
+
+chmod 600 "$tmp"
+mv "$tmp" "$identity"
+trap - EXIT HUP INT TERM
+
+printf 'Installed %s age identity: %s\n' "$profile" "$identity"
+
+if command -v age-keygen >/dev/null 2>&1; then
+  recipient=$(age-keygen -y "$identity" 2>/dev/null || true)
+  if [ -n "$recipient" ]; then
+    printf 'Recipient: %s\n' "$recipient"
+    if [ "$profile" = "work" ]; then
+      printf '\nUse this when initializing or regenerating work config:\n'
+      printf 'CHEZMOI_PROFILE=work CHEZMOI_WORK_AGE_RECIPIENT=%s chezmoi init --apply <repo>\n' "$recipient"
+      printf '\nAfter the first work key is settled, commit this public recipient as $workAgeRecipientDefault in .chezmoi.toml.tmpl.\n'
+    fi
+  fi
+else
+  printf 'Install age-keygen to print the public recipient for this identity.\n'
+fi

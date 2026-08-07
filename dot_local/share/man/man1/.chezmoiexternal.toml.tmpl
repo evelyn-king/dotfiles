@@ -1,0 +1,14 @@
+{{- $tools := get (get .tools .chezmoi.os | default dict) .chezmoi.arch | default dict -}}
+{{- range $name, $tool := $tools }}
+{{- with get $tool "man" }}
+{{- $folder := .folder }}
+{{- range .files }}
+["{{ . }}"]
+type = "{{ get $tool "type" }}"
+url = "{{ get $tool "url" }}"
+path = "{{ $folder }}/{{ . }}"
+checksum = { sha256 = "{{ get $tool "sha256" }}" }
+
+{{- end }}
+{{- end }}
+{{- end }}

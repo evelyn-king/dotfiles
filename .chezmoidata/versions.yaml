@@ -1,0 +1,378 @@
+tools:
+  linux:
+    amd64:
+      bat:
+        type: archive-file
+        url: https://github.com/sharkdp/bat/releases/download/v0.26.1/bat-v0.26.1-x86_64-unknown-linux-musl.tar.gz
+        sha256: 0dcd8ac79732c0d5b136f11f4ee00e581440e16a44eab5b3105b611bbf2cf191
+        bin:
+          target: bat
+          path: bat-v0.26.1-x86_64-unknown-linux-musl/bat
+        man:
+          folder: bat-v0.26.1-x86_64-unknown-linux-musl
+          files:
+            - bat.1
+        completions:
+          bash:
+            folder: bat-v0.26.1-x86_64-unknown-linux-musl/autocomplete
+            files:
+              - target: bat
+                source: bat.bash
+          zsh:
+            folder: bat-v0.26.1-x86_64-unknown-linux-musl/autocomplete
+            files:
+              - target: _bat
+                source: bat.zsh
+      bun:
+        type: archive-file
+        url: https://github.com/oven-sh/bun/releases/download/bun-v1.3.11/bun-linux-x64.zip
+        sha256: 8611ba935af886f05a6f38740a15160326c15e5d5d07adef966130b4493607ed
+        path: bun-linux-x64/bun
+      delta:
+        type: archive-file
+        url: https://github.com/dandavison/delta/releases/download/0.18.2/delta-0.18.2-x86_64-unknown-linux-musl.tar.gz
+        sha256: b7ea845004762358a00ef9127dd9fd723e333c7e4b9cb1da220c3909372310ee
+        path: delta-0.18.2-x86_64-unknown-linux-musl/delta
+      direnv:
+        type: file
+        url: https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.linux-amd64
+        sha256: 1f1b93dd6f38523fde26dfac96151ef9d31a374e3005cd3345fb93555ae0c9b5
+      duf:
+        type: archive-file
+        url: https://github.com/muesli/duf/releases/download/v0.9.1/duf_0.9.1_linux_x86_64.tar.gz
+        sha256: 5add851e7062c5e56939abb664705e4d14fa2d06289490aff31d51f153832de7
+        path: duf
+      dust:
+        type: archive-file
+        url: https://github.com/bootandy/dust/releases/download/v1.2.4/dust-v1.2.4-x86_64-unknown-linux-musl.tar.gz
+        sha256: 4e313f9f854017e58a2ada4c0d1774677b8cf53d63ab55a991d5871d5f504452
+        path: dust-v1.2.4-x86_64-unknown-linux-musl/dust
+      eza:
+        type: archive-file
+        url: https://github.com/eza-community/eza/releases/download/v0.23.4/eza_x86_64-unknown-linux-musl.tar.gz
+        sha256: d231bb3ee33b08c76279b5888845dceb7034d055c42bb9be46dbe0dae39394df
+        path: ./eza
+      fd:
+        type: archive-file
+        url: https://github.com/sharkdp/fd/releases/download/v10.3.0/fd-v10.3.0-x86_64-unknown-linux-musl.tar.gz
+        sha256: 2b6bfaae8c48f12050813c2ffe1884c61ea26e750d803df9c9114550a314cd14
+        path: fd-v10.3.0-x86_64-unknown-linux-musl/fd
+      fzf:
+        type: archive-file
+        url: https://github.com/junegunn/fzf/releases/download/v0.70.0/fzf-0.70.0-linux_amd64.tar.gz
+        sha256: 8fd0e0b93bdf64ba90081ffb6658d77ea5a024c122b36852b1de30f9d2733754
+        path: fzf
+      go:
+        type: archive
+        url: https://go.dev/dl/go1.26.1.linux-amd64.tar.gz
+        sha256: 031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a
+        stripComponents: 1
+      hyperfine:
+        type: archive-file
+        url: https://github.com/sharkdp/hyperfine/releases/download/v1.20.0/hyperfine-v1.20.0-x86_64-unknown-linux-musl.tar.gz
+        sha256: 3285ec7959285288137043dd81dce0dde056227018a8277532d9a364b4f03c2b
+        path: hyperfine-v1.20.0-x86_64-unknown-linux-musl/hyperfine
+      keychain:
+        type: file
+        url: https://github.com/danielrobbins/keychain/releases/download/2.9.8/keychain
+        sha256: f8b4e8a2a630907bb81737d455a2dec2cb8308e3210840665239ef9c49bbeadb
+      lazygit:
+        type: archive-file
+        url: https://github.com/jesseduffield/lazygit/releases/download/v0.59.0/lazygit_0.59.0_linux_x86_64.tar.gz
+        sha256: 264283f40a40c899d702a338b20622f690221f753f03bac827c1f34e91f516c2
+        path: lazygit
+      neovim:
+        type: archive
+        url: https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-linux-x86_64.tar.gz
+        sha256: 2fc90b962327f73a78afbfb8203fd19db8db9cdf4ee5e2bef84704339add89cc
+        target: nvim
+        stripComponents: 1
+      micromamba:
+        type: file
+        url: https://github.com/mamba-org/micromamba-releases/releases/download/2.5.0-2/micromamba-linux-64
+        sha256: c04571cfb0750e5432d530a3068b8fcd232ebed3133358e056e59a90b9852b00
+      rg:
+        type: archive-file
+        url: https://github.com/BurntSushi/ripgrep/releases/download/15.1.0/ripgrep-15.1.0-x86_64-unknown-linux-musl.tar.gz
+        sha256: 1c9297be4a084eea7ecaedf93eb03d058d6faae29bbc57ecdaf5063921491599
+        bin:
+          target: rg
+          path: ripgrep-15.1.0-x86_64-unknown-linux-musl/rg
+        man:
+          folder: ripgrep-15.1.0-x86_64-unknown-linux-musl/doc
+          files:
+            - rg.1
+        completions:
+          bash:
+            folder: ripgrep-15.1.0-x86_64-unknown-linux-musl/complete
+            files:
+              - target: rg
+                source: rg.bash
+          zsh:
+            folder: ripgrep-15.1.0-x86_64-unknown-linux-musl/complete
+            files:
+              - target: _rg
+                source: _rg
+      starship:
+        type: archive-file
+        url: https://github.com/starship/starship/releases/download/v1.24.2/starship-x86_64-unknown-linux-musl.tar.gz
+        sha256: 00ff3c1f8ffb59b5c15d4b44c076bcca04d92cf0055c86b916248c14f3ae714a
+        path: starship
+      tealdeer:
+        type: file
+        url: https://github.com/tealdeer-rs/tealdeer/releases/download/v1.8.1/tealdeer-linux-x86_64-musl
+        sha256: 6f2fad4435e0110484d3f25cdc4bf20129dae03238f32d06ebdd00bdc50ae2ed
+        bin:
+          target: tldr
+        completions:
+          bash:
+            type: file
+            url: https://github.com/tealdeer-rs/tealdeer/releases/download/v1.8.1/completions_bash
+            sha256: 3a14c45f758ce95ba088c79cd2c0a5b6890a8255d51af22028d4f3ebe977a656
+            files:
+              - target: tldr
+          zsh:
+            type: file
+            url: https://github.com/tealdeer-rs/tealdeer/releases/download/v1.8.1/completions_zsh
+            sha256: 8b2d55757af91c3fa594c0f2fe57eebf0db48e13451430319ea6d093b65e6889
+            files:
+              - target: _tldr
+      uv:
+        type: archive-file
+        url: https://github.com/astral-sh/uv/releases/download/0.10.8/uv-x86_64-unknown-linux-musl.tar.gz
+        sha256: a4e6ad1aecac61077de548d2cc9ccf2c2f1848863312b3b59fb0d2eb8d8a043c
+        path: uv-x86_64-unknown-linux-musl/uv
+      uvx:
+        type: archive-file
+        url: https://github.com/astral-sh/uv/releases/download/0.10.8/uv-x86_64-unknown-linux-musl.tar.gz
+        sha256: a4e6ad1aecac61077de548d2cc9ccf2c2f1848863312b3b59fb0d2eb8d8a043c
+        path: uv-x86_64-unknown-linux-musl/uvx
+      zellij:
+        type: archive-file
+        url: https://github.com/zellij-org/zellij/releases/download/v0.44.0/zellij-no-web-x86_64-unknown-linux-musl.tar.gz
+        sha256: 458b0c5ec19d6313580293e451c9a467c73b337d42faf8e2ce1712c56767b727
+        path: zellij
+      zoxide:
+        type: archive-file
+        url: https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide-0.9.9-x86_64-unknown-linux-musl.tar.gz
+        sha256: 4ff057d3c4d957946937274c2b8be7af2a9bbae7f90a1b5e9baaa7cb65a20caa
+        bin:
+          target: zoxide
+          path: zoxide
+        man:
+          folder: man/man1
+          files:
+            - zoxide.1
+            - zoxide-add.1
+            - zoxide-import.1
+            - zoxide-init.1
+            - zoxide-query.1
+            - zoxide-remove.1
+        completions:
+          bash:
+            folder: completions
+            files:
+              - target: zoxide
+                source: zoxide.bash
+          zsh:
+            folder: completions
+            files:
+              - target: _zoxide
+                source: _zoxide
+  darwin:
+    arm64:
+      bat:
+        type: archive-file
+        url: https://github.com/sharkdp/bat/releases/download/v0.26.1/bat-v0.26.1-aarch64-apple-darwin.tar.gz
+        sha256: e30beff26779c9bf60bb541e1d79046250cb74378f2757f8eb250afddb19e114
+        bin:
+          target: bat
+          path: bat-v0.26.1-aarch64-apple-darwin/bat
+        man:
+          folder: bat-v0.26.1-aarch64-apple-darwin
+          files:
+            - bat.1
+        completions:
+          bash:
+            folder: bat-v0.26.1-aarch64-apple-darwin/autocomplete
+            files:
+              - target: bat
+                source: bat.bash
+          zsh:
+            folder: bat-v0.26.1-aarch64-apple-darwin/autocomplete
+            files:
+              - target: bat
+                source: bat.zsh
+      bun:
+        type: archive-file
+        url: https://github.com/oven-sh/bun/releases/download/bun-v1.3.11/bun-darwin-aarch64.zip
+        sha256: 6f5a3467ed9caec4795bf78cd476507d9f870c7d57b86c945fcb338126772ffc
+        path: bun-darwin-aarch64/bun
+      delta:
+        type: archive-file
+        url: https://github.com/dandavison/delta/releases/download/0.18.2/delta-0.18.2-aarch64-apple-darwin.tar.gz
+        sha256: 6ba38dce9f91ee1b9a24aa4aede1db7195258fe176c3f8276ae2d4457d8170a0
+        path: delta-0.18.2-aarch64-apple-darwin/delta
+      direnv:
+        type: file
+        url: https://github.com/direnv/direnv/releases/download/v2.37.1/direnv.darwin-arm64
+        sha256: 4f569f3a36732bfd8b8fea7bfcc6ad87a59745c109022164d0ca4832451d5369
+      duf:
+        type: archive-file
+        url: https://github.com/muesli/duf/releases/download/v0.9.1/duf_0.9.1_darwin_arm64.tar.gz
+        sha256: 512ba0ff3585bb8c65841de557a4c4b8712332db005dc952fa98d373a05d01df
+        path: duf
+      dust: # no arm64 macOS build; x86_64 runs via Rosetta
+        type: archive-file
+        url: https://github.com/bootandy/dust/releases/download/v1.2.4/dust-v1.2.4-x86_64-apple-darwin.tar.gz
+        sha256: bf84d3ff7f58e325d3eb5bb7696df6b22ef1e01fec80c2d8f7c9d3e611be66f4
+        path: dust-v1.2.4-x86_64-apple-darwin/dust
+      fd:
+        type: archive-file
+        url: https://github.com/sharkdp/fd/releases/download/v10.3.0/fd-v10.3.0-aarch64-apple-darwin.tar.gz
+        sha256: 0570263812089120bc2a5d84f9e65cd0c25e4a4d724c80075c357239c74ae904
+        path: fd-v10.3.0-aarch64-apple-darwin/fd
+      fzf:
+        type: archive-file
+        url: https://github.com/junegunn/fzf/releases/download/v0.70.0/fzf-0.70.0-darwin_arm64.tar.gz
+        sha256: 75f4905c2e3d00666d81dffdd001bb2a9a8e0ad4e4ac8cecfc17a7401b99e6e4
+        path: fzf
+      go:
+        type: archive
+        url: https://go.dev/dl/go1.26.1.darwin-arm64.tar.gz
+        sha256: 353df43a7811ce284c8938b5f3c7df40b7bfb6f56cb165b150bc40b5e2dd541f
+        stripComponents: 1
+      hyperfine:
+        type: archive-file
+        url: https://github.com/sharkdp/hyperfine/releases/download/v1.20.0/hyperfine-v1.20.0-aarch64-apple-darwin.tar.gz
+        sha256: 8ee7067016620447c9d2d6234ec9a4680f958b7ad983549b56334668f63075b5
+        path: hyperfine-v1.20.0-aarch64-apple-darwin/hyperfine
+      keychain:
+        type: file
+        url: https://github.com/danielrobbins/keychain/releases/download/2.9.8/keychain
+        sha256: f8b4e8a2a630907bb81737d455a2dec2cb8308e3210840665239ef9c49bbeadb
+      lazygit:
+        type: archive-file
+        url: https://github.com/jesseduffield/lazygit/releases/download/v0.59.0/lazygit_0.59.0_darwin_arm64.tar.gz
+        sha256: cdd42e86b16b3bc21ec5cbe4be92d688e39f3806b53b63c54d1af4f498302ed8
+        path: lazygit
+      neovim:
+        type: archive
+        url: https://github.com/neovim/neovim/releases/download/v0.11.6/nvim-macos-arm64.tar.gz
+        sha256: d5ee93b67630d5a87f3d336d0f7e8b2fe6973aa653d3cc93b82b820e6538c1dd
+        target: nvim
+        stripComponents: 1
+      micromamba:
+        type: file
+        url: https://github.com/mamba-org/micromamba-releases/releases/download/2.5.0-2/micromamba-osx-arm64
+        sha256: 22953898e3cfd63c680d696a204c7858ce7f10a10c271bda7e6defd63370ee41
+      rg:
+        type: archive-file
+        url: https://github.com/BurntSushi/ripgrep/releases/download/15.1.0/ripgrep-15.1.0-aarch64-apple-darwin.tar.gz
+        sha256: 378e973289176ca0c6054054ee7f631a065874a352bf43f0fa60ef079b6ba715
+        bin:
+          target: rg
+          path: ripgrep-15.1.0-aarch64-apple-darwin/rg
+        man:
+          folder: ripgrep-15.1.0-aarch64-apple-darwin/doc
+          files:
+            - rg.1
+        completions:
+          bash:
+            folder: ripgrep-15.1.0-aarch64-apple-darwin/complete
+            files:
+              - target: rg
+                source: rg.bash
+          zsh:
+            folder: ripgrep-15.1.0-aarch64-apple-darwin/complete
+            files:
+              - target: _rg
+                source: _rg
+      starship:
+        type: archive-file
+        url: https://github.com/starship/starship/releases/download/v1.24.2/starship-aarch64-apple-darwin.tar.gz
+        sha256: d3a0da21374962625a2ee992110979bc1fa33424d7b6aea58a70405e26544fd9
+        path: starship
+      uv:
+        type: archive-file
+        url: https://github.com/astral-sh/uv/releases/download/0.10.8/uv-aarch64-apple-darwin.tar.gz
+        sha256: c3a6fff5b6b4abddff863117878194e35dbc6b0267d61ad259ab9896f9b8dcbb
+        path: uv-aarch64-apple-darwin/uv
+      uvx:
+        type: archive-file
+        url: https://github.com/astral-sh/uv/releases/download/0.10.8/uv-aarch64-apple-darwin.tar.gz
+        sha256: c3a6fff5b6b4abddff863117878194e35dbc6b0267d61ad259ab9896f9b8dcbb
+        path: uv-aarch64-apple-darwin/uvx
+      zoxide:
+        type: archive-file
+        url: https://github.com/ajeetdsouza/zoxide/releases/download/v0.9.9/zoxide-0.9.9-aarch64-apple-darwin.tar.gz
+        sha256: 57e733d0436309dae2ed97e46bba43937209395298e1d88812d4e893900cb40a
+        bin:
+          target: zoxide
+          path: zoxide
+        man:
+          folder: man/man1
+          files:
+            - zoxide.1
+            - zoxide-add.1
+            - zoxide-import.1
+            - zoxide-init.1
+            - zoxide-query.1
+            - zoxide-remove.1
+        completions:
+          bash:
+            folder: completions
+            files:
+              - target: zoxide
+                source: zoxide.bash
+          zsh:
+            folder: completions
+            files:
+              - target: _zoxide
+                source: _zoxide
+plugins:
+  tmux:
+    tpm:
+      url: https://github.com/tmux-plugins/tpm/archive/99469c4a9b1ccf77fade25842dc7bafbc8ce9946.tar.gz
+  vim:
+    gruvbox:
+      url: https://github.com/morhetz/gruvbox/archive/697c00291db857ca0af00ec154e5bd514a79191f.tar.gz
+      include:
+        - "*/autoload/**"
+        - "*/colors/**"
+    nord:
+      url: https://github.com/nordtheme/vim/archive/refs/tags/v0.19.0.tar.gz
+      include:
+        - "*/autoload/**"
+        - "*/colors/**"
+    nerdcommenter:
+      url: https://github.com/preservim/nerdcommenter/archive/a462bbda1e26f44fb3d3eb9d9d1c6a07aa98e665.tar.gz
+      include:
+        - "*/autoload/**"
+        - "*/doc/**"
+        - "*/plugin/**"
+    nerdtree:
+      url: https://github.com/preservim/nerdtree/archive/690d061b591525890f1471c6675bcb5bdc8cdff9.tar.gz
+      include:
+        - "*/autoload/**"
+        - "*/doc/**"
+        - "*/lib"
+        - "*/lib/**"
+        - "*/lib/nerdtree/**"
+        - "*/nerdtree_plugin/**"
+        - "*/plugin/**"
+        - "*/syntax/**"
+    vim_fugitive:
+      url: https://github.com/tpope/vim-fugitive/archive/61b51c09b7c9ce04e821f6cf76ea4f6f903e3cf4.tar.gz
+      include:
+        - "*/autoload/**"
+        - "*/doc/**"
+        - "*/ftdetect/**"
+        - "*/ftplugin/**"
+        - "*/plugin/**"
+        - "*/syntax/**"
+    vim_surround:
+      url: https://github.com/tpope/vim-surround/archive/3d188ed2113431cf8dac77be61b842acb64433d9.tar.gz
+      include:
+        - "*/doc/**"
+        - "*/plugin/**"

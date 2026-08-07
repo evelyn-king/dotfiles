@@ -1,0 +1,86 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+SCRIPT_NAME="sync-homebrew"
+BREWFILE="${HOME}/.Brewfile"
+NO_UPGRADE=1
+CLEANUP=0
+export HOMEBREW_NO_AUTO_UPDATE="${HOMEBREW_NO_AUTO_UPDATE:-1}"
+
+usage() {
+  cat <<EOF
+Usage: ${SCRIPT_NAME} [--file <path>] [--upgrade] [--cleanup]
+
+Install the packages declared in the managed Brewfile.
+
+Options:
+  --file <path>  Brewfile to install. Defaults to ~/.Brewfile.
+  --upgrade      Allow brew bundle to upgrade outdated packages.
+  --cleanup      Remove top-level Homebrew entries not declared in the Brewfile.
+  -h, --help     Show this help text.
+EOF
+}
+
+log() {
+  printf '[%s] %s\n' "${SCRIPT_NAME}" "$*"
+}
+
+die() {
+  printf '[%s] %s\n' "${SCRIPT_NAME}" "$*" >&2
+  exit 1
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
+}
+
+require_macos() {
+  [ "$(uname -s)" = "Darwin" ] || die "This command only supports macOS"
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --file)
+      [ "$#" -ge 2 ] || die "Missing value for --file"
+      BREWFILE="$2"
+      shift 2
+      ;;
+    --upgrade)
+      NO_UPGRADE=0
+      shift
+      ;;
+    --cleanup)
+      CLEANUP=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      die "Unknown argument: $1"
+      ;;
+  esac
+done
+
+require_macos
+require_command brew
+[ -f "${BREWFILE}" ] || die "Brewfile not found: ${BREWFILE}"
+
+check_args=(bundle check --file "${BREWFILE}")
+install_args=(bundle install --file "${BREWFILE}")
+if [ "${NO_UPGRADE}" -eq 1 ]; then
+  check_args+=(--no-upgrade)
+  install_args+=(--no-upgrade)
+fi
+if [ "${CLEANUP}" -eq 1 ]; then
+  install_args+=(--cleanup)
+fi
+
+if brew "${check_args[@]}" >/dev/null 2>&1; then
+  log "Homebrew bundle already satisfied"
+  exit 0
+fi
+
+brew "${install_args[@]}"

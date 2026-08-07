@@ -1,0 +1,27 @@
+# 15_host_env.sh - machine-specific shell state
+# shellcheck shell=bash
+
+{{- $profileName := .profile -}}
+{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
+{{- $profile := get .profiles $profileName | default dict -}}
+{{- $features := get $host "features" | default dict -}}
+{{- $jupyter := get $host "jupyter" | default .hosts.default.jupyter -}}
+{{- $omarchyDesktop := and
+  (eq .chezmoi.os "linux")
+  (get $profile "omarchy_desktop_allowed" | default false)
+  (get $features "omarchy_desktop" | default false)
+-}}
+{{- if $host.conda_base_home_relative }}
+export LOCAL_PRAXIS_CONDA_BASE="{{ .chezmoi.homeDir }}/{{ $host.conda_base }}"
+{{- else }}
+export LOCAL_PRAXIS_CONDA_BASE="{{ $host.conda_base }}"
+{{- end }}
+export SHELL_PROFILE="{{ $profileName }}"
+export SHELL_IS_WORK="{{ if eq $profileName "work" }}1{{ else }}0{{ end }}"
+export SHELL_IS_PERSONAL="{{ if eq $profileName "personal" }}1{{ else }}0{{ end }}"
+export SHELL_IS_OMARCHY="{{ if $omarchyDesktop }}1{{ else }}0{{ end }}"
+export SHELL_WORK_EXTRAS="{{ if get $profile "work_extras" | default false }}1{{ else }}0{{ end }}"
+export MAMBA_ROOT_PREFIX_DEFAULT="${LOCAL_PRAXIS_CONDA_BASE}/micromamba"
+export JUPYTER_BIND_HOST="{{ $jupyter.bind_host }}"
+export JUPYTER_ENV_NAME="{{ $jupyter.env_name }}"
+export JUPYTER_PORT="{{ $jupyter.port }}"

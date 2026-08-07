@@ -1,0 +1,30 @@
+{{- $tools := get (get .tools .chezmoi.os | default dict) .chezmoi.arch | default dict -}}
+{{- range $name, $tool := $tools }}
+{{- if ne (get $tool "type") "archive" }}
+{{- with get $tool "bin" }}
+["{{ .target }}"]
+type = "{{ get . "type" | default (get $tool "type") }}"
+url = "{{ get . "url" | default (get $tool "url") }}"
+{{- with get . "path" }}
+path = "{{ . }}"
+{{- end }}
+executable = true
+{{- with get . "sha256" | default (get $tool "sha256") }}
+checksum = { sha256 = "{{ . }}" }
+{{- end }}
+
+{{- else }}
+["{{ $name }}"]
+type = "{{ get $tool "type" }}"
+url = "{{ get $tool "url" }}"
+{{- if hasKey $tool "path" }}
+path = "{{ get $tool "path" }}"
+{{- end }}
+executable = true
+{{- with get $tool "sha256" }}
+checksum = { sha256 = "{{ . }}" }
+{{- end }}
+
+{{- end }}
+{{- end }}
+{{- end }}
