@@ -29,4 +29,8 @@ export MANPATH="${HOME}/.local/share/man:${MANPATH:-}"
 export BUN_INSTALL="${HOME}/.bun"
 shell_path_prepend "${BUN_INSTALL}/bin"
 
+if [ -s "${HOME}/.bun/_bun" ]; then
+  shell_path_prepend "${HOME}/.bun/_bun"
+fi
+
 export DOCKER_DEFAULT_PLATFORM='linux/amd64'

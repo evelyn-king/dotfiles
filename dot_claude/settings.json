@@ -27,5 +27,9 @@
   },
   "alwaysThinkingEnabled": true,
   "effortLevel": "high",
-  "autoUpdatesChannel": "stable"
+  "autoUpdatesChannel": "stable",
+  "tui": "fullscreen",
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true
+  }
 }

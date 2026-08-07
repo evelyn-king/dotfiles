@@ -14,6 +14,7 @@ packages=(
   opencode-ai@latest
   tree-sitter-cli@latest
   @googleworkspace/cli
+  @doist/todoist-cli
 )
 
 bun install -g "${packages[@]}"
