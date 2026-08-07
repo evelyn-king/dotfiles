@@ -3,10 +3,6 @@ hosts:
     profile: personal
     features:
       omarchy_desktop: false
-    icas:
-      cache_path: local-codex/icas/cache
-      work_path: local-codex/icas/workspace
-      home_relative: true
     conda_base: .local/opt
     conda_base_home_relative: true
     jupyter:
@@ -31,10 +27,6 @@ hosts:
     profile: personal
     features:
       omarchy_desktop: false
-    icas:
-      cache_path: local-codex/icas/cache
-      work_path: local-codex/icas/workspace
-      home_relative: true
     conda_base: .local/opt
     conda_base_home_relative: true
   ionq-jofre:
@@ -65,23 +57,21 @@ hosts:
       bind_host: 127.0.0.1
       env_name: jupyter
       port: 9898
+  lagrange:
+    profile: personal
+    features:
+      omarchy_desktop: false
+    conda_base: .local/opt
+    conda_base_home_relative: true
   gimli:
     profile: personal
     features:
       omarchy_desktop: true
-    icas:
-      cache_path: local-codex/icas/cache
-      work_path: local-codex/icas/workspace
-      home_relative: true
     conda_base: .local/opt
     conda_base_home_relative: true
   maxwell:
     profile: personal
     features:
       omarchy_desktop: true
-    icas:
-      cache_path: local-codex/icas/cache
-      work_path: local-codex/icas/workspace
-      home_relative: true
     conda_base: .local/opt
     conda_base_home_relative: true

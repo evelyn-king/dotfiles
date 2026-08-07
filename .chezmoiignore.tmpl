@@ -54,6 +54,7 @@ Library/**
 {{- end }}
 
 {{- if eq $profileName "personal" }}
+.icas.toml
 .config/shell/work/**
 {{- else if eq $profileName "work" }}
 .config/shell/personal/**
