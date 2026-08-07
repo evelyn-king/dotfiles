@@ -37,6 +37,39 @@ if command -v docker >/dev/null 2>&1; then
   alias d='docker'
 fi
 
+if command -v emacsclient >/dev/null 2>&1; then
+  alias emacs='emacsclient --no-window-system --alternate-editor=""'
+fi
+
+if command -v opencode >/dev/null 2>&1; then
+  alias c='opencode'
+fi
+
+if command -v claude >/dev/null 2>&1; then
+  alias cx='printf "\033[2J\033[3J\033[H" && claude --allow-dangerously-skip-permissions'
+fi
+
+if command -v rails >/dev/null 2>&1; then
+  alias r='rails'
+fi
+
+if command -v tmux >/dev/null 2>&1; then
+  alias t='tmux attach || tmux new -s Work'
+fi
+
+if command -v git >/dev/null 2>&1; then
+  alias g='git'
+  alias gcm='git commit -m'
+  alias gcam='git commit -a -m'
+  alias gcad='git commit -a --amend'
+fi
+
+if ! command -v open >/dev/null 2>&1 && command -v xdg-open >/dev/null 2>&1; then
+  open() (
+    xdg-open "$@" >/dev/null 2>&1 &
+  )
+fi
+
 n() {
   if [ "$#" -eq 0 ]; then
     command nvim .
