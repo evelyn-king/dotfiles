@@ -1,11 +1,8 @@
-# If not running interactively, don't do anything.
-case "$-" in
-  *i*) ;;
-  *)
-    return
-    ;;
-esac
+shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/interactive.sh"
 
-if [ -f "${HOME}/.config/shell/main.sh" ]; then
-  . "${HOME}/.config/shell/main.sh" interactive
+if [ -f "${shell_loader}" ]; then
+  # shellcheck source=/dev/null
+  . "${shell_loader}"
+else
+  printf 'Missing source file: %s\n' "${shell_loader}" >&2
 fi

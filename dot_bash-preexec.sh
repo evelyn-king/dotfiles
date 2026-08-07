@@ -114,8 +114,8 @@ declare -a preexec_functions
 # name passed as $1
 __bp_trim_whitespace() {
     local var=${1:?} text=${2:-}
-    text="${text#"${text%%[![:space:]]*}"}"   # remove leading whitespace characters
-    text="${text%"${text##*[![:space:]]}"}"   # remove trailing whitespace characters
+    text="${text#"${text%%[![:space:]]*}"}"
+    text="${text%"${text##*[![:space:]]}"}"
     printf -v "$var" '%s' "$text"
 }
 
@@ -166,7 +166,6 @@ __bp_precmd_invoke_cmd() {
         # Test existence of functions with: declare -[Ff]
         if type -t "$precmd_function" 1>/dev/null; then
             __bp_set_ret_value "$__bp_last_ret_value" "$__bp_last_argument_prev_command"
-            # Quote our function invocation to prevent issues with IFS
             "$precmd_function"
         fi
     done
@@ -223,28 +222,17 @@ __bp_preexec_invoke_exec() {
     fi
 
     if [[ -n "${COMP_POINT:-}" || -n "${READLINE_POINT:-}" ]]; then
-        # We're in the middle of a completer or a keybinding set up by "bind
-        # -x".  This obviously can't be an interactively issued command.
         return
     fi
     if [[ -z "${__bp_preexec_interactive_mode:-}" ]]; then
-        # We're doing something related to displaying the prompt.  Let the
-        # prompt set the title instead of me.
         return
     else
-        # If we're in a subshell, then the prompt won't be re-displayed to put
-        # us back into interactive mode, so let's not set the variable back.
-        # In other words, if you have a subshell like
-        #   (sleep 1; sleep 2)
-        # You want to see the 'sleep 2' as a set_command_title as well.
         if [[ 0 -eq "${BASH_SUBSHELL:-}" ]]; then
             __bp_preexec_interactive_mode=""
         fi
     fi
 
-    if  __bp_in_prompt_command "${BASH_COMMAND:-}"; then
-        # If we're executing something inside our prompt_command then we don't
-        # want to call preexec. Bash prior to 3.1 can't detect this at all :/
+    if __bp_in_prompt_command "${BASH_COMMAND:-}"; then
         __bp_preexec_interactive_mode=""
         return
     fi
@@ -253,7 +241,6 @@ __bp_preexec_invoke_exec() {
     this_command=$(LC_ALL=C HISTTIMEFORMAT='' builtin history 1)
     this_command="${this_command#*[[:digit:]][* ] }"
 
-    # Sanity check to make sure we have something to invoke our function with.
     if [[ -z "$this_command" ]]; then
         return
     fi
@@ -268,7 +255,6 @@ __bp_preexec_invoke_exec() {
         # Test existence of function with: declare -[fF]
         if type -t "$preexec_function" 1>/dev/null; then
             __bp_set_ret_value "${__bp_last_ret_value:-}"
-            # Quote our function invocation to prevent issues with IFS
             "$preexec_function" "$this_command"
             preexec_function_ret_value="$?"
             if [[ "$preexec_function_ret_value" != 0 ]]; then
@@ -280,21 +266,16 @@ __bp_preexec_invoke_exec() {
     # Restore the last argument of the last executed command, and set the return
     # value of the DEBUG trap to be the return code of the last preexec function
     # to return an error.
-    # If `extdebug` is enabled a non-zero return value from any preexec function
-    # will cause the user's command not to execute.
-    # Run `shopt -s extdebug` to enable
     __bp_set_ret_value "$preexec_ret_value" "$__bp_last_argument_prev_command"
 }
 
 __bp_install() {
-    # Exit if we already have this installed.
     if [[ "${PROMPT_COMMAND[*]:-}" == *"__bp_precmd_invoke_cmd"* ]]; then
         return 1
     fi
 
     trap '__bp_preexec_invoke_exec "$_"' DEBUG
 
-    # Preserve any prior DEBUG trap as a preexec function
     eval "local trap_argv=(${__bp_trap_string:-})"
     local prior_trap=${trap_argv[2]:-}
     unset __bp_trap_string
@@ -305,49 +286,35 @@ __bp_install() {
         preexec_functions+=(__bp_original_debug_trap)
     fi
 
-    # Adjust our HISTCONTROL Variable if needed.
     __bp_adjust_histcontrol
 
-    # Issue #25. Setting debug trap for subshells causes sessions to exit for
-    # backgrounded subshell commands (e.g. (pwd)& ). Believe this is a bug in Bash.
-    #
-    # Disabling this by default. It can be enabled by setting this variable.
     if [[ -n "${__bp_enable_subshells:-}" ]]; then
-
-        # Set so debug trap will work be invoked in subshells.
         set -o functrace > /dev/null 2>&1
         shopt -s extdebug > /dev/null 2>&1
     fi
 
     local existing_prompt_command
-    # Remove setting our trap install string and sanitize the existing prompt command string
     existing_prompt_command="${PROMPT_COMMAND:-}"
-    # Edge case of appending to PROMPT_COMMAND
-    existing_prompt_command="${existing_prompt_command//$__bp_install_string/:}" # no-op
-    existing_prompt_command="${existing_prompt_command//$'\n':$'\n'/$'\n'}" # remove known-token only
-    existing_prompt_command="${existing_prompt_command//$'\n':;/$'\n'}" # remove known-token only
+    existing_prompt_command="${existing_prompt_command//$__bp_install_string/:}"
+    existing_prompt_command="${existing_prompt_command//$'\n':$'\n'/$'\n'}"
+    existing_prompt_command="${existing_prompt_command//$'\n':;/$'\n'}"
     __bp_sanitize_string existing_prompt_command "$existing_prompt_command"
     if [[ "${existing_prompt_command:-:}" == ":" ]]; then
         existing_prompt_command=
     fi
 
-    # Install our hooks in PROMPT_COMMAND to allow our trap to know when we've
-    # actually entered something.
     PROMPT_COMMAND='__bp_precmd_invoke_cmd'
     PROMPT_COMMAND+=${existing_prompt_command:+$'\n'$existing_prompt_command}
     if (( BASH_VERSINFO[0] > 5 || (BASH_VERSINFO[0] == 5 && BASH_VERSINFO[1] >= 1) )); then
         PROMPT_COMMAND+=('__bp_interactive_mode')
     else
-        # shellcheck disable=SC2179 # PROMPT_COMMAND is not an array in bash <= 5.0
+        # shellcheck disable=SC2179
         PROMPT_COMMAND+=$'\n__bp_interactive_mode'
     fi
 
-    # Add two functions to our arrays for convenience
-    # of definition.
     precmd_functions+=(precmd)
     preexec_functions+=(preexec)
 
-    # Invoke our two functions manually that were added to $PROMPT_COMMAND
     __bp_precmd_invoke_cmd
     __bp_interactive_mode
 }
@@ -356,21 +323,18 @@ __bp_install() {
 # after our session has started. This allows bash-preexec to be included
 # at any point in our bash profile.
 __bp_install_after_session_init() {
-    # bash-preexec needs to modify these variables in order to work correctly
-    # if it can't, just stop the installation
     __bp_require_not_readonly PROMPT_COMMAND HISTCONTROL HISTTIMEFORMAT || return
 
     local sanitized_prompt_command
     __bp_sanitize_string sanitized_prompt_command "${PROMPT_COMMAND:-}"
     if [[ -n "$sanitized_prompt_command" ]]; then
-        # shellcheck disable=SC2178 # PROMPT_COMMAND is not an array in bash <= 5.0
+        # shellcheck disable=SC2178
         PROMPT_COMMAND=${sanitized_prompt_command}$'\n'
     fi
-    # shellcheck disable=SC2179 # PROMPT_COMMAND is not an array in bash <= 5.0
+    # shellcheck disable=SC2179
     PROMPT_COMMAND+=${__bp_install_string}
 }
 
-# Run our install so long as we're not delaying it.
 if [[ -z "${__bp_delay_install:-}" ]]; then
     __bp_install_after_session_init
 fi

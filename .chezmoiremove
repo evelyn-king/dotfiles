@@ -1,0 +1,7 @@
+# Targets to delete from the destination on apply.
+
+# lazygit only reads config.yml; the old config.yaml was silently ignored.
+.config/lazygit/config.yaml
+
+# Omarchy 4 replaced the bash menu-override stub with extensions/omarchy-menu.jsonc.
+.config/omarchy/extensions/menu.sh

@@ -1,0 +1,87 @@
+hosts:
+  default:
+    profile: personal
+    features:
+      omarchy_desktop: false
+    icas:
+      cache_path: local-codex/icas/cache
+      work_path: local-codex/icas/workspace
+      home_relative: true
+    conda_base: .local/opt
+    conda_base_home_relative: true
+    jupyter:
+      bind_host: 127.0.0.1
+      env_name: jupyter
+      port: 8888
+  IONQ-D0977:
+    profile: work
+    features:
+      omarchy_desktop: false
+    icas:
+      cache_path: local-codex/icas/cache
+      work_path: local-codex/icas/workspace
+      home_relative: true
+    conda_base: .local/opt
+    conda_base_home_relative: true
+    jupyter:
+      bind_host: 127.0.0.1
+      env_name: jupyter
+      port: 8899
+  obsidian:
+    profile: personal
+    features:
+      omarchy_desktop: false
+    icas:
+      cache_path: local-codex/icas/cache
+      work_path: local-codex/icas/workspace
+      home_relative: true
+    conda_base: .local/opt
+    conda_base_home_relative: true
+  ionq-jofre:
+    profile: work
+    features:
+      omarchy_desktop: false
+    icas:
+      cache_path: local-codex/icas/cache
+      work_path: local-codex/icas/workspace
+      home_relative: true
+    conda_base: .local/opt
+    conda_base_home_relative: true
+    jupyter:
+      bind_host: 127.0.0.1
+      env_name: jupyter
+      port: 9988
+  hpc01-bwi01:
+    profile: work
+    features:
+      omarchy_desktop: false
+    icas:
+      cache_path: /apps/evelyn-workspace/icas/cache
+      work_path: /apps/evelyn-workspace/icas/workspace
+      home_relative: false
+    conda_base: /apps/evelyn-workspace
+    conda_base_home_relative: false
+    jupyter:
+      bind_host: 127.0.0.1
+      env_name: jupyter
+      port: 9898
+  gimli:
+    profile: personal
+    features:
+      omarchy_desktop: true
+    icas:
+      cache_path: local-codex/icas/cache
+      work_path: local-codex/icas/workspace
+      home_relative: true
+    conda_base: .local/opt
+    conda_base_home_relative: true
+  maxwell:
+    profile: personal
+    features:
+      omarchy_desktop: true
+    icas:
+      cache_path: local-codex/icas/cache
+      work_path: local-codex/icas/workspace
+      home_relative: true
+    conda_base: .local/opt
+    conda_base_home_relative: true

@@ -1,6 +1,7 @@
 # Omarchy Linux Package List
 
-This repo still assumes an Omarchy-flavored Arch Linux base on Linux hosts.
+This repo assumes an Omarchy-flavored Arch Linux base only on hosts with the
+`omarchy_desktop` feature enabled.
 
 ## Omarchy-specific layer
 

@@ -1,0 +1,53 @@
+["gruvbox"]
+type = "archive"
+url = "{{ .plugins.vim.gruvbox.url }}"
+exact = true
+stripComponents = 1
+{{- with .plugins.vim.gruvbox.include }}
+include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
+{{- end }}
+
+["nord"]
+type = "archive"
+url = "{{ .plugins.vim.nord.url }}"
+exact = true
+stripComponents = 1
+{{- with .plugins.vim.nord.include }}
+include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
+{{- end }}
+
+["nerdcommenter"]
+type = "archive"
+url = "{{ .plugins.vim.nerdcommenter.url }}"
+exact = true
+stripComponents = 1
+{{- with .plugins.vim.nerdcommenter.include }}
+include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
+{{- end }}
+
+["nerdtree"]
+type = "archive"
+url = "{{ .plugins.vim.nerdtree.url }}"
+exact = true
+stripComponents = 1
+{{- with .plugins.vim.nerdtree.include }}
+include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
+{{- end }}
+
+["vim-fugitive"]
+type = "archive"
+url = "{{ .plugins.vim.vim_fugitive.url }}"
+exact = true
+stripComponents = 1
+{{- with .plugins.vim.vim_fugitive.include }}
+include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
+{{- end }}
+
+["vim-surround"]
+type = "archive"
+url = "{{ .plugins.vim.vim_surround.url }}"
+exact = true
+stripComponents = 1
+{{- with .plugins.vim.vim_surround.include }}
+include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
+{{- end }}

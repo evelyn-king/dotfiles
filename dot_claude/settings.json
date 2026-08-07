@@ -1,5 +1,8 @@
 {
-  "includeCoAuthoredBy": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
   "model": "opus",
   "hooks": {
     "PreToolUse": [
@@ -14,10 +17,19 @@
       }
     ]
   },
+  "extraKnownMarketplaces": {
+    "anthropic-agent-skills": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/skills"
+      }
+    }
+  },
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "autoUpdatesChannel": "stable",
   "tui": "fullscreen",
   "enabledPlugins": {
     "skill-creator@claude-plugins-official": true
-  },
-  "effortLevel": "high"
+  }
 }
