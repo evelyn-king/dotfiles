@@ -1,5 +1,5 @@
-# Repo-managed theming
-config-file = ?"~/.config/themes/{{ .theme }}/ghostty.conf"
+# Theme
+theme = "light:Gruvbox Light,dark:Gruvbox Dark"
 
 # Font
 font-family = "CaskaydiaCove Nerd Font"

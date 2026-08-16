@@ -50,4 +50,5 @@ set undofile
 inoremap jk <Esc>
 
 set background=dark
-source ~/.config/themes/current/vim.vim
+colorscheme gruvbox
+let g:airline_theme = 'gruvbox'

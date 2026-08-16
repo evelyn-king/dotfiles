@@ -29,9 +29,7 @@
 ;; refresh your font settings. If Emacs still can't find your font, it likely
 ;; wasn't installed correctly. Font issues are rarely Doom issues!
 
-;; Theme is controlled by chezmoi; ~/.config/themes/current/doom.el is a
-;; symlink to the active theme's doom.el file.
-(load (expand-file-name "~/.config/themes/current/doom.el"))
+(setq doom-theme 'doom-gruvbox)
 
 ;; This determines the style of line numbers in effect. If set to `nil', line
 ;; numbers are disabled. For relative line numbers, set this to `relative'.

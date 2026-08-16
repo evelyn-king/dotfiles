@@ -1,13 +1,4 @@
-{{- $ageIdentity := env "CHEZMOI_AGE_IDENTITY" | default "~/.config/chezmoi/key.txt" -}}
-{{- /* Public age recipients are not secret. */ -}}
-{{- $ageRecipient := env "CHEZMOI_AGE_RECIPIENT" | default "age197jc7wzxms3whemclkuq7z8mefw7r3238avljr3m6tmg76yal5ls3qtv6h" -}}
 sourceDir = {{ .chezmoi.sourceDir | quote }}
-
-encryption = "age"
-
-[age]
-  identity = {{ $ageIdentity | quote }}
-  recipient = {{ $ageRecipient | quote }}
 
 [cd]
   command = "zsh"

@@ -7,15 +7,6 @@ stripComponents = 1
 include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
 {{- end }}
 
-["nord"]
-type = "archive"
-url = "{{ .plugins.vim.nord.url }}"
-exact = true
-stripComponents = 1
-{{- with .plugins.vim.nord.include }}
-include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
-{{- end }}
-
 ["nerdcommenter"]
 type = "archive"
 url = "{{ .plugins.vim.nerdcommenter.url }}"

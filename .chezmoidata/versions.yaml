@@ -16,11 +16,6 @@ plugins:
       include:
         - "*/autoload/**"
         - "*/colors/**"
-    nord:
-      url: https://github.com/nordtheme/vim/archive/refs/tags/v0.19.0.tar.gz
-      include:
-        - "*/autoload/**"
-        - "*/colors/**"
     nerdcommenter:
       url: https://github.com/preservim/nerdcommenter/archive/a462bbda1e26f44fb3d3eb9d9d1c6a07aa98e665.tar.gz
       include:

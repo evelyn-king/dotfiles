@@ -18,10 +18,10 @@ dependencies of other formulae, plus casks and taps.
 
 ## Coverage
 
-56 formulae, 17 casks, 3 taps. Broadly:
+56 formulae, 17 casks, 1 tap. Broadly:
 
-- Shell and terminal: `starship`, `zoxide`, `direnv`, `atuin`-adjacent tooling,
-  `tmux`, `zellij`, `superfile`
+- Shell and terminal: `starship`, `zoxide`, `direnv`, `atuin`, `tmux`,
+  `zellij`
 - Search and file tools: `ripgrep`, `fd`, `fzf`, `bat`, `eza`, `dust`, `duf`,
   `jq`, `ast-grep`, `tealdeer`
 - Git: `git`, `git-lfs`, `git-delta`, `git-filter-repo`, `lazygit`

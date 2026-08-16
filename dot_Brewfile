@@ -91,14 +91,10 @@ brew "sccache"
 brew "shellcheck"
 # Export Slack data without admin privileges
 brew "slackdump"
-# Editor of encrypted files
-brew "sops"
 # Non-interactive SSH password auth
 brew "sshpass"
 # Cross-shell prompt for astronauts
 brew "starship"
-# Modern and pretty fancy file manager for the terminal
-brew "superfile"
 # Very fast implementation of tldr in Rust
 brew "tealdeer"
 # Terminal multiplexer

@@ -17,7 +17,7 @@ chezmoi apply
 
 Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes without updating pinned externals.
 
-If you already have this repo initialized from the previous `home/` layout, run `chezmoi init` once after pulling so your generated config picks up the repo-root `sourceDir`.
+`~/.config/chezmoi/chezmoi.toml` is rendered from `.chezmoi.toml.tmpl` at init time, not on every apply. After pulling a change to that template, run `chezmoi init` once so the generated config picks it up.
 
 ## Homebrew
 
@@ -42,7 +42,6 @@ This is deterministic at the package-set level. Homebrew still resolves concrete
 ## Branches
 
 - `main` contains the macOS chezmoi source tree at the repo root
-- native Windows history lives on the separate `windows` branch
 
 ## Shell
 
@@ -52,15 +51,9 @@ setup). See `docs/shell-startup.md` for the split and why PATH is built in
 
 ## Theming
 
-`.chezmoidata/theme.yaml` holds the active theme name; `dot_config/themes/`
-holds one directory per theme. Change the name and run `chezmoi apply` to
-re-theme ghostty, btop, and neovim. The active name is also rendered to
-`~/.config/themes/current-theme` for consumers that resolve it at runtime.
-
-## Encryption
-
-Encrypted files use a single age key. See `docs/encryption.md` for key and
-recipient wiring.
+Everything is gruvbox. Each config sets its own theme directly — ghostty,
+btop, neovim, vim, and doom — with no shared theme data or indirection layer.
+Re-introduce a selector here if a second theme ever earns its keep.
 
 ## Remote Jupyter
 

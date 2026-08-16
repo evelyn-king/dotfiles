@@ -50,6 +50,6 @@ Two things in `.zshrc` are order-sensitive:
 
 ## Machine-local additions
 
-`~/.config/shell/extras.sh` is sourced at the end if present. It is stored
-encrypted in the repo (`dot_config/shell/encrypted_extras.sh.age`) and only
-applies when the age identity exists — see `docs/encryption.md`.
+`~/.config/shell/extras.sh` is sourced at the end if present. It is not managed
+by this repo — create it by hand on a machine that needs local-only settings.
+Keep secrets there rather than in tracked files.

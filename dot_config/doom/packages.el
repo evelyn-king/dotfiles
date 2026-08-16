@@ -52,9 +52,3 @@
 ;; (unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;; (unpin! t)
-
-;; Theme packages (managed by chezmoi theme selection)
-{{ if eq .theme "everforest" -}}
-(package! everforest-theme
-  :recipe (:host github :repo "Theory-of-Everything/everforest-emacs"))
-{{ end -}}

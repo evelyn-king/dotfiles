@@ -58,6 +58,10 @@
 .aerospace.toml
 .hyprspace.toml
 
+# Hyprland is Linux-only and superfile is no longer used.
+.config/hypr
+.config/superfile
+
 # Completions and man pages ship with the Homebrew formulae. Only the three
 # files the externals managed are listed; _copilot is not ours to remove.
 .local/share/zsh/site-functions/bat
@@ -72,8 +76,19 @@
 .local/share/man/man1/zoxide-query.1
 .local/share/man/man1/zoxide-remove.1
 
-# btop, ghostty and neovim now point at ~/.config/themes/<theme>/ directly
-# instead of going through the current/ symlink layer.
-.config/themes/current/btop.theme
-.config/themes/current/ghostty.conf
-.config/themes/current/neovim.lua
+# Theming is gruvbox-only, so each config carries its own theme directly and
+# the ~/.config/themes/ tree (and btop's symlink into it) is gone.
+.config/themes
+.config/btop/themes/current.theme
+.config/btop/themes/gruvbox_dark_v2.theme
+
+# Only the gruvbox colorscheme is installed for plain vim now.
+.vim/pack/plugins/start/nord
+.vim/pack/plugins/start/everforest
+.vim/pack/plugins/start/rose-pine
+
+# The multi-theme hot-reload machinery went away with the single-theme setup,
+# and example.lua was LazyVim boilerplate that returned an empty spec.
+.config/nvim/lua/plugins/all-themes.lua
+.config/nvim/lua/plugins/example.lua
+.config/nvim/lua/plugins/omarchy-theme-hotreload.lua

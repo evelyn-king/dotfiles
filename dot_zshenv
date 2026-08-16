@@ -19,8 +19,7 @@ export NLTK_DATA="$XDG_DATA_HOME/nltk_data"
 export DOCKER_DEFAULT_PLATFORM=linux/amd64
 export BUN_INSTALL="$HOME/.bun"
 
-export LOCAL_PRAXIS_CONDA_BASE="$HOME/.local/opt"
-export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$LOCAL_PRAXIS_CONDA_BASE/micromamba}"
+export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/opt/micromamba}"
 
 export JUPYTER_BIND_HOST=127.0.0.1
 export JUPYTER_ENV_NAME=jupyter
