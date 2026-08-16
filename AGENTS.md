@@ -4,6 +4,7 @@
 - `.chezmoi.toml.tmpl` bootstraps chezmoi and selects the repo root as `sourceDir`.
 - The repo root is the chezmoi source state for files under `$HOME`.
 - `.chezmoidata/` carries template data (`versions.yaml`).
+- `nix/` holds the nix-darwin flake that declares macOS packages. It is repo content, not a dotfile, so it is listed in `.chezmoiignore`; see `docs/nix-darwin.md`.
 - `dot_zshenv` and `dot_zshrc` are the whole shell startup path; see `docs/shell-startup.md`.
 - Top-level docs like `README.md` and `AGENTS.md` describe usage and repository conventions.
 

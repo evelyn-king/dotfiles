@@ -7,19 +7,11 @@ typeset -U path fpath
 
 # --- PATH -------------------------------------------------------------------
 
-if [[ -x /opt/homebrew/bin/brew ]]; then
-  eval "$(/opt/homebrew/bin/brew shellenv)"
-elif [[ -x /usr/local/bin/brew ]]; then
-  eval "$(/usr/local/bin/brew shellenv)"
-fi
-
 # (N-/) drops entries that aren't existing directories.
 #
-# The Nix profiles are listed ahead of $path so they win over Homebrew, which
-# `brew shellenv` above prepends. `typeset -U` keeps the first occurrence of a
-# duplicate, so naming them here is what does the reordering. Homebrew stays
-# reachable during the migration so `brew` itself still runs; drop the block
-# above once Homebrew is uninstalled.
+# The Nix profiles are named explicitly so their order is set here rather than
+# inherited from /etc/zshenv. `typeset -U` keeps the first occurrence of a
+# duplicate, so listing them is what fixes their position.
 path=(
   "$HOME/.local/bin"(N-/)
   "$BUN_INSTALL/bin"(N-/)

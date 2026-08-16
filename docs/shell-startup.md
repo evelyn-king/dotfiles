@@ -14,9 +14,9 @@ split is simply "always" versus "at a prompt".
 
 `.zshenv` would be the natural home for PATH, but on macOS `/etc/zprofile` runs
 `path_helper` *after* `.zshenv`, and `path_helper` rebuilds PATH with the system
-directories in front. Anything prepended in `.zshenv` — Homebrew especially —
-would end up shadowed by `/usr/bin`. Building PATH in `.zshrc` puts it after
-`path_helper` and keeps the intended order.
+directories in front. Anything prepended in `.zshenv` — the Nix profiles
+especially — would end up shadowed by `/usr/bin`. Building PATH in `.zshrc` puts
+it after `path_helper` and keeps the intended order.
 
 The tradeoff: non-interactive shells inherit PATH from their parent rather than
 constructing it. That is normal, and scripts in `~/.local/bin` do not depend on

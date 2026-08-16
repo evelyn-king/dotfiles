@@ -19,25 +19,24 @@ Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes witho
 
 `~/.config/chezmoi/chezmoi.toml` is rendered from `.chezmoi.toml.tmpl` at init time, not on every apply. After pulling a change to that template, run `chezmoi init` once so the generated config picks it up.
 
-## Homebrew
+## Packages
 
-On macOS, this repo now manages a global Homebrew bundle in `~/.Brewfile`.
-
-```bash
-chezmoi edit ~/.Brewfile
-check-homebrew
-sync-homebrew
-```
-
-`check-homebrew`, `sync-homebrew`, and `dump-homebrew` default `HOMEBREW_NO_AUTO_UPDATE=1` so the bundle workflow does not implicitly refresh Homebrew metadata. `sync-homebrew` also uses `brew bundle --no-upgrade` by default, so it converges on the tracked top-level packages without opportunistically upgrading everything already installed. Add `--cleanup` if you want undeclared top-level packages removed as well.
-
-To seed the Brewfile from an existing Mac, run:
+macOS packages come from nix-darwin. The declaration is `nix/flake.nix`, which
+is repo content rather than a dotfile, so it is read from the source tree
+directly and listed in `.chezmoiignore`.
 
 ```bash
-dump-homebrew --source-dir /path/to/this/repo
+darwin-rebuild switch --flake ~/.local/share/chezmoi/nix#lagrange
+nix flake update --flake ~/.local/share/chezmoi/nix    # move the pin
 ```
 
-This is deterministic at the package-set level. Homebrew still resolves concrete formula and cask versions from the current state of its taps, so strict version pinning needs versioned formulae or a custom tap.
+`nix/flake.lock` pins nixpkgs to an exact commit, so the package set is
+reproducible and moves only when you update it and review the diff.
+
+GUI applications are installed by hand rather than through Nix — the store is
+read-only, so an app that updates itself fails forever. See
+[`docs/nix-darwin.md`](docs/nix-darwin.md) for that reasoning, the list of
+hand-installed apps, and the exceptions.
 
 ## Branches
 

@@ -93,6 +93,13 @@ Should that ever be revisited, two cautions apply:
 
 ## Notes
 
+- **Not everything comes from Nix.** `.chezmoidata/versions.yaml` still pins
+  `keychain` (held back pending a check against 3.x) plus the tmux and vim
+  plugins, which are fetched as chezmoi externals. `micromamba` and the GUI
+  applications are installed by hand. Language-level package managers — `bun`,
+  `cargo`, `go install`, `uv`, `pixi` — fetch their own binaries as before, and
+  their bin directories sit ahead of the Nix profiles in `dot_zshrc`, so
+  anything installed through them shadows the Nix copy.
 - **Unfree.** Every package in the closure is free, so no `allowUnfree` escape
   hatch is configured and adding an unfree package will fail the build until one
   is. Prefer a narrow `allowUnfreePredicate` allowlist over blanket
