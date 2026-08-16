@@ -38,10 +38,6 @@ read-only, so an app that updates itself fails forever. See
 [`docs/nix-darwin.md`](docs/nix-darwin.md) for that reasoning, the list of
 hand-installed apps, and the exceptions.
 
-## Branches
-
-- `main` contains the macOS chezmoi source tree at the repo root
-
 ## Shell
 
 Shell startup is `~/.zshenv` (environment) and `~/.zshrc` (PATH plus interactive
@@ -52,7 +48,7 @@ setup). See `docs/shell-startup.md` for the split and why PATH is built in
 
 Everything is gruvbox. Each config sets its own theme directly — ghostty,
 btop, neovim, vim, and doom — with no shared theme data or indirection layer.
-Re-introduce a selector here if a second theme ever earns its keep.
+Add a selector here if a second theme ever earns its keep.
 
 ## Remote Jupyter
 

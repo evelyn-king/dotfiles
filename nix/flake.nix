@@ -45,7 +45,7 @@
         tealdeer
 
         # --- git ---
-        delta            # brew: git-delta
+        delta
         git
         git-filter-repo
         git-lfs
@@ -59,12 +59,12 @@
         # micromamba — NOT from Nix. 2.6.2 has no Darwin substitute and fails to
         # build from source (libmamba fmt/libcxx-21 incompatibility). Install the
         # standalone binary instead; see docs/nix-darwin.md.
-        nodejs           # brew: node
+        nodejs
         pixi
         uv
 
         # --- editors ---
-        emacs-macport    # brew cask: emacs-plus-app (different patch set)
+        emacs-macport
         helix
         neovim
         vim
@@ -92,23 +92,23 @@
         gnupg
         herdr
         ollama
-        pinentry_mac     # brew: pinentry-mac
+        pinentry_mac
         prettyping
         slackdump
         sshpass
         w3m
         wget
 
-        # No former Homebrew cask is managed here except emacs-macport above,
-        # which is kept because it is the only one with no self-updater:
+        # emacs-macport is the only GUI app bundle in this closure, because it
+        # is the only one with no self-updater. The apps deliberately left out:
         #
         #   1Password, Tailscale   privileged helpers (code-signature-checked
         #                          browser integration; a network system
         #                          extension) that Nix repackaging can break.
         #   Zed, Obsidian, Zotero, self-updaters. The store is read-only, so the
         #   Ghostty, iTerm2, codex update always fails and the tool nags.
-        #                          Ghostty would be `ghostty-bin` if reinstated —
-        #                          the source build is Linux-only.
+        #                          Ghostty would be `ghostty-bin` here — the
+        #                          source build is Linux-only.
         #
         # See docs/nix-darwin.md.
       ];

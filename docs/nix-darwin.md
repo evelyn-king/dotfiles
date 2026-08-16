@@ -1,8 +1,7 @@
 # nix-darwin
 
 macOS packages are declared in [`nix/flake.nix`](../nix/flake.nix) and applied
-with nix-darwin. This replaces Homebrew as the package manager; chezmoi keeps
-ownership of dotfiles.
+with nix-darwin. chezmoi keeps ownership of dotfiles.
 
 ## Commands
 
@@ -26,15 +25,6 @@ updating the world is `nix flake update`, reviewed as a diff, never implicit.
   below for why.
 - **Determinate Nix** — the daemon and `/etc/nix/nix.conf`. Hence
   `nix.enable = false` in the flake; nix-darwin must not manage Nix here.
-
-## Coverage
-
-All 56 former Homebrew formulae are in nixpkgs for `aarch64-darwin`. Four are
-named differently: `git-delta`→`delta`, `node`→`nodejs`, `pinentry-mac`→
-`pinentry_mac`, `dust`→`dust` (the old `du-dust` alias is gone).
-
-Of 17 casks, 1 comes from nixpkgs: `emacs-macport`. Eight more are packaged for
-Darwin but deliberately not used — see below.
 
 ## Applications installed by hand
 
@@ -65,8 +55,8 @@ repackaging can break the signature chains their privileged components depend
 on. The other six are excluded because they self-update.
 
 `codex` is the only command-line tool among these, but it leaves no gap: it is
-already installed globally via bun at `~/.bun/bin/codex`, and `$BUN_INSTALL/bin`
-sits ahead of the Nix profiles in `dot_zshrc`, so that copy was winning anyway.
+installed globally via bun at `~/.bun/bin/codex`, and `$BUN_INSTALL/bin` sits
+ahead of the Nix profiles in `dot_zshrc`, so that copy wins.
 
 ## Why self-updating apps are not managed here
 
@@ -93,22 +83,22 @@ Should that ever be revisited, two cautions apply:
 
 ## Notes
 
-- **Not everything comes from Nix.** `.chezmoidata/versions.yaml` still pins
+- **Not everything comes from Nix.** `.chezmoidata/versions.yaml` pins
   `keychain` (held back pending a check against 3.x) plus the tmux and vim
   plugins, which are fetched as chezmoi externals. `micromamba` and the GUI
   applications are installed by hand. Language-level package managers — `bun`,
-  `cargo`, `go install`, `uv`, `pixi` — fetch their own binaries as before, and
-  their bin directories sit ahead of the Nix profiles in `dot_zshrc`, so
-  anything installed through them shadows the Nix copy.
+  `cargo`, `go install`, `uv`, `pixi` — fetch their own binaries, and their bin
+  directories sit ahead of the Nix profiles in `dot_zshrc`, so anything
+  installed through them shadows the Nix copy.
 - **Unfree.** Every package in the closure is free, so no `allowUnfree` escape
   hatch is configured and adding an unfree package will fail the build until one
   is. Prefer a narrow `allowUnfreePredicate` allowlist over blanket
   `allowUnfree` so each exception stays a deliberate edit.
-- **Emacs.** `emacs-macport` is not `emacs-plus`; it carries a different patch
-  set. Verify Doom still builds after the switch — see
+- **Emacs.** `emacs-macport` carries its own patch set; check Doom still builds
+  against it after a flake update — see
   `run_once_after_install-doom-emacs.sh.tmpl`.
-- **Ghostty.** If ever reinstated, the attribute is `ghostty-bin` — the source
-  build is Linux-only in nixpkgs.
+- **Ghostty.** If it is ever added here, the attribute is `ghostty-bin` — the
+  source build is Linux-only in nixpkgs.
 - **micromamba is not managed by Nix.** nixpkgs 2.6.2 has no `aarch64-darwin`
   substitute and fails to build from source — libmamba hits a `fmt`/libcxx-21
   incompatibility (`no member named 'format' in namespace 'fmt'`). Because a
@@ -132,9 +122,3 @@ Should that ever be revisited, two cautions apply:
   Spotlight and the Dock index poorly. If Emacs proves hard to launch from
   Spotlight, `mac-app-util` writes real aliases instead; it is a third-party
   flake, so it is documented in the flake as opt-in rather than enabled.
-- **Provenance.** Relevant mainly if GUI casks are ever reinstated: the Darwin
-  GUI packages in nixpkgs are fixed-output derivations wrapping vendor
-  `.dmg`/`.zip` artifacts rather than source builds. The gain over a Homebrew
-  cask is a pinned, reviewable hash — casks with `version :latest` use
-  `sha256 :no_check` and verify nothing — but the vendor binary is still
-  trusted.
