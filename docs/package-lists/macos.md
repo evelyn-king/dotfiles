@@ -1,5 +1,9 @@
 # macOS Package List
 
+> **Migration in progress.** Packages are moving to nix-darwin — see
+> [`docs/nix-darwin.md`](../nix-darwin.md). Homebrew is still the live package
+> manager until the cutover completes; this document describes it as it stands.
+
 Apple Silicon macOS machines use Homebrew as the primary package manager.
 
 ## Manifest

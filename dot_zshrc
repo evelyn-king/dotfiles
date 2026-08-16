@@ -14,11 +14,20 @@ elif [[ -x /usr/local/bin/brew ]]; then
 fi
 
 # (N-/) drops entries that aren't existing directories.
+#
+# The Nix profiles are listed ahead of $path so they win over Homebrew, which
+# `brew shellenv` above prepends. `typeset -U` keeps the first occurrence of a
+# duplicate, so naming them here is what does the reordering. Homebrew stays
+# reachable during the migration so `brew` itself still runs; drop the block
+# above once Homebrew is uninstalled.
 path=(
   "$HOME/.local/bin"(N-/)
   "$BUN_INSTALL/bin"(N-/)
   "$HOME/.rd/bin"(N-/)
   "$HOME/.config/emacs/bin"(N-/)
+  "$HOME/.nix-profile/bin"(N-/)
+  /run/current-system/sw/bin(N-/)
+  /nix/var/nix/profiles/default/bin(N-/)
   $path
   "$HOME/.pixi/bin"(N-/)
   "/Applications/Obsidian.app/Contents/MacOS"(N-/)

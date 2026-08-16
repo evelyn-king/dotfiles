@@ -3,4 +3,5 @@ CLAUDE.md
 .mailmap
 docs/**
 LICENSE
+nix/**
 README.md
