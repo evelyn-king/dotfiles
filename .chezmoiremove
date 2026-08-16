@@ -99,3 +99,10 @@
 .local/bin/check-homebrew
 .local/bin/dump-homebrew
 .local/bin/sync-homebrew
+
+# cargo now calls sccache directly. The wrapper existed only to fall back when
+# sccache was missing, which nix-darwin makes impossible; its fallback branch
+# was broken anyway. .local/bin/rustc-wrapper was a stale symlink into the
+# pre-rename local-praxis tree and is what cargo actually resolved.
+.cargo/rustc-wrapper.sh
+.local/bin/rustc-wrapper
