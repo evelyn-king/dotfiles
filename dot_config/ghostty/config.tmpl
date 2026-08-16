@@ -1,38 +1,10 @@
-{{- $profileOverride := env "CHEZMOI_PROFILE" -}}
-{{- $hostKnown := hasKey .hosts .chezmoi.hostname -}}
-{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
-{{- $profileName := $profileOverride -}}
-{{- if eq $profileName "" -}}
-{{- if not $hostKnown -}}
-{{- fail (printf "hostname %q has no configured profile; set CHEZMOI_PROFILE=personal or CHEZMOI_PROFILE=work explicitly" .chezmoi.hostname) -}}
-{{- end -}}
-{{- $profileName = get $host "profile" | default .profiles.default -}}
-{{- end -}}
-{{- $profile := get .profiles $profileName | default dict -}}
-{{- $features := get $host "features" | default dict -}}
-{{- $omarchyDesktop := and
-  (eq .chezmoi.os "linux")
-  (get $profile "omarchy_desktop_allowed" | default false)
-  (get $features "omarchy_desktop" | default false)
--}}
-{{- if $omarchyDesktop }}
-# Dynamic theme colors
-config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
-{{- else }}
 # Repo-managed theming
-config-file = ?"~/.config/themes/current/ghostty.conf"
-{{- end }}
+config-file = ?"~/.config/themes/{{ .theme }}/ghostty.conf"
 
 # Font
 font-family = "CaskaydiaCove Nerd Font"
 font-style = Regular
-{{- if $omarchyDesktop }}
-# Hyprland scaling
-font-size = 9
-{{- else }}
-# Decent MacOS size for my screen
 font-size = 12
-{{- end }}
 
 # Window
 window-theme = ghostty
@@ -40,7 +12,6 @@ window-padding-x = 14
 window-padding-y = 14
 confirm-close-surface=false
 resize-overlay = never
-gtk-toolbar-style = flat
 
 # Cursor styling
 cursor-style = "block"
@@ -60,6 +31,3 @@ keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 
 # Slowdown mouse scrolling
 mouse-scroll-multiplier = 0.95
-
-# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
-async-backend = epoll

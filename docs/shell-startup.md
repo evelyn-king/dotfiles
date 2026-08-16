@@ -1,48 +1,55 @@
 # Shell Startup Layout
 
-Shell startup is split into two stages:
+Shell startup is two files:
 
-- `~/.config/shell/base.sh`: environment and PATH setup needed by every bash/zsh
-  shell.
-- `~/.config/shell/interactive.sh`: interactive-only setup. It sources
-  `base.sh` first, then adds completions, hooks, keychain, and prompt init.
+- `~/.zshenv`: environment variables read by every zsh invocation, interactive
+  or not.
+- `~/.zshrc`: PATH construction plus all interactive setup — completions, ssh
+  agent, tool hooks, aliases, functions, and prompt init.
 
-Shell startup files are best understood in terms of two questions:
+zsh reads `.zshenv` for every shell and `.zshrc` for interactive shells, so the
+split is simply "always" versus "at a prompt".
 
-- Is this a login shell?
-- Is this an interactive shell?
+## Why PATH lives in `.zshrc`
 
-`base.sh` handles setup that should exist in any shell session. `interactive.sh`
-handles setup that only makes sense when a user is actively at a prompt.
+`.zshenv` would be the natural home for PATH, but on macOS `/etc/zprofile` runs
+`path_helper` *after* `.zshenv`, and `path_helper` rebuilds PATH with the system
+directories in front. Anything prepended in `.zshenv` — Homebrew especially —
+would end up shadowed by `/usr/bin`. Building PATH in `.zshrc` puts it after
+`path_helper` and keeps the intended order.
 
-The entrypoint mapping follows each shell's startup rules:
+The tradeoff: non-interactive shells inherit PATH from their parent rather than
+constructing it. That is normal, and scripts in `~/.local/bin` do not depend on
+the shell config for it.
 
-- `~/.profile` -> `base.sh`
-- `~/.zprofile` -> `base.sh`
-- `~/.zshrc` -> `interactive.sh`
-- `~/.bashrc` -> `interactive.sh`
-- `~/.bash_profile` -> `interactive.sh` for interactive login shells,
-  otherwise `base.sh`
+## PATH conventions
 
-The Bash and Zsh entrypoints differ because the shells read different files:
+`typeset -U path` keeps entries unique, first occurrence winning. Directories
+use the `(N-/)` glob qualifier so entries that do not exist are dropped rather
+than left as dead PATH members:
 
-- Bash interactive login shells read `~/.bash_profile`, but do not automatically
-  read `~/.bashrc`.
-- Bash interactive non-login shells read `~/.bashrc`.
-- Zsh login shells read `~/.zprofile`.
-- Zsh interactive shells read `~/.zshrc`.
+```zsh
+path=(
+  "$HOME/.local/bin"(N-/)
+  $path
+  "$HOME/.pixi/bin"(N-/)
+)
+```
 
-That means interactive login Bash needs `~/.bash_profile` to choose the full
-interactive path, while interactive login Zsh can keep login setup in
-`~/.zprofile` and interactive setup in `~/.zshrc`.
+The exception is `$GOPATH/bin`, added unconditionally because the first
+`go install` creates it.
 
-The fragment order is explicit inside each loader:
+## Ordering constraints
 
-- `base.sh`: `00_init.sh`, `15_host_env.sh`, `25_nvim.sh`, `30_env.sh`,
-  `40_python.sh`
-- `interactive.sh`: `05_zsh_completions.sh` (zsh) or `10_bash_init.sh` (bash),
-  `30_interactive.sh`, `35_keychain.sh`, `45_omarchy.sh` (when
-  `SHELL_IS_OMARCHY=1`), the active profile's `90_extras.sh`, `99_finish.sh`
+Two things in `.zshrc` are order-sensitive:
 
-On macOS, interactive zsh keeps prompt setup in `~/.zshrc` so `/etc/zshrc`
-finishes its prompt reset before `starship` runs.
+- `compinit` must run before anything calling `compdef`, which is why
+  completions are set up before the tool integrations.
+- `starship`, `zoxide`, and `atuin` init last, so `/etc/zshrc` has finished its
+  prompt reset before `starship` installs its own.
+
+## Machine-local additions
+
+`~/.config/shell/extras.sh` is sourced at the end if present. It is stored
+encrypted in the repo (`dot_config/shell/encrypted_extras.sh.age`) and only
+applies when the age identity exists — see `docs/encryption.md`.

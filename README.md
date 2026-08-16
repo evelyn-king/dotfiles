@@ -41,19 +41,31 @@ This is deterministic at the package-set level. Homebrew still resolves concrete
 
 ## Branches
 
-- `main` contains the macOS/Linux chezmoi source tree at the repo root
+- `main` contains the macOS chezmoi source tree at the repo root
 - native Windows history lives on the separate `windows` branch
+
+## Shell
+
+Shell startup is `~/.zshenv` (environment) and `~/.zshrc` (PATH plus interactive
+setup). See `docs/shell-startup.md` for the split and why PATH is built in
+`.zshrc`.
+
+## Theming
+
+`.chezmoidata/theme.yaml` holds the active theme name; `dot_config/themes/`
+holds one directory per theme. Change the name and run `chezmoi apply` to
+re-theme ghostty, btop, and neovim. The active name is also rendered to
+`~/.config/themes/current-theme` for consumers that resolve it at runtime.
 
 ## Encryption
 
-Personal and work encrypted files use separate age keys. See
-`docs/encryption.md` for profile-specific key and recipient wiring.
+Encrypted files use a single age key. See `docs/encryption.md` for key and
+recipient wiring.
 
 ## Remote Jupyter
 
-Shell startup exports `JUPYTER_BIND_HOST`, `JUPYTER_ENV_NAME`, and `JUPYTER_PORT`
-from the host config, with defaults that bind JupyterLab to `127.0.0.1:8888`
-inside the `jupyter` environment.
+`~/.zshenv` exports `JUPYTER_BIND_HOST`, `JUPYTER_ENV_NAME`, and `JUPYTER_PORT`,
+binding JupyterLab to `127.0.0.1:8888` inside the `jupyter` environment.
 
 `jupyter-remote-lab` runs `jupyter lab` through `micromamba run -n jupyter` or
 `conda run -n jupyter` by default, so the notebook server starts inside that

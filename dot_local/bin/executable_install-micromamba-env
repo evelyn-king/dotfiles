@@ -14,7 +14,7 @@ user kernel first and then reinstalling the kernel from the refreshed env.
 
 Environment:
   JUPYTER_ENV_NAME   Kernel management environment name. Defaults to "jupyter".
-  MAMBA_ROOT_PREFIX  Micromamba root prefix. Defaults to the chezmoi host config.
+  MAMBA_ROOT_PREFIX  Micromamba root prefix. Defaults to ~/.local/opt/micromamba.
 EOF
 }
 
@@ -32,14 +32,7 @@ require_command() {
 }
 
 default_mamba_root_prefix() {
-  host_env_file="${HOME}/.config/shell/15_host_env.sh"
-  if [ -f "${host_env_file}" ]; then
-    # shellcheck source=/dev/null
-    source "${host_env_file}"
-  else
-    printf '[%s] Missing source file: %s\n' "${SCRIPT_NAME}" "${host_env_file}" >&2
-  fi
-  printf '%s\n' "${MAMBA_ROOT_PREFIX_DEFAULT:-${HOME}/.local/opt/micromamba}"
+  printf '%s\n' "${HOME}/.local/opt/micromamba"
 }
 
 env_name_from_file() {

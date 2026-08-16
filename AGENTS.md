@@ -3,11 +3,12 @@
 ## Project Structure & Module Organization
 - `.chezmoi.toml.tmpl` bootstraps chezmoi and selects the repo root as `sourceDir`.
 - The repo root is the chezmoi source state for files under `$HOME`.
-- `.chezmoidata/` carries template data.
+- `.chezmoidata/` carries template data (`theme.yaml`, `versions.yaml`).
+- `dot_zshenv` and `dot_zshrc` are the whole shell startup path; see `docs/shell-startup.md`.
 - Top-level docs like `README.md` and `AGENTS.md` describe usage and repository conventions.
 
 ## Branching
-- Keep macOS/Linux configs on `main`.
+- Keep macOS configs on `main`.
 - Use the separate `windows` branch for native Windows history.
 
 ## Build, Test, and Development Commands
@@ -33,4 +34,5 @@
 - Avoid committing secrets. Keep user-specific values in configs as placeholders.
 - On `main`, place new configs at the repo root using chezmoi naming conventions so they render to the intended destination.
 - Put native Windows changes on the `windows` branch.
+- Prefer plain files over templates. Only reach for `.tmpl` when a value genuinely varies or must be resolved at apply time.
 - Keep `dot_config/nvim/lazy-lock.json` untracked; it is per-machine.

@@ -1,0 +1,28 @@
+# .zshenv - environment for every zsh invocation.
+#
+# PATH is deliberately NOT built here: macOS /etc/zprofile runs path_helper
+# after .zshenv and would reorder anything prepended at this stage. PATH lives
+# in .zshrc instead.
+
+export EDITOR=nvim
+export VISUAL=$EDITOR
+
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+export TMPDIR=/tmp
+
+export NLTK_DATA="$XDG_DATA_HOME/nltk_data"
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+export BUN_INSTALL="$HOME/.bun"
+
+export LOCAL_PRAXIS_CONDA_BASE="$HOME/.local/opt"
+export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$LOCAL_PRAXIS_CONDA_BASE/micromamba}"
+
+export JUPYTER_BIND_HOST=127.0.0.1
+export JUPYTER_ENV_NAME=jupyter
+export JUPYTER_PORT=8888
+export JUPYTER_REMOTE_ENV_FILE="${JUPYTER_REMOTE_ENV_FILE:-$XDG_STATE_HOME/jupyter-remote/current.env}"

@@ -1,8 +1,166 @@
-shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/interactive.sh"
+# .zshrc - interactive zsh.
+#
+# PATH is built here rather than in .zshenv because macOS /etc/zprofile runs
+# path_helper in between, which would reorder earlier prepends.
 
-if [ -f "${shell_loader}" ]; then
-  # shellcheck source=/dev/null
-  . "${shell_loader}"
-else
-  printf 'Missing source file: %s\n' "${shell_loader}" >&2
+typeset -U path fpath
+
+# --- PATH -------------------------------------------------------------------
+
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
 fi
+
+# (N-/) drops entries that aren't existing directories.
+path=(
+  "$HOME/.local/bin"(N-/)
+  "$BUN_INSTALL/bin"(N-/)
+  "$HOME/.rd/bin"(N-/)
+  "$HOME/.config/emacs/bin"(N-/)
+  $path
+  "$HOME/.pixi/bin"(N-/)
+  "/Applications/Obsidian.app/Contents/MacOS"(N-/)
+)
+
+if (( $+commands[go] )); then
+  export GOPATH="$XDG_DATA_HOME/go"
+  # Not (N-/): this is created by the first `go install`, so keep it on PATH.
+  path=("$GOPATH/bin" $path)
+fi
+
+export MANPATH="$HOME/.local/share/man:${MANPATH:-}"
+
+[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
+[[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
+
+gcloud_sdk="$HOME/.local/opt/google-cloud-sdk"
+[[ -f "$gcloud_sdk/path.zsh.inc" ]] && source "$gcloud_sdk/path.zsh.inc"
+
+if [[ -d "$HOME/.config/nvm" ]]; then
+  export NVM_DIR="$HOME/.config/nvm"
+  [[ -f "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
+fi
+
+GPG_TTY=$(tty 2>/dev/null) && export GPG_TTY
+
+# --- completions ------------------------------------------------------------
+
+fpath=("$XDG_DATA_HOME/zsh/site-functions"(N-/) $fpath)
+
+autoload -Uz compinit
+# Only rebuild the dump if it's more than a day old.
+if [[ -n ~/.zcompdump(N.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+autoload -U +X bashcompinit && bashcompinit
+
+[[ -f "$gcloud_sdk/completion.zsh.inc" ]] && source "$gcloud_sdk/completion.zsh.inc"
+unset gcloud_sdk
+
+# --- ssh agent --------------------------------------------------------------
+
+# Keep a forwarded agent when SSH'd in; otherwise let keychain manage a local one.
+use_forwarded_agent=0
+if [[ -n "$SSH_CONNECTION" && "$SSH_AUTH_SOCK" == /tmp/ssh-*/agent.* ]]; then
+  ssh-add -l >/dev/null 2>&1
+  (( $? == 0 || $? == 1 )) && use_forwarded_agent=1
+fi
+if (( ! use_forwarded_agent )) && (( $+commands[keychain] )); then
+  eval "$(keychain --eval --quiet --ignore-missing id_ed25519)" || true
+fi
+unset use_forwarded_agent
+
+# --- tool integrations ------------------------------------------------------
+
+(( $+commands[direnv] )) && eval "$(direnv hook zsh)"
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
+(( $+commands[pixi] )) && eval "$(pixi completion --shell zsh)"
+
+if (( $+commands[micromamba] )); then
+  export MAMBA_EXE="$commands[micromamba]"
+  eval "$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX")"
+fi
+
+if (( $+commands[fzf] )); then
+  source <(fzf --zsh)
+  if (( $+commands[fd] )); then
+    export FZF_DEFAULT_COMMAND='fd --type f --strip-cwd-prefix'
+    export FZF_CTRL_T_COMMAND="$FZF_DEFAULT_COMMAND"
+  fi
+fi
+
+# --- aliases and functions --------------------------------------------------
+
+alias ..='cd ..'
+alias ...='cd ../..'
+alias ....='cd ../../..'
+
+(( $+commands[bun] )) && alias bunx='bun x'
+(( $+commands[helix] )) && alias hx='helix'
+(( $+commands[docker] )) && alias d='docker'
+(( $+commands[rails] )) && alias r='rails'
+(( $+commands[opencode] )) && alias c='opencode'
+(( $+commands[tmux] )) && alias t='tmux attach || tmux new -s Work'
+(( $+commands[emacsclient] )) && alias emacs='emacsclient --no-window-system --alternate-editor=""'
+(( $+commands[claude] )) && alias cx='printf "\033[2J\033[3J\033[H" && claude --allow-dangerously-skip-permissions'
+
+if (( $+commands[eza] )); then
+  alias ls='eza -lh --group-directories-first --icons=auto'
+  alias lsa='ls -a'
+  alias lt='eza --tree --level=2 --long --icons --git'
+  alias lta='lt -a'
+fi
+
+if (( $+commands[fzf] && $+commands[bat] )); then
+  alias ff="fzf --preview 'bat --style=numbers --color=always {}'"
+  alias eff='${EDITOR:-nvim} "$(ff)"'
+fi
+
+if (( $+commands[git] )); then
+  alias g='git'
+  alias gcm='git commit -m'
+  alias gcam='git commit -a -m'
+  alias gcad='git commit -a --amend'
+fi
+
+n() {
+  if (( $# == 0 )); then
+    command nvim .
+  else
+    command nvim "$@"
+  fi
+}
+
+create_direnv_micromamba() {
+  local env_name=${1:-${PWD:t}}
+  echo "layout micromamba $env_name" >.envrc
+  direnv allow .
+}
+
+create_direnv_venv() {
+  echo "source .venv/bin/activate" >.envrc
+  direnv allow .
+}
+
+jupyter_remote_load_env() {
+  local env_file=${1:-$JUPYTER_REMOTE_ENV_FILE}
+  if [[ ! -f "$env_file" ]]; then
+    print -u2 "Missing Jupyter env file: $env_file"
+    return 1
+  fi
+  source "$env_file"
+}
+
+# --- local overrides --------------------------------------------------------
+
+[[ -f "$XDG_CONFIG_HOME/shell/extras.sh" ]] && source "$XDG_CONFIG_HOME/shell/extras.sh"
+
+# --- prompt (must stay last) ------------------------------------------------
+
+(( $+commands[starship] )) && eval "$(starship init zsh)"
+(( $+commands[zoxide] )) && eval "$(zoxide init --cmd cd zsh)"
+(( $+commands[atuin] )) && eval "$(atuin init zsh)"
