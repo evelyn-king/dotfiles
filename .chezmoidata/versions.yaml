@@ -1,11 +1,3 @@
-tools:
-  darwin:
-    arm64:
-      keychain:
-        type: file
-        url: https://github.com/danielrobbins/keychain/releases/download/2.9.8/keychain
-        sha256: f8b4e8a2a630907bb81737d455a2dec2cb8308e3210840665239ef9c49bbeadb
-
 plugins:
   tmux:
     tpm:

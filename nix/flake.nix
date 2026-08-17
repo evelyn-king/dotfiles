@@ -27,6 +27,7 @@
         # --- shell and terminal ---
         atuin
         direnv
+        keychain
         starship
         tmux
         zellij

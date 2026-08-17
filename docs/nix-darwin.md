@@ -14,6 +14,30 @@ nix flake update --flake ~/.local/share/chezmoi/nix                 # move the p
 `nix/` is listed in `.chezmoiignore`: it is repo content, not a dotfile, so it
 is read from the source tree directly rather than rendered into `$HOME`.
 
+`chezmoi apply` reminds you to switch, but never switches.
+`run_after_darwin-rebuild.sh.tmpl` runs on every apply and compares the running
+system against the flake, printing the `darwin-rebuild switch` line for as long
+as the two differ. It nags until you act, rather than once when the file
+changed; an apply on a current system is silent. The check costs one `nix eval`,
+about 2.5s.
+
+**It stops there on purpose.** Activation requires root, and `chezmoi apply` is
+a routine command that must not escalate. The script is rendered from repo
+content, so a `sudo` call inside it would grant root to anything that reaches
+the source tree — a bad commit, a compromised upstream, a careless merge — at
+the moment you run an unrelated apply. Activation stays a separate command you
+type knowingly.
+
+What it compares is deliberate. `config.system.path` and
+`config.system.build.etc` are matched against `/run/current-system/sw` and
+`/run/current-system/etc`; the system's own `outPath` is **not** used. That
+top-level path embeds `system.configurationRevision`, which is the git revision
+of this entire repo — so every commit, including ones nowhere near `nix/`, would
+report drift that no package or `/etc` file reflects. The two halves compared
+instead carry no revision, so a difference is always a real one. The gap is
+narrow but worth knowing: a change that alters neither the package set nor
+`/etc` — a launchd job, say — will not be caught.
+
 `flake.lock` pins nixpkgs to an exact commit. It is committed deliberately —
 updating the world is `nix flake update`, reviewed as a diff, never implicit.
 
@@ -83,13 +107,14 @@ Should that ever be revisited, two cautions apply:
 
 ## Notes
 
-- **Not everything comes from Nix.** `.chezmoidata/versions.yaml` pins
-  `keychain` (held back pending a check against 3.x) plus the tmux and vim
-  plugins, which are fetched as chezmoi externals. `micromamba` and the GUI
-  applications are installed by hand. Language-level package managers — `bun`,
-  `cargo`, `go install`, `uv`, `pixi` — fetch their own binaries, and their bin
+- **Not everything comes from Nix.** `.chezmoidata/versions.yaml` pins the tmux
+  and vim plugins, which are fetched as chezmoi externals. `micromamba` and the
+  GUI applications are installed by hand. Language-level package managers —
+  `bun`, `cargo`, `go install`, `uv`, `pixi` — fetch their own binaries, and bin
   directories sit ahead of the Nix profiles in `dot_zshrc`, so anything
-  installed through them shadows the Nix copy.
+  installed through them shadows the Nix copy. That ordering also means a stale
+  binary left in `~/.local/bin` will win over the Nix one — remove it when a
+  tool moves into the flake.
 - **Unfree.** Every package in the closure is free, so no `allowUnfree` escape
   hatch is configured and adding an unfree package will fail the build until one
   is. Prefer a narrow `allowUnfreePredicate` allowlist over blanket
