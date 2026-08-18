@@ -1,39 +1,54 @@
 #!/usr/bin/env bash
 
-# Install the applications declared in .chezmoidata/omarchy.yaml that this
-# machine is missing.
+# Install the applications and editors declared in .chezmoidata/omarchy.yaml
+# that this machine is missing.
 #
-# Scoped to chosen applications only. Omarchy's own baseline is already present
-# on any Omarchy install, and the hardware-driven half of this machine's
-# package delta is deliberately excluded — see the comment on `packages:` in
-# the data file.
+# Scoped to chosen applications only. Omarchy's own baseline
+# (/usr/share/omarchy/install/omarchy-*.packages) is present on any Omarchy
+# install, and the hardware-driven half of this machine's package delta is
+# deliberately excluded — see the comment on `packages:` in the data file.
 #
 # `omarchy pkg add` elevates on its own, so it is called plainly rather than
 # wrapped in sudo. That does mean an install can prompt for a password: when
 # there is no terminal to answer with, this reports what is missing and stops
 # rather than hanging a non-interactive apply.
 #
-# repo: {{ .omarchy.packages.repo | join " " }}
-# aur:  {{ .omarchy.packages.aur | join " " }}
+# repo:    {{ .omarchy.packages.repo | join " " }}
+# fonts:   {{ .omarchy.packages.fonts | join " " }}
+# aur:     {{ .omarchy.packages.aur | join " " }}
+# editors: {{ range $editor, $sentinel := .omarchy.editors }}{{ $editor }}={{ $sentinel }} {{ end }}
 
 set -euo pipefail
 
 command -v omarchy >/dev/null 2>&1 || exit 0
 
-repo_pkgs=({{ range .omarchy.packages.repo }}{{ . | quote }} {{ end }})
+# Fonts are declared separately for readability but install identically, so
+# they join the repo list here rather than getting a branch of their own.
+repo_pkgs=({{ range .omarchy.packages.repo }}{{ . | quote }} {{ end }}{{ range .omarchy.packages.fonts }}{{ . | quote }} {{ end }})
 aur_pkgs=({{ range .omarchy.packages.aur }}{{ . | quote }} {{ end }})
+
+# Editors are keyed by the package that proves they are installed, because the
+# name Omarchy installs under is not always the name you install by.
+declare -A editors=({{ range $editor, $sentinel := .omarchy.editors }}[{{ $editor }}]={{ $sentinel | quote }} {{ end }})
+
+installed() { pacman -Q "$1" >/dev/null 2>&1; }
 
 missing() {
   local pkg
   for pkg in "$@"; do
-    pacman -Q "$pkg" >/dev/null 2>&1 || printf '%s\n' "$pkg"
+    installed "$pkg" || printf '%s\n' "$pkg"
   done
 }
 
 mapfile -t missing_repo < <(missing "${repo_pkgs[@]}")
 mapfile -t missing_aur < <(missing "${aur_pkgs[@]}")
 
-if ((${#missing_repo[@]} == 0 && ${#missing_aur[@]} == 0)); then
+missing_editors=()
+for editor in "${!editors[@]}"; do
+  installed "${editors[$editor]}" || missing_editors+=("$editor")
+done
+
+if ((${#missing_repo[@]} == 0 && ${#missing_aur[@]} == 0 && ${#missing_editors[@]} == 0)); then
   exit 0
 fi
 
@@ -43,8 +58,9 @@ if [ ! -t 0 ]; then
   echo "omarchy: not a terminal, skipping package install. Missing:" >&2
   # `((0)) && echo` returns 1, which under `set -e` would abort the apply over
   # nothing. Guard with `if` rather than `&&`.
-  if ((${#missing_repo[@]})); then echo "  repo: ${missing_repo[*]}" >&2; fi
-  if ((${#missing_aur[@]})); then echo "  aur:  ${missing_aur[*]}" >&2; fi
+  if ((${#missing_repo[@]})); then echo "  repo:    ${missing_repo[*]}" >&2; fi
+  if ((${#missing_aur[@]})); then echo "  aur:     ${missing_aur[*]}" >&2; fi
+  if ((${#missing_editors[@]})); then echo "  editors: ${missing_editors[*]}" >&2; fi
   exit 0
 fi
 
@@ -72,6 +88,15 @@ if ((${#missing_aur[@]})); then
   fi
 fi
 
+# Last, because these installers finish by launching the editor they just set
+# up. Nothing after this point should need the terminal back.
+if ((${#missing_editors[@]})); then
+  echo "omarchy: installing editors: ${missing_editors[*]}"
+  for editor in "${missing_editors[@]}"; do
+    omarchy install editor "$editor" || failed+=("$editor")
+  done
+fi
+
 if ((${#failed[@]})); then
-  echo "omarchy: these packages did not install: ${failed[*]}" >&2
+  echo "omarchy: these did not install: ${failed[*]}" >&2
 fi

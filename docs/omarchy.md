@@ -24,6 +24,7 @@ keeps a fair amount of it elsewhere.
 | `~/.config/hypr/monitors.lua` | Per-host display scaling, templated on hostname |
 | `~/.local/share/applications/*.desktop` | Webapps and TUI launchers |
 | `~/.local/share/icons/hicolor/256x256/apps/*.png` | The four webapp icons that are not package-owned |
+| `~/.config/zed/settings.json` | Zed preferences (`vim_mode`), kept at mode 0600 as Zed writes it |
 
 **2. Settings whose source of truth is `~/.local/state` or fontconfig.**
 Declared in `.chezmoidata/omarchy.yaml` and applied by
@@ -41,9 +42,28 @@ Each step compares before acting, so an apply on a machine that already matches
 is silent. That matters: applying a theme restarts the shell and animates a
 background transition.
 
-**3. Packages.** Declared in the same data file, installed by
-`run_onchange_after_omarchy-packages.sh.tmpl` through `omarchy pkg add` and
-`omarchy pkg aur add`.
+**3. Packages, fonts and editors.** Declared in the same data file, installed
+by `run_onchange_after_omarchy-packages.sh.tmpl`.
+
+`packages.repo`, `packages.fonts` and `packages.aur` go through `omarchy pkg
+add` and `omarchy pkg aur add`. Fonts are split out only because that list
+grows on its own; they install identically. Note that this is *not*
+`omarchy install font`, which installs a font and immediately switches to it —
+making a font available and choosing it are separate decisions, and the choice
+is `omarchy.font`.
+
+`editors` is a map of `omarchy install editor <key>` to the package whose
+presence proves that editor is installed. Those get the full installer rather
+than a package add, because each does post-install work a bare `pacman -S`
+skips: `omazed setup` wires Zed's theme to Omarchy's, and the VSCode installer
+writes `~/.vscode/argv.json` so credentials go to gnome-libsecret. The sentinel
+package is what stops this re-running every apply, and it is not always the
+key — `omarchy install editor zed` installs `zed` and `omazed`, and emacs
+installs as `omarchy-emacs`. Editors are installed last, because each installer
+finishes by launching the editor it just set up.
+
+Vim is not an editor entry: it has no Omarchy installer, so it is an ordinary
+`packages.repo` line.
 
 Scoped to *chosen applications*. Omarchy's own baseline
 (`/usr/share/omarchy/install/omarchy-*.packages`) is present on every install
@@ -105,9 +125,14 @@ Specific exclusions:
   regenerated on any machine that installs it.
 - **`~/.local/state/omarchy/toggles/`** — `flags.lua` is a stock placeholder and
   `internal-monitor-scale` is per-panel.
-- **Fonts** — every installed font package is already in Omarchy's baseline.
-  Adding one means adding it to `packages.repo` and naming it in
-  `omarchy.font`.
+- **Editor configuration written by the Omarchy installers** —
+  `~/.config/Code/User/settings.json` holds only the colour theme (rewritten by
+  `omarchy-theme-set-vscode`) and `update.mode`, both reproduced by the
+  installer. `~/.vscode/argv.json` carries a per-install `crash-reporter-id`
+  and must not be copied between machines. All of `~/.config/emacs/` is
+  package-managed: `omarchy.el` is a generated shim that loads the packaged
+  implementation, and the rest are byte-identical copies of
+  `/usr/share/omarchy-emacs/config/`.
 - **Channel and Plymouth theme** — `omarchy channel set` and
   `omarchy plymouth set` write under `/etc`, outside chezmoi's remit.
 
@@ -122,6 +147,8 @@ them through the UI shows up as chezmoi drift:
 - `shell.json` — `omarchy bar move` and friends rewrite the layout.
 - `mimeapps.list` — `omarchy default browser` rewrites the handler lines.
 - `xdg-terminals.list` — `omarchy default terminal` rewrites the whole file.
+- `zed/settings.json` — `omazed` rewrites the `theme` block on every theme
+  change. The rest of the file is yours.
 
 Make such a change stick with `chezmoi edit <path>`, or re-add the file after
 tuning it live. This is the same tradeoff `~/.config/git/config` already makes
@@ -135,8 +162,55 @@ for `git config --global`.
   executable bit — `omarchy-webapp-install` sets it, so the source file needs
   chezmoi's `executable_` prefix.
 - **A new application**: add it to `packages.repo` or `packages.aur`.
+- **A new font**: add the package to `packages.fonts`. That only makes it
+  available; to use it, set `omarchy.font` to the family name as
+  `omarchy font list` spells it.
+- **A new editor**: if `omarchy install editor <name>` exists for it, add it to
+  `editors` with the package that proves it installed (check with
+  `pacman -Qqe` after installing). Otherwise it is just a package.
 - **A different theme or font**: edit `.chezmoidata/omarchy.yaml`. The script
   re-runs because its rendered content changed.
+
+## Emacs: plain package, not omarchy-emacs
+
+`packages.repo` carries `emacs-wayland`, not `omarchy-emacs`. That is a
+deliberate choice, and worth recording because the Omarchy menu pushes the
+other one.
+
+`omarchy-emacs` provides two things that are genuinely non-trivial: an Emacs
+theme regenerated from Omarchy's palette on every `omarchy theme set` (via
+`~/.config/omarchy/themed/omarchy-colors.el.tpl`), and a font sync that reads
+the *active terminal's* family and size, using pixel sizes on pgtk so that
+`omarchy display text size` is not applied twice. It also adds filenotify
+watchers for live reload and `theme-set.d`/`font-set.d` hook drop-ins.
+
+It is not used here for two reasons:
+
+1. **Directory ownership.** `omarchy-emacs-setup` writes `init.el`,
+   `omarchy.el` and `themes/` into `~/.config/emacs`, which is where
+   `run_onchange_after_clone-doom-emacs.sh.tmpl` puts Doom's checkout. Only one
+   can own it. (That script already refuses a directory that is not a git
+   checkout, so the collision is inert rather than destructive — but it means
+   Doom would silently never install.)
+2. **Conflicting opinions.** The integration ends with
+   `(add-hook 'before-save-hook #'delete-trailing-whitespace)`, which overrides
+   the `(whitespace +guess +trim)` module in `dot_config/doom/init.el` —
+   ws-butler trims only the lines you touched, this trims the whole buffer. It
+   also calls `(enable-theme 'omarchy)`, against
+   `(setq doom-theme 'doom-gruvbox)` in `dot_config/doom/config.el`. The rest
+   of it (`menu-bar-mode -1`, `server-start`, a bash `-lc` shell) is Doom's
+   territory anyway.
+
+The tradeoff accepted is that Emacs does not follow `omarchy theme set`
+automatically; `doom-theme` is matched to the Omarchy theme by hand.
+
+If that ever needs revisiting, note that the package has **no pacman install
+scriptlet** — installing it writes nothing into `$HOME`. All of the above comes
+from `omarchy-emacs-setup`, which only `omarchy install editor emacs` runs. The
+implementation lives at `/usr/share/omarchy-emacs/config/omarchy.el` and can be
+loaded from `~/.config/doom/config.el` directly, leaving `~/.config/emacs` to
+Doom. Its hooks self-heal: the code runs `omarchy-emacs-sync-hooks` on startup
+when the drop-in is missing.
 
 ## Applying
 

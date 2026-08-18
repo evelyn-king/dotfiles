@@ -42,6 +42,13 @@ omarchy:
       - bitwarden-cli
       - dropbox
       - dropbox-cli
+      # Plain Emacs, deliberately not the omarchy-emacs integration package.
+      # That one's setup writes init.el, omarchy.el and themes/ into
+      # ~/.config/emacs, which is where Doom's checkout goes (see
+      # run_onchange_after_clone-doom-emacs.sh.tmpl). Its theme and whitespace
+      # opinions also override doom-theme and ws-butler. docs/omarchy.md has
+      # the full comparison.
+      - emacs-wayland
       - gamescope
       - ghostty
       - nautilus-dropbox
@@ -50,9 +57,34 @@ omarchy:
       - spotify
       - steam
       - tailscale
+      - vim
       - voxtype-bin
+    # Fonts, separated from the applications above only because they are a
+    # category that grows on its own. They install by the same path: plain
+    # repo packages. Not `omarchy install font`, which installs *and* switches
+    # the active font — making a font available and choosing it are separate
+    # decisions, and the choice is `omarchy.font` above.
+    fonts:
+      - ttf-cascadia-mono-nerd
+      - ttf-firacode-nerd
     # AUR, built through yay. Slower and occasionally broken, so keep this
     # list as short as it can be.
     aur:
       - brave-origin-bin
       - slack-desktop
+
+  # Editors installed with `omarchy install editor <key>` rather than a plain
+  # package add, because each installer does post-install work that a bare
+  # `pacman -S` skips: `omazed setup` wires Zed's theme to Omarchy's, and the
+  # VSCode installer writes ~/.vscode/argv.json (so credentials go to
+  # gnome-libsecret) and pins update.mode. Vim is not here — it is just a
+  # package, so it lives in packages.repo above.
+  #
+  # The value is the package whose presence proves the editor is installed,
+  # which is what keeps this from re-running on every apply. It is not always
+  # the key: `omarchy install editor zed` installs zed *and* omazed.
+  #
+  # Emacs is deliberately absent — see the emacs-wayland note above.
+  editors:
+    vscode: visual-studio-code-bin
+    zed: zed
