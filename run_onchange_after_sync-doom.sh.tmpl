@@ -4,8 +4,13 @@
 # config.el hash: {{ include "dot_config/doom/config.el" | sha256sum }}
 # init.el hash: {{ include "dot_config/doom/init.el" | sha256sum }}
 # packages.el hash: {{ include "dot_config/doom/packages.el" | sha256sum }}
+# Emacs executable: {{ lookPath "emacs" | quote }}
 
-if [ -x "$HOME/.config/emacs/bin/doom" ]; then
+set -eu
+
+if ! command -v emacs >/dev/null 2>&1; then
+  echo "Emacs is not installed; skipping Doom Emacs sync."
+elif [ -x "$HOME/.config/emacs/bin/doom" ]; then
   "$HOME/.config/emacs/bin/doom" sync
 else
   echo "Doom Emacs not found at ~/.config/emacs"

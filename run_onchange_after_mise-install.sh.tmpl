@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
 
-# Install the runtimes and global CLI tools declared in ~/.config/mise/config.toml.
+# Install the runtimes and global CLI tools declared in
+# ~/.config/mise/conf.d/10-dotfiles.toml.
 #
 # Re-runs whenever that file changes, so adding a tool is a one-line edit plus
 # `chezmoi apply` rather than a remembered command. This replaces the old
 # sync-uv and sync-bun scripts, which had to be run by hand and had drifted
 # from what was actually installed.
 #
-# config.toml hash: {{ include "dot_config/mise/config.toml" | sha256sum }}
+# tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
+# mise executable: {{ lookPath "mise" | quote }}
 
 set -euo pipefail
 
-# mise comes from the flake, so on a pre-switch machine there is nothing to do.
+# mise is yours to install; on a machine without it there is nothing to do.
+# Its resolved path is rendered above so installing it changes this script and
+# makes chezmoi retry on the next apply.
 command -v mise >/dev/null 2>&1 || exit 0
 
 # The npm: backend is configured to use bun, and pipx: uses uv when present.
-# Both come from the flake; without them mise falls back to slower defaults
-# rather than failing, so this is a warning and not an exit.
+# Without them mise falls back to slower defaults rather than failing, so this
+# is a warning and not an exit.
 for backend in bun uv; do
   command -v "$backend" >/dev/null 2>&1 ||
     echo "mise: $backend not on PATH; backend installs will use a fallback." >&2

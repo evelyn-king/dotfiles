@@ -4,6 +4,7 @@
     "pr": ""
   },
   "model": "opus",
+  "theme": "auto",
   "hooks": {
     "PreToolUse": [
       {

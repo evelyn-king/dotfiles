@@ -48,7 +48,7 @@ updating the world is `nix flake update`, reviewed as a diff, never implicit.
 - **nix-darwin** — command-line packages and the system font. GUI apps are
   installed by hand; see below for why.
 - **mise** — language runtimes and global CLI tools, declared in
-  `dot_config/mise/config.toml`. Everything above the system closure.
+  `dot_config/mise/conf.d/10-dotfiles.toml`. Everything above the system closure.
 - **Determinate Nix** — the daemon and `/etc/nix/nix.conf`. Hence
   `nix.enable = false` in the flake; nix-darwin must not manage Nix here.
 
@@ -152,9 +152,9 @@ Should that ever be revisited, two cautions apply:
   `fmt`/libcxx-21 incompatibility (`no member named 'format' in namespace
   'fmt'`) — and a broken package in `environment.systemPackages` fails the
   entire closure. mise installs the same upstream standalone binary, pinned in
-  `dot_config/mise/config.toml`, which is strictly better than the `curl | tar`
+  `dot_config/mise/conf.d/10-dotfiles.toml`, which is strictly better than the `curl | tar`
   this used to require. The env store at `$MAMBA_ROOT_PREFIX`
-  (`~/.local/opt/micromamba`, set in `dot_zshenv`) is data, not a competing
+  (`~/.local/opt/micromamba`, set by the shared shell environment template) is data, not a competing
   install — leave it in place regardless.
 - **Spotlight.** The closure ships two app bundles, `Emacs.app` and
   `pinentry-mac.app` (a GPG helper that comes along with `pinentry_mac`, not a

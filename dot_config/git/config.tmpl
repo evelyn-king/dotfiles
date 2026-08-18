@@ -1,0 +1,99 @@
+# git config, at the XDG path rather than ~/.gitconfig.
+#
+# git reads $XDG_CONFIG_HOME/git/config first and ~/.gitconfig second, and when
+# both exist it reads both. Distributions ship a stock ~/.config/git/config —
+# Omarchy is one — so writing ~/.gitconfig would leave that file underneath
+# this one, quietly contributing every setting this file does not happen to
+# override. Owning the XDG path replaces it outright instead.
+#
+# The cost is that `git config --global` now writes here, into a file chezmoi
+# manages, so it shows up as drift. Use `chezmoi edit ~/.config/git/config`.
+
+[user]
+  name = "Evelyn King"
+  email = "evelyn@evieking.com"
+  signingkey = 08B79F9C4FA6D2E1
+
+[gpg]
+  format = openpgp
+
+[commit]
+  gpgsign = true
+
+[core]
+  autocrlf = false
+  editor = nvim
+
+[init]
+  defaultBranch = main
+
+[pull]
+  rebase = true
+
+[push]
+  autoSetupRemote = true
+
+[fetch]
+  prune = true
+
+[rerere]
+  enabled = true
+  autoupdate = true
+
+{{ if lookPath "git-lfs" -}}
+[filter "lfs"]
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+{{ end }}
+
+{{- /* WSL reports ID=ubuntu, so os-release alone would hand it libsecret and a
+       credential store that silently discards everything. Detect it from the
+       kernel release instead: WSL1 ends in "-Microsoft", WSL2 contains
+       "-microsoft-standard". .chezmoi.kernel is an empty map off Linux, hence
+       the hasKey guard rather than a direct lookup. */ -}}
+{{- $osrelease := "" -}}
+{{- if hasKey .chezmoi.kernel "osrelease" -}}
+{{-   $osrelease = .chezmoi.kernel.osrelease -}}
+{{- end -}}
+{{- $isWSL := and (eq .chezmoi.os "linux") (contains "microsoft" (lower $osrelease)) -}}
+{{- $gcm := "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe" -}}
+{{- if $isWSL -}}
+{{-   range $candidate := list
+        "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
+        "/mnt/c/Program Files (x86)/Git/mingw64/bin/git-credential-manager.exe"
+        "/mnt/c/Program Files/Git/mingw64/libexec/git-core/git-credential-manager-core.exe" -}}
+{{-     if stat $candidate -}}{{- $gcm = $candidate -}}{{- break -}}{{- end -}}
+{{-   end -}}
+{{- end }}
+[credential]
+{{- if $isWSL }}
+  # WSL: authenticate through Git Credential Manager on the Windows side, so
+  # credentials are shared with Git for Windows and survive a distro reinstall.
+  # No Linux keyring is involved — libsecret here would store into a keyring
+  # that nothing unlocks, accepting writes and returning nothing.
+  #
+  # Requires Git for Windows (which bundles GCM) installed on the host. The
+  # path is resolved at apply time; if none of the known locations existed then
+  # this is the default and you may need to correct it after installing.
+  #
+  # The doubled backslash is load-bearing: git parses "\\" to a single
+  # backslash, then runs the helper through a shell, which needs the space
+  # escaped. A plainly-quoted path splits at "Program" and fails.
+  helper = {{ $gcm | replace " " "\\\\ " }}
+{{- else if eq .chezmoi.os "darwin" }}
+  helper = osxkeychain
+{{- else }}
+  # Needs git-credential-libsecret on PATH. Arch ships it with git itself; on
+  # Ubuntu it must be built from /usr/share/doc/git/contrib/credential/libsecret.
+  # Fall back to `helper = cache --timeout=3600` on a headless box with no
+  # keyring — put that in ~/.config/git/config.local rather than editing here.
+  helper = libsecret
+{{- end }}
+
+# Machine-local overrides, deliberately untracked. git ignores a missing path,
+# so this costs nothing on a machine that has no such file. The counterpart to
+# ~/.config/shell/extras.sh.
+[include]
+  path = ~/.config/git/config.local

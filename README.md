@@ -41,7 +41,7 @@ nix flake update --flake ~/.local/share/chezmoi/nix    # move the pin
 ```
 
 Language runtimes and global CLI tools come from mise instead, declared in
-[`dot_config/mise/config.toml`](dot_config/mise/config.toml). `chezmoi apply`
+[`dot_config/mise/conf.d/10-dotfiles.toml`](dot_config/mise/conf.d/10-dotfiles.toml). `chezmoi apply`
 installs them; adding one is a one-line edit.
 
 ```bash
@@ -60,9 +60,9 @@ the exceptions.
 
 ## Shell
 
-Shell startup is `~/.zshenv` (environment) and `~/.zshrc` (PATH plus interactive
-setup). See `docs/shell-startup.md` for the split and why PATH is built in
-`.zshrc`.
+zsh and bash share environment, PATH, and interactive setup bodies from
+`.chezmoitemplates/shell-*.sh`; their rendered startup files remain flat and
+self-contained. See `docs/shell-startup.md` for the ordering constraints.
 
 ## Theming
 

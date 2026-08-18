@@ -4,10 +4,11 @@
 #
 # chezmoi manages dot_config/doom (the config) but not Doom itself, which is a
 # git checkout rather than a set of files. Without this,
-# run_once_after_install-doom-emacs.sh runs `doom install` against a directory
+# run_onchange_after_install-doom-emacs.sh runs `doom install` against a directory
 # that nothing ever creates, and a fresh machine silently ends up with no Doom.
 #
 # Doom rev: {{ .doom.rev }}
+# git executable: {{ lookPath "git" | quote }}
 
 set -euo pipefail
 
@@ -15,6 +16,8 @@ repo="{{ .doom.repo }}"
 rev="{{ .doom.rev }}"
 dest="$HOME/.config/emacs"
 
+# Rendering the resolved path makes a later git install change this script and
+# lets chezmoi retry the clone after an initial no-op.
 command -v git >/dev/null 2>&1 || exit 0
 
 if [ ! -d "$dest/.git" ]; then

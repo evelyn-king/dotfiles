@@ -1,0 +1,9 @@
+# rustc-wrapper is emitted only when sccache is on PATH at apply time. Setting
+# it unconditionally makes every cargo invocation fail on a machine that has
+# rustup but not sccache, and the error does not name sccache.
+#
+# Install sccache and re-run `chezmoi apply` to pick it up.
+{{ if lookPath "sccache" -}}
+[build]
+rustc-wrapper = "sccache"
+{{ end -}}

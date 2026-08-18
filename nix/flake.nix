@@ -54,7 +54,7 @@
 
         # --- languages, runtimes, package managers ---
         # node, python and go are NOT here: mise owns the runtimes, pinned in
-        # dot_config/mise/config.toml. bun and uv stay because mise shells out
+        # dot_config/mise/conf.d/10-dotfiles.toml. bun and uv stay because mise shells out
         # to them for its npm: and pipx: backends. micromamba is not here
         # either — nixpkgs has no aarch64-darwin build; mise fetches the
         # upstream standalone binary. See docs/nix-darwin.md.

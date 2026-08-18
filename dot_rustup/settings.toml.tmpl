@@ -1,0 +1,30 @@
+{{- /* rustup names its default toolchain by full target triple, so a
+       hardcoded one is wrong everywhere but the machine it was written on.
+       This file was captured on Apple silicon; on Linux that triple names a
+       toolchain rustup has never heard of, and cargo then fails with a
+       message that never mentions this file.
+
+       GOARCH says amd64/arm64 where rustup wants x86_64/aarch64. Only those
+       two are supported; fail rendering for anything else instead of silently
+       selecting a plausible but incorrect toolchain. */ -}}
+{{- $cpu := "" -}}
+{{- if eq .chezmoi.arch "amd64" -}}
+{{-   $cpu = "x86_64" -}}
+{{- else if eq .chezmoi.arch "arm64" -}}
+{{-   $cpu = "aarch64" -}}
+{{- else -}}
+{{-   fail (printf "unsupported architecture for rustup: %s" .chezmoi.arch) -}}
+{{- end -}}
+{{- $platform := "" -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   $platform = "unknown-linux-gnu" -}}
+{{- else if eq .chezmoi.os "darwin" -}}
+{{-   $platform = "apple-darwin" -}}
+{{- else -}}
+{{-   fail (printf "unsupported OS for rustup: %s" .chezmoi.os) -}}
+{{- end -}}
+version = "12"
+default_toolchain = "stable-{{ $cpu }}-{{ $platform }}"
+profile = "default"
+
+[overrides]

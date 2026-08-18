@@ -1,5 +1,7 @@
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
+# Prefer zsh, but do not hard-fail on a machine that only has bash — this
+# branch assumes you install your own programs, so zsh may genuinely be absent.
 [cd]
-  command = "zsh"
+  command = {{ if lookPath "zsh" }}"zsh"{{ else }}"bash"{{ end }}
   args = ["-i"]

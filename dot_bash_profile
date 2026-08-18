@@ -1,0 +1,5 @@
+# Login bash reads ~/.bash_profile and skips ~/.bashrc entirely. Sourcing one
+# from the other keeps login and non-login shells identical, which is what zsh
+# gets for free from .zshenv/.zshrc.
+
+[ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"
