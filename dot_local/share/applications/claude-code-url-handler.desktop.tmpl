@@ -1,0 +1,11 @@
+{{- /* Written by Claude Code itself when it registers its deep-link handler.
+       Tracked so a second machine handles claude-cli:// links without waiting
+       for that first run, and templated because the Exec line is an absolute
+       path into $HOME. */ -}}
+[Desktop Entry]
+Name=Claude Code URL Handler
+Comment=Handle claude-cli:// deep links for Claude Code
+Exec="{{ .chezmoi.homeDir }}/.local/bin/claude" --handle-uri %u
+Type=Application
+NoDisplay=true
+MimeType=x-scheme-handler/claude-cli;

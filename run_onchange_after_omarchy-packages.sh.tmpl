@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+
+# Install the applications declared in .chezmoidata/omarchy.yaml that this
+# machine is missing.
+#
+# Scoped to chosen applications only. Omarchy's own baseline is already present
+# on any Omarchy install, and the hardware-driven half of this machine's
+# package delta is deliberately excluded — see the comment on `packages:` in
+# the data file.
+#
+# `omarchy pkg add` elevates on its own, so it is called plainly rather than
+# wrapped in sudo. That does mean an install can prompt for a password: when
+# there is no terminal to answer with, this reports what is missing and stops
+# rather than hanging a non-interactive apply.
+#
+# repo: {{ .omarchy.packages.repo | join " " }}
+# aur:  {{ .omarchy.packages.aur | join " " }}
+
+set -euo pipefail
+
+command -v omarchy >/dev/null 2>&1 || exit 0
+
+repo_pkgs=({{ range .omarchy.packages.repo }}{{ . | quote }} {{ end }})
+aur_pkgs=({{ range .omarchy.packages.aur }}{{ . | quote }} {{ end }})
+
+missing() {
+  local pkg
+  for pkg in "$@"; do
+    pacman -Q "$pkg" >/dev/null 2>&1 || printf '%s\n' "$pkg"
+  done
+}
+
+mapfile -t missing_repo < <(missing "${repo_pkgs[@]}")
+mapfile -t missing_aur < <(missing "${aur_pkgs[@]}")
+
+if ((${#missing_repo[@]} == 0 && ${#missing_aur[@]} == 0)); then
+  exit 0
+fi
+
+# An apply driven by a script or a hook has no way to answer a sudo prompt.
+# Say what is missing and leave it; the next interactive apply picks it up.
+if [ ! -t 0 ]; then
+  echo "omarchy: not a terminal, skipping package install. Missing:" >&2
+  # `((0)) && echo` returns 1, which under `set -e` would abort the apply over
+  # nothing. Guard with `if` rather than `&&`.
+  if ((${#missing_repo[@]})); then echo "  repo: ${missing_repo[*]}" >&2; fi
+  if ((${#missing_aur[@]})); then echo "  aur:  ${missing_aur[*]}" >&2; fi
+  exit 0
+fi
+
+# Installed one at a time on purpose. A single `pacman -S` aborts the whole
+# batch when one name has been renamed or dropped upstream, which would leave
+# every other application uninstalled for a reason that has nothing to do with
+# them. Failures are reported at the end instead of stopping the apply.
+failed=()
+
+if ((${#missing_repo[@]})); then
+  echo "omarchy: installing ${missing_repo[*]}"
+  for pkg in "${missing_repo[@]}"; do
+    omarchy pkg add "$pkg" || failed+=("$pkg")
+  done
+fi
+
+if ((${#missing_aur[@]})); then
+  if command -v yay >/dev/null 2>&1; then
+    echo "omarchy: installing from the AUR: ${missing_aur[*]}"
+    for pkg in "${missing_aur[@]}"; do
+      omarchy pkg aur add "$pkg" || failed+=("$pkg")
+    done
+  else
+    echo "omarchy: yay is not installed; skipping AUR packages: ${missing_aur[*]}" >&2
+  fi
+fi
+
+if ((${#failed[@]})); then
+  echo "omarchy: these packages did not install: ${failed[*]}" >&2
+fi

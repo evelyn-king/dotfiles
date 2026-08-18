@@ -1,0 +1,89 @@
+#!/usr/bin/env bash
+
+# Apply the Omarchy desktop selections declared in .chezmoidata/omarchy.yaml.
+#
+# These four cannot be tracked as files. Theme, background and editor persist
+# under ~/.local/state/omarchy, which is generated state: the current theme is
+# a rebuilt copy of the stock theme with user overlays merged on top, and
+# `omarchy theme set` goes on to retint the terminals, tmux, btop, the browser,
+# VSCode, Obsidian, GNOME and the keyboard. The font's canonical home is
+# ~/.config/fontconfig/fonts.conf, but setting it also rewrites the font line
+# in every terminal's config. Placing any of that by hand leaves the derived
+# half stale, so drive Omarchy's own setters and let them do the work.
+#
+# Every step compares before acting. Setting a theme restarts the shell and
+# animates a background transition, which is not something to do on each apply.
+#
+# selections: theme={{ .omarchy.theme }} bg={{ .omarchy.background }} font={{ .omarchy.font }} editor={{ .omarchy.editor }}
+
+set -euo pipefail
+
+# Omarchy is yours to install; anywhere else there is nothing to apply.
+command -v omarchy >/dev/null 2>&1 || exit 0
+
+theme={{ .omarchy.theme | quote }}
+background={{ .omarchy.background | quote }}
+font={{ .omarchy.font | quote }}
+editor={{ .omarchy.editor | quote }}
+
+# `omarchy theme current` prints the display name ("Tokyo Night"); slugify it
+# the same way omarchy-theme-set does so the comparison is like-for-like.
+slugify() { tr '[:upper:]' '[:lower:]' | tr ' ' '-'; }
+
+# --- theme ------------------------------------------------------------------
+
+if [ -n "$theme" ] && [ "$(omarchy theme current | slugify)" != "$theme" ]; then
+  echo "omarchy: setting theme to $theme"
+  omarchy theme set "$theme"
+fi
+
+# --- background -------------------------------------------------------------
+
+# Pinned by basename rather than path: the theme's own backgrounds live under
+# a state directory that is deleted and rebuilt on every theme change, so the
+# absolute path is not stable enough to record. Setting a theme also cycles to
+# the *next* background, so this has to run after the theme step above.
+if [ -n "$background" ]; then
+  current=$(basename "$(readlink -f "$HOME/.local/state/omarchy/current/background" 2>/dev/null || true)")
+  if [ "$current" != "$background" ]; then
+    wanted=""
+    for dir in \
+      "$HOME/.config/omarchy/backgrounds/$theme" \
+      "$HOME/.local/state/omarchy/current/theme/backgrounds"; do
+      if [ -f "$dir/$background" ]; then
+        wanted="$dir/$background"
+        break
+      fi
+    done
+
+    if [ -n "$wanted" ]; then
+      echo "omarchy: setting background to $background"
+      omarchy theme bg set "$wanted"
+    else
+      echo "omarchy: background '$background' not found for theme '$theme'; leaving as is." >&2
+    fi
+  fi
+fi
+
+# --- font -------------------------------------------------------------------
+
+# omarchy-font-set refuses an uninstalled family, but it exits non-zero doing
+# so and this script runs under `set -e`. Check first and warn, so a missing
+# font package does not fail the whole apply.
+if [ -n "$font" ] && [ "$(omarchy font current)" != "$font" ]; then
+  if fc-list | grep -Fqi -- "$font"; then
+    echo "omarchy: setting font to $font"
+    omarchy font set "$font"
+  else
+    echo "omarchy: font '$font' is not installed; skipping." >&2
+  fi
+fi
+
+# --- default editor ---------------------------------------------------------
+
+# Setting this pops a desktop notification, hence the comparison rather than
+# an unconditional call.
+if [ -n "$editor" ] && [ "$(omarchy default editor)" != "$editor" ]; then
+  echo "omarchy: setting default editor to $editor"
+  omarchy default editor "$editor"
+fi

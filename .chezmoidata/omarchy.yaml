@@ -1,0 +1,58 @@
+# Omarchy desktop selections, applied by the run_onchange_after_omarchy-*.sh
+# scripts. Read only on Omarchy; .chezmoiignore keeps those scripts off every
+# other OS.
+#
+# What belongs here: settings whose source of truth is ~/.local/state or a
+# system database rather than a file under ~/.config, so they cannot be tracked
+# as plain dotfiles. Anything that IS a plain file is tracked as one instead —
+# the default agent, terminal and browser all are. See docs/omarchy.md.
+
+omarchy:
+  # Slug from `omarchy theme list`. Stock themes live in
+  # /usr/share/omarchy/themes, user themes and overlays in
+  # ~/.config/omarchy/themes.
+  theme: gruvbox
+
+  # Basename of an image in the theme's own backgrounds/ directory or in
+  # ~/.config/omarchy/backgrounds/<theme>/. Leave empty to accept whatever
+  # `omarchy theme set` cycles to, which is not stable across machines.
+  background: 2-flower-basket.jpg
+
+  # `omarchy font list`. fontconfig is the source of truth and the terminals
+  # are sed-ed to match, which is why this is a command and not a tracked
+  # fonts.conf. The font package must be installed — see packages.repo.
+  font: JetBrainsMono Nerd Font
+
+  # One of code|cursor|zed|sublime_text|helix|vim|emacs|nvim. Persisted to
+  # ~/.local/state/omarchy/defaults/editor, hence not a tracked file.
+  editor: nvim
+
+  # Packages beyond Omarchy's own baseline
+  # (/usr/share/omarchy/install/omarchy-*.packages), which every Omarchy
+  # install already has. Deliberately only the chosen applications: the
+  # hardware-driven half of this machine's package delta — intel-ucode,
+  # lib32-vulkan-intel, ollama-cuda, supergfxctl, fprintd, libfprint,
+  # efibootmgr, mkinitcpio, usbutils — belongs to this laptop, not to the
+  # setup, and installing it elsewhere would be wrong.
+  packages:
+    # From the configured repositories, which on Omarchy includes the
+    # `omarchy` repo and multilib (both are in its default pacman.conf).
+    repo:
+      - bitwarden
+      - bitwarden-cli
+      - dropbox
+      - dropbox-cli
+      - gamescope
+      - ghostty
+      - nautilus-dropbox
+      - openai-codex-desktop
+      - signal-desktop
+      - spotify
+      - steam
+      - tailscale
+      - voxtype-bin
+    # AUR, built through yay. Slower and occasionally broken, so keep this
+    # list as short as it can be.
+    aur:
+      - brave-origin-bin
+      - slack-desktop

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Rebuild the caches that make the tracked desktop entries and icons usable.
+#
+# chezmoi writes ~/.local/share/applications and ~/.local/share/icons as plain
+# files; the desktop stack does not notice on its own. Without the first
+# refresh, mimeinfo.cache is stale and the scheme handlers in mimeapps.list
+# (claude-cli://, zoommtg://) resolve to nothing. Without the second, the four
+# webapp icons that are not package-owned render blank.
+#
+# Both are what `omarchy-webapp-install` runs after writing the same files, so
+# this only restores a step chezmoi bypasses.
+#
+{{ $hash := "" -}}
+{{- range sortAlpha (glob (joinPath .chezmoi.sourceDir "dot_local/share/applications/*")) -}}
+{{-   $hash = printf "%s%s" $hash (include . | sha256sum) -}}
+{{- end -}}
+{{- range sortAlpha (glob (joinPath .chezmoi.sourceDir "dot_local/share/icons/hicolor/256x256/apps/*")) -}}
+{{-   $hash = printf "%s%s" $hash (include . | sha256sum) -}}
+{{- end -}}
+# entries and icons hash: {{ $hash | sha256sum }}
+
+set -euo pipefail
+
+# Both tools ship with the desktop stack Omarchy installs, but neither is worth
+# failing an apply over.
+if command -v update-desktop-database >/dev/null 2>&1; then
+  update-desktop-database "$HOME/.local/share/applications" || true
+fi
+
+if command -v gtk-update-icon-cache >/dev/null 2>&1; then
+  gtk-update-icon-cache "$HOME/.local/share/icons/hicolor" >/dev/null 2>&1 || true
+fi

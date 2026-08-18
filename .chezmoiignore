@@ -5,3 +5,33 @@ CLAUDE.md
 docs/**
 LICENSE
 README.md
+
+{{/* Omarchy-only configuration. Hyprland, the Omarchy shell and the `omarchy`
+     CLI mean nothing on macOS, plain Ubuntu or WSL, and ~/.config/hypr on a
+     non-Omarchy Arch box belongs to whatever installed Hyprland there.
+
+     The webapp entries under ~/.local/share/applications are listed too: they
+     are XDG desktop files, so a plain Arch or Ubuntu desktop would happily
+     honour them, but every one of them shells out to `omarchy-launch-webapp`
+     or `xdg-terminal-exec`, which only Omarchy provides.
+
+     Omarchy reports ID=omarchy with ID_LIKE=arch, so the ID alone is the
+     signal. .chezmoi.osRelease is absent off Linux, hence the hasKey guards
+     rather than a direct lookup. */ -}}
+{{- $isOmarchy := false -}}
+{{- if hasKey .chezmoi "osRelease" -}}
+{{-   if hasKey .chezmoi.osRelease "id" -}}
+{{-     $isOmarchy = eq .chezmoi.osRelease.id "omarchy" -}}
+{{-   end -}}
+{{- end -}}
+{{- if not $isOmarchy }}
+.config/hypr
+.config/omarchy
+.config/mimeapps.list
+.config/xdg-terminals.list
+.local/share/applications
+.local/share/icons
+{{/* Script names are matched after chezmoi strips the run_onchange_after_
+     prefix, so this is `omarchy-*.sh` and not the source filename. */}}
+omarchy-*.sh
+{{- end }}
