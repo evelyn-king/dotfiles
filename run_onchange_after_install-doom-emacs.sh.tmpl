@@ -1,0 +1,22 @@
+#!/bin/sh
+
+# Install Doom once Emacs and the pinned checkout are both available.
+#
+# The executable path is part of the rendered script so installing Emacs after
+# an initial apply causes chezmoi to retry this hook.
+# Emacs executable: {{ lookPath "emacs" | quote }}
+# Doom rev: {{ .doom.rev }}
+
+set -eu
+
+if ! command -v emacs >/dev/null 2>&1; then
+  echo "Emacs is not installed; skipping Doom Emacs install."
+  exit 0
+fi
+
+if [ -x "$HOME/.config/emacs/bin/doom" ]; then
+  echo "Installing Doom Emacs packages..."
+  "$HOME/.config/emacs/bin/doom" install --aot --no-config --env
+else
+  echo "Doom Emacs not found at ~/.config/emacs; skipping Doom Emacs install." >&2
+fi

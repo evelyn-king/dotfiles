@@ -28,7 +28,7 @@ keeps a fair amount of it elsewhere.
 
 **2. Settings whose source of truth is `~/.local/state` or fontconfig.**
 Declared in `.chezmoidata/omarchy.yaml` and applied by
-`run_onchange_after_omarchy-selections.sh.tmpl`, which calls Omarchy's own
+`run_after_omarchy-selections.sh.tmpl`, which calls Omarchy's own
 setters:
 
 | Setting | Why it is not a file |
@@ -38,12 +38,13 @@ setters:
 | font | Canonically `~/.config/fontconfig/fonts.conf`, but setting it also rewrites the font line in every terminal's config. |
 | default editor | Lives in `~/.local/state/omarchy/defaults/editor`. |
 
-Each step compares before acting, so an apply on a machine that already matches
-is silent. That matters: applying a theme restarts the shell and animates a
-background transition.
+The hook runs after every apply so a font or other prerequisite installed after
+the initial bootstrap is picked up. Each step compares before acting, so a
+machine that already matches remains silent. That matters: applying a theme
+restarts the shell and animates a background transition.
 
 **3. Packages, fonts and editors.** Declared in the same data file, installed
-by `run_onchange_after_omarchy-packages.sh.tmpl`.
+by `run_after_omarchy-packages.sh.tmpl`.
 
 `packages.repo`, `packages.fonts` and `packages.aur` go through `omarchy pkg
 add` and `omarchy pkg aur add`. Fonts are split out only because that list
@@ -74,7 +75,9 @@ setup.
 
 `omarchy pkg add` elevates on its own, so an install can prompt for a password.
 When stdin is not a terminal the script reports what is missing and stops
-rather than hanging a non-interactive apply.
+rather than hanging a non-interactive apply. It runs after every apply, so the
+next interactive apply retries skipped or failed installations without needing
+a data-file change.
 
 To recompute the delta on a machine:
 

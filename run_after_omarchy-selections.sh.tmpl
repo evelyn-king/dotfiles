@@ -11,8 +11,9 @@
 # in every terminal's config. Placing any of that by hand leaves the derived
 # half stale, so drive Omarchy's own setters and let them do the work.
 #
-# Every step compares before acting. Setting a theme restarts the shell and
-# animates a background transition, which is not something to do on each apply.
+# This is an always-run hook because prerequisites such as a selected font can
+# appear after the first apply. Every step compares before acting, so an
+# already-converged apply remains silent and avoids unnecessary restarts.
 #
 # selections: theme={{ .omarchy.theme }} bg={{ .omarchy.background }} font={{ .omarchy.font }} editor={{ .omarchy.editor }}
 

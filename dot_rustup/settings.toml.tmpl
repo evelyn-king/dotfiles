@@ -5,12 +5,24 @@
        message that never mentions this file.
 
        GOARCH says amd64/arm64 where rustup wants x86_64/aarch64. Only those
-       two are mapped: an architecture this repo has never run on should
-       render something obviously wrong rather than a plausible guess. */ -}}
-{{- $cpu := "x86_64" -}}
-{{- if eq .chezmoi.arch "arm64" }}{{ $cpu = "aarch64" }}{{ end -}}
-{{- $platform := "unknown-linux-gnu" -}}
-{{- if eq .chezmoi.os "darwin" }}{{ $platform = "apple-darwin" }}{{ end -}}
+       two are supported; fail rendering for anything else instead of silently
+       selecting a plausible but incorrect toolchain. */ -}}
+{{- $cpu := "" -}}
+{{- if eq .chezmoi.arch "amd64" -}}
+{{-   $cpu = "x86_64" -}}
+{{- else if eq .chezmoi.arch "arm64" -}}
+{{-   $cpu = "aarch64" -}}
+{{- else -}}
+{{-   fail (printf "unsupported architecture for rustup: %s" .chezmoi.arch) -}}
+{{- end -}}
+{{- $platform := "" -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   $platform = "unknown-linux-gnu" -}}
+{{- else if eq .chezmoi.os "darwin" -}}
+{{-   $platform = "apple-darwin" -}}
+{{- else -}}
+{{-   fail (printf "unsupported OS for rustup: %s" .chezmoi.os) -}}
+{{- end -}}
 version = "12"
 default_toolchain = "stable-{{ $cpu }}-{{ $platform }}"
 profile = "default"

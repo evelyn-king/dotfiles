@@ -9,9 +9,12 @@
 # so sccache needs to be on PATH too or cargo will fail.
 #
 # Script version: 2026-08-17-rust-default-toolchain
+# rustup executable: {{ lookPath "rustup" | quote }}
 
 set -euo pipefail
 
+# Rendering the resolved path makes a later rustup install change this script,
+# so chezmoi retries it rather than preserving the initial no-op forever.
 command -v rustup >/dev/null 2>&1 || exit 0
 
 if rustup show active-toolchain >/dev/null 2>&1; then

@@ -40,11 +40,13 @@
   enabled = true
   autoupdate = true
 
+{{ if lookPath "git-lfs" -}}
 [filter "lfs"]
   required = true
   clean = git-lfs clean -- %f
   smudge = git-lfs smudge -- %f
   process = git-lfs filter-process
+{{ end }}
 
 {{- /* WSL reports ID=ubuntu, so os-release alone would hand it libsecret and a
        credential store that silently discards everything. Detect it from the

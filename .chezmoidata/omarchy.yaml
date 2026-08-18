@@ -1,4 +1,4 @@
-# Omarchy desktop selections, applied by the run_onchange_after_omarchy-*.sh
+# Omarchy desktop selections, applied by the run_after_omarchy-*.sh
 # scripts. Read only on Omarchy; .chezmoiignore keeps those scripts off every
 # other OS.
 #

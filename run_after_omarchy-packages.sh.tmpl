@@ -8,6 +8,10 @@
 # install, and the hardware-driven half of this machine's package delta is
 # deliberately excluded — see the comment on `packages:` in the data file.
 #
+# This is an always-run hook so a non-interactive bootstrap, a missing AUR
+# helper, or a transient package failure is retried by the next apply. Package
+# queries keep an already-converged apply cheap and silent.
+#
 # `omarchy pkg add` elevates on its own, so it is called plainly rather than
 # wrapped in sudo. That does mean an install can prompt for a password: when
 # there is no terminal to answer with, this reports what is missing and stops

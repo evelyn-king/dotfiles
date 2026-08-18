@@ -9,10 +9,13 @@
 # from what was actually installed.
 #
 # tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
+# mise executable: {{ lookPath "mise" | quote }}
 
 set -euo pipefail
 
 # mise is yours to install; on a machine without it there is nothing to do.
+# Its resolved path is rendered above so installing it changes this script and
+# makes chezmoi retry on the next apply.
 command -v mise >/dev/null 2>&1 || exit 0
 
 # The npm: backend is configured to use bun, and pipx: uses uv when present.

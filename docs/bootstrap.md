@@ -35,16 +35,23 @@ It is idempotent; re-running it is safe and skips whatever is already done.
    rather than guessing if it is not one of the supported ones. WSL is detected
    separately from `/proc/sys/kernel/osrelease`, since it reports `ID=ubuntu`
    and is the same platform for packaging but not for credentials.
-2. Installs **git**, if missing — Command Line Tools on macOS, `apt-get` on
-   Ubuntu, `pacman` on Arch. This is the only step that needs sudo, and only on
-   Linux.
+2. Ensures **git** and **curl** are installed — Command Line Tools and the
+   system curl on macOS, `apt-get` on Ubuntu, `pacman -Syu` on Arch. They are
+   checked independently, so an existing git installation cannot hide a
+   missing curl. Arch performs a full synchronized upgrade to avoid an
+   unsupported partial-upgrade state. This is the only step that needs sudo,
+   and only on Linux.
 3. Installs **chezmoi**, if missing, into `~/.local/bin` using the upstream
    standalone installer. That installer behaves identically on all three
    platforms and needs no package manager, which keeps this step from having to
    know what each distro calls the package.
 4. Runs `chezmoi init --apply --branch machinetype/portable` against the repo
    **over HTTPS**, because `origin` is an SSH remote and a fresh machine has no
-   key yet. Override the branch with `DOTFILES_BRANCH=...`.
+   key yet. Override the branch with `DOTFILES_BRANCH=...`. When launched via
+   the documented pipe, chezmoi is connected back to the controlling terminal
+   so Omarchy package installation can prompt for privilege elevation. A
+   headless apply skips those packages and retries them on the next interactive
+   apply.
 5. Creates `~/.config/shell/extras.sh` mode `600` if it is missing.
 6. Warns if mise is absent, since that means layer 2 did nothing.
 

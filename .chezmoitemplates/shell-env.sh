@@ -15,13 +15,25 @@ export XDG_STATE_HOME="$HOME/.local/state"
 # there would always be false.
 export GOPATH="$XDG_DATA_HOME/go"
 
-# LANG only. Setting LC_ALL as well overrides every category unconditionally,
-# which breaks on minimal Linux installs where this locale was never generated.
-export LANG=en_US.UTF-8
+# Preserve a valid inherited locale. Minimal Linux images often inherit an
+# en_US.UTF-8 that was never generated, while macOS and Linux do not guarantee
+# the same spelling. Pick the first available UTF-8 locale, then POSIX C as a
+# last resort. LC_ALL is used only for the probe and is never exported.
+if [ -z "${LANG:-}" ] || ! LC_ALL="$LANG" locale charmap >/dev/null 2>&1; then
+  LANG=C
+  for __locale in C.UTF-8 en_US.UTF-8 C; do
+    if LC_ALL="$__locale" locale charmap >/dev/null 2>&1; then
+      LANG=$__locale
+      break
+    fi
+  done
+  unset __locale
+fi
+export LANG
 
-# macOS hands each user a private /var/folders TMPDIR; this normalises it to
-# match Linux. Harmless where /tmp is already the default.
-export TMPDIR=/tmp
+# Keep macOS's private per-user temporary directory and any deliberate caller
+# override. Linux normally reaches the /tmp fallback.
+export TMPDIR="${TMPDIR:-/tmp}"
 
 export NLTK_DATA="$XDG_DATA_HOME/nltk_data"
 export BUN_INSTALL="$HOME/.bun"

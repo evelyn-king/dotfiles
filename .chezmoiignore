@@ -31,7 +31,7 @@ README.md
 .config/xdg-terminals.list
 .local/share/applications
 .local/share/icons
-{{/* Script names are matched after chezmoi strips the run_onchange_after_
-     prefix, so this is `omarchy-*.sh` and not the source filename. */}}
+{{/* Script names are matched after chezmoi strips the run_*_ prefix, so this
+     is `omarchy-*.sh` and not the source filename. */}}
 omarchy-*.sh
 {{- end }}

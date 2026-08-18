@@ -73,24 +73,26 @@ else
   say "Platform: $PLATFORM"
 fi
 
-# --- 2. git -----------------------------------------------------------------
+# --- 2. bootstrap prerequisites ---------------------------------------------
 
-# chezmoi needs git to clone, and cannot bootstrap it.
-install_git() {
+# chezmoi needs git to clone and curl to fetch its standalone installer.
+install_prerequisites() {
   case "$PLATFORM" in
   macos)
     # git arrives with the Command Line Tools. The installer is a GUI dialog.
-    if xcode-select -p >/dev/null 2>&1; then
-      die "Command Line Tools are installed but git is still missing; investigate by hand."
+    if ! command -v git >/dev/null 2>&1; then
+      if xcode-select -p >/dev/null 2>&1; then
+        die "Command Line Tools are installed but git is still missing; investigate by hand."
+      fi
+      say "Installing the Xcode Command Line Tools (a GUI dialog will open)."
+      xcode-select --install || true
+      printf 'Waiting for the install to finish'
+      until xcode-select -p >/dev/null 2>&1; do
+        printf '.'
+        sleep 10
+      done
+      printf '\n'
     fi
-    say "Installing the Xcode Command Line Tools (a GUI dialog will open)."
-    xcode-select --install || true
-    printf 'Waiting for the install to finish'
-    until xcode-select -p >/dev/null 2>&1; do
-      printf '.'
-      sleep 10
-    done
-    printf '\n'
     ;;
   ubuntu)
     say "Installing git (sudo apt-get)."
@@ -98,18 +100,23 @@ install_git() {
     sudo apt-get install -y git ca-certificates curl
     ;;
   arch)
-    say "Installing git (sudo pacman)."
-    sudo pacman -Sy --needed --noconfirm git ca-certificates curl
+    # Arch does not support partial upgrades. Refreshing package databases with
+    # -Sy and installing from them can mix new packages with an old system, so
+    # synchronize and upgrade the system as part of this prerequisite install.
+    say "Upgrading the system and installing git (sudo pacman)."
+    sudo pacman -Syu --needed --noconfirm git ca-certificates curl
     ;;
   esac
 }
 
-if command -v git >/dev/null 2>&1; then
-  say "git already installed."
+if command -v git >/dev/null 2>&1 && command -v curl >/dev/null 2>&1; then
+  say "git and curl already installed."
 else
-  install_git
-  command -v git >/dev/null 2>&1 || die "git is still missing after the install step."
+  install_prerequisites
 fi
+
+command -v git >/dev/null 2>&1 || die "git is still missing after the install step."
+command -v curl >/dev/null 2>&1 || die "curl is still missing after the install step."
 
 # --- 3. chezmoi -------------------------------------------------------------
 
@@ -136,7 +143,16 @@ command -v chezmoi >/dev/null 2>&1 || die "chezmoi is not on PATH; open a new sh
 # the run_ hooks (mise install, rust toolchain, Doom) — each of which no-ops if
 # the tool it drives is absent.
 say "Applying dotfiles from $BRANCH."
-chezmoi init --apply --branch "$BRANCH" "$REPO_HTTPS"
+# The documented curl-to-bash invocation makes stdin a pipe. Give chezmoi the
+# controlling terminal when one exists so Omarchy's package hook can safely
+# prompt through its own privilege elevation. Headless runs keep their existing
+# stdin; the always-run hook reports missing packages and retries on a later
+# interactive apply.
+if [ -r /dev/tty ] && [ -w /dev/tty ]; then
+  chezmoi init --apply --branch "$BRANCH" "$REPO_HTTPS" </dev/tty
+else
+  chezmoi init --apply --branch "$BRANCH" "$REPO_HTTPS"
+fi
 
 SOURCE_DIR="$(chezmoi source-path)"
 
