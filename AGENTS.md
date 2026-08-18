@@ -10,7 +10,7 @@
 - Top-level docs like `README.md` and `AGENTS.md` describe usage and repository conventions.
 
 ## Branching
-- This branch targets macOS, Ubuntu, Arch, and Ubuntu under WSL. Assume the user has already installed any program a config refers to; detect tools at runtime rather than requiring them.
+- This branch targets macOS, Ubuntu, Arch (including derivatives such as Omarchy, which reports `ID=omarchy` with `ID_LIKE=arch`), and Ubuntu under WSL. Assume the user has already installed any program a config refers to; detect tools at runtime rather than requiring them.
 - WSL reports `ID=ubuntu` in `/etc/os-release`, so never branch on that alone. Detect it from `.chezmoi.kernel.osrelease` containing `microsoft` (guard with `hasKey`, the map is empty off Linux), or `/proc/sys/kernel/osrelease` in shell.
 - `machinetype/macos` keeps the macOS-only lineage, including the nix-darwin flake and the Apple-specific bootstrap.
 

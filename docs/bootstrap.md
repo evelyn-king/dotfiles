@@ -1,6 +1,7 @@
 # Bootstrapping a fresh machine
 
-Supported: macOS, Ubuntu/Debian, Arch, and Ubuntu under WSL.
+Supported: macOS, Ubuntu/Debian, Arch (and Arch derivatives such as Omarchy),
+and Ubuntu under WSL.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/evelyn-king/dotfiles/machinetype/portable/bootstrap.sh | bash
@@ -91,10 +92,11 @@ defaults rather than failing.
 - [ ] **SSH key.** Restore `~/.ssh/id_ed25519` and add it to your agent
       (`ssh-add --apple-use-keychain` on macOS, plain `ssh-add` elsewhere).
       `keychain` manages it from there on, if you have installed it.
-- [ ] **GPG signing key.** `~/.gitconfig` sets `commit.gpgsign = true` against
-      a hardcoded `signingkey`, so **every commit fails until that key is in
-      the keyring.** Import it, then check `echo test | gpg --clearsign`. You
-      will need a `pinentry` your platform can drive.
+- [ ] **GPG signing key.** `~/.config/git/config` sets `commit.gpgsign = true`
+      against a hardcoded `signingkey`, so **every commit fails until that key
+      is in the keyring.** Import it, then check
+      `echo test | gpg --clearsign`. You will need a `pinentry` your platform
+      can drive.
 - [ ] **Switch the remote back to SSH.**
       `git -C ~/.local/share/chezmoi remote set-url origin git@github.com:evelyn-king/dotfiles.git`
 - [ ] **Fill in `~/.config/shell/extras.sh`.** Machine-local settings and
@@ -114,14 +116,16 @@ credential storage silently does nothing. Override in
 `~/.config/git/config.local` if you would rather use `cache`.
 
 **Arch.** Ships `git-credential-libsecret` with git itself, so that works out
-of the box. If bash is the primary shell there, note that `~/.bashrc` carries
-both the environment and the interactive setup — see
-[`shell-startup.md`](shell-startup.md) for why the split differs from zsh's.
+of the box. Derivatives that report `ID_LIKE=arch` — Omarchy among them — are
+detected as Arch and take the same path. If bash is the primary shell there,
+note that `~/.bashrc` carries both the environment and the interactive setup —
+see [`shell-startup.md`](shell-startup.md) for why the split differs from
+zsh's.
 
 **Ubuntu under WSL.** Same packaging as native Ubuntu, different credentials.
-`~/.gitconfig` routes `credential.helper` to Git Credential Manager on the
-Windows side rather than to `libsecret`, so credentials are shared with Git for
-Windows and survive a distro reinstall. This is not merely a preference:
+`~/.config/git/config` routes `credential.helper` to Git Credential Manager on
+the Windows side rather than to `libsecret`, so credentials are shared with Git
+for Windows and survive a distro reinstall. This is not merely a preference:
 a headless WSL session has no unlocked keyring, so `libsecret` there accepts
 writes and then returns nothing — auth appears to succeed and silently keeps
 re-prompting.

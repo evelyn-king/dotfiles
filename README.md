@@ -2,11 +2,11 @@
 
 Dotfiles managed directly with `chezmoi`.
 
-Targets macOS, Ubuntu, Arch, and Ubuntu under WSL. **You install the programs;
-these configs adapt to whichever ones they find.** Nothing here installs a terminal, an editor or a
-CLI tool — every config detects at runtime, so a missing tool costs you that
-tool and not a broken shell. Use brew, apt, pacman or nix as the machine
-prefers.
+Targets macOS, Ubuntu, Arch (including derivatives such as Omarchy), and Ubuntu
+under WSL. **You install the programs; these configs adapt to whichever ones
+they find.** Nothing here installs a terminal, an editor or a CLI tool — every
+config detects at runtime, so a missing tool costs you that tool and not a
+broken shell. Use brew, apt, pacman or nix as the machine prefers.
 
 ## Bootstrap
 

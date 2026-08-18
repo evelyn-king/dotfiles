@@ -1,3 +1,14 @@
+# git config, at the XDG path rather than ~/.gitconfig.
+#
+# git reads $XDG_CONFIG_HOME/git/config first and ~/.gitconfig second, and when
+# both exist it reads both. Distributions ship a stock ~/.config/git/config —
+# Omarchy is one — so writing ~/.gitconfig would leave that file underneath
+# this one, quietly contributing every setting this file does not happen to
+# override. Owning the XDG path replaces it outright instead.
+#
+# The cost is that `git config --global` now writes here, into a file chezmoi
+# manages, so it shows up as drift. Use `chezmoi edit ~/.config/git/config`.
+
 [user]
   name = "Evelyn King"
   email = "evelyn@evieking.com"

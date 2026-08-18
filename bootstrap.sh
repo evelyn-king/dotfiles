@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 #
-# Take a fresh macOS, Ubuntu or Arch machine to the point chezmoi can take over.
+# Take a fresh macOS, Ubuntu or Arch machine to the point chezmoi can take
+# over. Arch here includes its derivatives, Omarchy among them.
 #
 #   curl -fsSL https://raw.githubusercontent.com/evelyn-king/dotfiles/machinetype/portable/bootstrap.sh | bash
 #
@@ -45,9 +46,13 @@ Linux)
   # shellcheck disable=SC1091
   . /etc/os-release
   case "${ID:-}:${ID_LIKE:-}" in
-  arch:* | *:*arch*) PLATFORM=arch ;;
+  # Omarchy is Arch underneath and reports ID_LIKE=arch, so the generic arm
+  # below would catch it. Name it anyway: the ID_LIKE line is the distro's to
+  # change, and dropping to "unsupported Linux" on a machine pacman runs on
+  # perfectly well would be a poor way to find that out.
+  omarchy:* | arch:* | *:*arch*) PLATFORM=arch ;;
   ubuntu:* | debian:* | *:*debian*) PLATFORM=ubuntu ;;
-  *) die "unsupported Linux '${ID:-unknown}'. Supported: ubuntu/debian, arch." ;;
+  *) die "unsupported Linux '${ID:-unknown}'. Supported: ubuntu/debian, arch/omarchy." ;;
   esac
   # WSL1 kernels end in "-Microsoft", WSL2 contain "-microsoft-standard".
   # WSL_DISTRO_NAME is the belt-and-braces check for stripped-down kernels.
@@ -150,9 +155,10 @@ fi
 command -v mise >/dev/null 2>&1 ||
   warn "mise is not installed, so no runtimes or global CLI tools were set up."
 
-# ~/.gitconfig points at Git Credential Manager on the Windows side. If Git for
-# Windows is not installed, the rendered path is a default rather than a
-# resolved one and every authenticated fetch will fail on a missing helper.
+# ~/.config/git/config points at Git Credential Manager on the Windows side.
+# If Git for Windows is not installed, the rendered path is a default rather
+# than a resolved one and every authenticated fetch will fail on a missing
+# helper.
 if [ "$IS_WSL" -eq 1 ]; then
   gcm_found=0
   for gcm in \
@@ -162,7 +168,7 @@ if [ "$IS_WSL" -eq 1 ]; then
     [ -x "$gcm" ] && gcm_found=1 && break
   done
   [ "$gcm_found" -eq 1 ] ||
-    warn "Git Credential Manager not found under /mnt/c. Install Git for Windows on the host, then re-run 'chezmoi apply' so ~/.gitconfig picks up the real path."
+    warn "Git Credential Manager not found under /mnt/c. Install Git for Windows on the host, then re-run 'chezmoi apply' so ~/.config/git/config picks up the real path."
 
   # Neovim picks this up automatically once it is on PATH; without it there is
   # no clipboard provider under WSL at all. See docs/bootstrap.md.
@@ -180,8 +186,9 @@ cat <<EOF
     - Install a Nerd Font. ghostty pins "CaskaydiaCove Nerd Font" by name, and
       starship and 'eza --icons' need the glyphs.
     - Restore ~/.ssh/id_ed25519 and add it to your agent.
-    - Import the GPG signing key. ~/.gitconfig sets commit.gpgsign = true, so
-      every commit fails until that key is in the keyring.
+    - Import the GPG signing key. ~/.config/git/config sets
+      commit.gpgsign = true, so every commit fails until that key is in the
+      keyring.
     - git -C $SOURCE_DIR remote set-url origin $REPO_SSH
     - Fill in $EXTRAS
 
