@@ -1,18 +1,21 @@
 # Language runtimes and every global CLI tool.
 #
 # Versions are exact and move deliberately: `mise upgrade --bump` rewrites this
-# file, so an upgrade arrives as one reviewable diff — the same contract
-# nix/flake.lock has for the system closure. `mise.lock` pins the resolved
-# artefacts alongside it.
+# file, so an upgrade arrives as one reviewable diff rather than as silent
+# drift between machines. `mise.lock` pins the resolved artefacts alongside it.
 #
-# The division of labour: nix-darwin owns the system closure, mise owns
-# everything above it. `bun` and `uv` deliberately stay in the flake — they are
-# the backends mise shells out to for `npm:` and `pipx:` tools, so installing
-# them through mise would be a needless ordering dependency.
+# This is the only thing the repo installs. Everything else — the system
+# packages, the editors, the fonts, `bun` and `uv` themselves — is yours to put
+# on the machine by whatever means that machine prefers: brew, apt, pacman, nix.
+# Configs detect what they find at runtime rather than assuming a provider.
 #
-# `mise activate zsh` runs in .zshrc, so these are interactive-shell tools.
-# See docs/nix-darwin.md for the boundary and docs/shell-startup.md for the
-# activation point.
+# `bun` and `uv` are deliberately absent below. mise shells out to them for its
+# `npm:` and `pipx:` backends, so installing them through mise would be a
+# needless ordering dependency; without them mise falls back to slower defaults
+# rather than failing.
+#
+# `mise activate` runs in the interactive rc, so these are interactive-shell
+# tools. See docs/shell-startup.md for the activation point.
 
 [settings]
 lockfile = true
@@ -52,7 +55,7 @@ go = "1.26.5"
 "npm:tree-sitter-cli" = "0.26.12"
 
 # --- other ------------------------------------------------------------------
-# nixpkgs' micromamba has no aarch64-darwin substitute and fails to build from
-# source, so it used to be a hand-run `curl | tar`. mise fetches the same
-# standalone binary from the upstream releases, pinned.
+# mise fetches the upstream standalone binary, pinned, and resolves the right
+# artefact per platform — which is the reason it lives here rather than being
+# left to each machine's package manager.
 micromamba = "2.9.0-0"

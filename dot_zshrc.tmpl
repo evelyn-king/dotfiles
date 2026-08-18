@@ -1,0 +1,26 @@
+# .zshrc - interactive zsh.
+#
+# PATH and the interactive setup are shared with ~/.bashrc; edit
+# .chezmoitemplates/shell-path.sh and shell-interactive.sh, not this. What stays
+# here is only what zsh does differently from bash.
+
+typeset -U path fpath
+
+{{ template "shell-path.sh" . }}
+
+# --- completions ------------------------------------------------------------
+
+# Completions installed by a package manager into a system prefix arrive on
+# fpath already. This is for the rest.
+fpath=("$XDG_DATA_HOME/zsh/site-functions"(N-/) $fpath)
+
+autoload -Uz compinit
+# Only rebuild the dump if it's more than a day old.
+if [[ -n ~/.zcompdump(N.mh+24) ]]; then
+  compinit
+else
+  compinit -C
+fi
+autoload -U +X bashcompinit && bashcompinit
+
+{{ template "shell-interactive.sh" . }}

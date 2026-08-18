@@ -4,14 +4,15 @@
 - `.chezmoi.toml.tmpl` bootstraps chezmoi and selects the repo root as `sourceDir`.
 - The repo root is the chezmoi source state for files under `$HOME`.
 - `.chezmoidata/` carries template data (`versions.yaml`).
-- `nix/` holds the nix-darwin flake that declares system packages. It is repo content, not a dotfile, so it is listed in `.chezmoiignore`; see `docs/nix-darwin.md`.
-- `dot_config/mise/config.toml` declares language runtimes and global CLI tools, pinned. It is the counterpart to the flake, not an overlap — see `docs/nix-darwin.md` for the division of labour.
-- `bootstrap.sh` takes a fresh Mac to the point chezmoi can take over. Repo content, also in `.chezmoiignore`; see `docs/bootstrap.md`.
-- `dot_zshenv` and `dot_zshrc` are the whole shell startup path; see `docs/shell-startup.md`.
+- `dot_config/mise/config.toml` declares language runtimes and global CLI tools, pinned. It is the only thing this repo installs.
+- `.chezmoitemplates/shell-*.sh` hold the shared shell bodies, stitched into `~/.zshrc` and `~/.bashrc` at apply time; see `docs/shell-startup.md`.
+- `dot_zshenv.tmpl`, `dot_zshrc.tmpl`, `dot_bash_profile` and `dot_bashrc.tmpl` are the shell entry points.
 - Top-level docs like `README.md` and `AGENTS.md` describe usage and repository conventions.
 
 ## Branching
-- Keep macOS configs on `main`. This repo targets macOS only.
+- This branch targets macOS, Ubuntu, Arch, and Ubuntu under WSL. Assume the user has already installed any program a config refers to; detect tools at runtime rather than requiring them.
+- WSL reports `ID=ubuntu` in `/etc/os-release`, so never branch on that alone. Detect it from `.chezmoi.kernel.osrelease` containing `microsoft` (guard with `hasKey`, the map is empty off Linux), or `/proc/sys/kernel/osrelease` in shell.
+- `machinetype/macos` keeps the macOS-only lineage, including the nix-darwin flake and the Apple-specific bootstrap.
 
 ## Build, Test, and Development Commands
 - `chezmoi apply` applies the dotfiles using the configured source tree.

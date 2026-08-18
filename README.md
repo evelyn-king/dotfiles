@@ -2,15 +2,21 @@
 
 Dotfiles managed directly with `chezmoi`.
 
+Targets macOS, Ubuntu, Arch, and Ubuntu under WSL. **You install the programs;
+these configs adapt to whichever ones they find.** Nothing here installs a terminal, an editor or a
+CLI tool — every config detects at runtime, so a missing tool costs you that
+tool and not a broken shell. Use brew, apt, pacman or nix as the machine
+prefers.
+
 ## Bootstrap
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/evelyn-king/dotfiles/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/evelyn-king/dotfiles/machinetype/portable/bootstrap.sh | bash
 ```
 
-Takes a factory Mac to a working system: Xcode CLT, Determinate Nix, the clone,
-the first `darwin-rebuild switch`, then `chezmoi apply`. What is left over is a
-short manual checklist. See [`docs/bootstrap.md`](docs/bootstrap.md).
+Installs the only two things chezmoi cannot bootstrap for itself — git and
+chezmoi — then runs `chezmoi init --apply`. What is left over is a manual
+checklist. See [`docs/bootstrap.md`](docs/bootstrap.md).
 
 ## Structure
 
@@ -31,38 +37,27 @@ Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes witho
 
 ## Packages
 
-System packages come from nix-darwin. The declaration is `nix/flake.nix`, which
-is repo content rather than a dotfile, so it is read from the source tree
-directly and listed in `.chezmoiignore`.
-
-```bash
-darwin-rebuild switch --flake ~/.local/share/chezmoi/nix#lagrange
-nix flake update --flake ~/.local/share/chezmoi/nix    # move the pin
-```
-
-Language runtimes and global CLI tools come from mise instead, declared in
+Language runtimes and global CLI tools come from mise, declared in
 [`dot_config/mise/config.toml`](dot_config/mise/config.toml). `chezmoi apply`
 installs them; adding one is a one-line edit.
 
 ```bash
-mise upgrade --bump                                    # move the pins
+mise upgrade --bump    # move the pins, review the diff, commit
 ```
 
-Both are pinned to exact versions — `nix/flake.lock` and `mise.lock` — so the
-whole set is reproducible and moves only when you update it and review the
-diff. Nothing else is version-managed.
-
-GUI applications are installed by hand rather than through Nix — the store is
-read-only, so an app that updates itself fails forever. See
-[`docs/nix-darwin.md`](docs/nix-darwin.md) for that reasoning, the division of
-labour between the two package managers, the list of hand-installed apps, and
-the exceptions.
+Pins are exact, so the set is reproducible and moves only when you update it.
+That is the only thing this repo installs — everything else is yours, by
+whatever means the machine prefers. If mise itself is absent the hook exits
+quietly and you simply get no runtimes.
 
 ## Shell
 
-Shell startup is `~/.zshenv` (environment) and `~/.zshrc` (PATH plus interactive
-setup). See `docs/shell-startup.md` for the split and why PATH is built in
-`.zshrc`.
+zsh and bash are both first-class; zsh is the default. The bodies live in
+`.chezmoitemplates/shell-{env,path,interactive}.sh` and are stitched into
+`~/.zshrc` and `~/.bashrc` at apply time, so each rendered file is flat and
+self-contained with no runtime source chain. See
+[`docs/shell-startup.md`](docs/shell-startup.md) for the split, why PATH is
+built in the interactive rc, and the ordering constraints.
 
 ## Theming
 

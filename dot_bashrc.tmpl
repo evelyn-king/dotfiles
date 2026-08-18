@@ -1,0 +1,46 @@
+# .bashrc - bash environment and interactive setup.
+#
+# Bash has no .zshenv equivalent, so this file carries both halves: the shared
+# environment runs unconditionally, and everything past the interactive guard
+# matches what ~/.zshrc does. Edit the shared bodies in .chezmoitemplates/,
+# not here.
+
+{{ template "shell-env.sh" . }}
+
+# Nothing below this line applies to non-interactive shells.
+case $- in
+*i*) ;;
+*) return ;;
+esac
+
+{{ template "shell-path.sh" . }}
+
+# --- history ----------------------------------------------------------------
+
+# zsh needs no equivalent block: atuin owns history in both shells, but bash's
+# defaults truncate and overwrite badly enough to matter before atuin loads.
+HISTSIZE=100000
+HISTFILESIZE=100000
+HISTCONTROL=ignoreboth
+shopt -s histappend checkwinsize
+
+# --- completions ------------------------------------------------------------
+
+if ! shopt -oq posix; then
+  for __bc in \
+{{- if eq .chezmoi.os "darwin" }}
+    "${HOMEBREW_PREFIX:-/opt/homebrew}/etc/profile.d/bash_completion.sh" \
+{{- end }}
+    /usr/share/bash-completion/bash_completion \
+    /etc/bash_completion; do
+    if [ -r "$__bc" ]; then
+      . "$__bc"
+      break
+    fi
+  done
+  unset __bc
+fi
+
+export BASH_COMPLETION_USER_DIR="$XDG_DATA_HOME/bash-completion"
+
+{{ template "shell-interactive.sh" . }}
