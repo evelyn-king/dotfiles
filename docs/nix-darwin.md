@@ -45,10 +45,18 @@ updating the world is `nix flake update`, reviewed as a diff, never implicit.
 
 - **chezmoi** — dotfiles. Do not enable home-manager's program modules; they
   overlap with chezmoi and the two will fight over `~/.zshrc`.
-- **nix-darwin** — command-line packages. GUI apps are installed by hand; see
-  below for why.
+- **nix-darwin** — command-line packages and the system font. GUI apps are
+  installed by hand; see below for why.
+- **mise** — language runtimes and global CLI tools, declared in
+  `dot_config/mise/config.toml`. Everything above the system closure.
 - **Determinate Nix** — the daemon and `/etc/nix/nix.conf`. Hence
   `nix.enable = false` in the flake; nix-darwin must not manage Nix here.
+
+`bun` and `uv` sit on the boundary and stay in the flake: mise shells out to
+them for its `npm:` and `pipx:` backends, so installing them through mise would
+be a needless ordering dependency. `rustup` is also in the flake — it is
+already Rust's own version manager, and `dot_rustup/settings.toml` configures
+it. See [`bootstrap.md`](bootstrap.md) for the layering as a whole.
 
 ## Applications installed by hand
 
@@ -56,14 +64,14 @@ These are not managed by Nix. Install from the vendor `.dmg`; most self-update.
 
 | App | Why not Nix |
 |---|---|
-| 1Password | Privileged helper; browser integration verifies code signatures |
 | Tailscale | Installs a network system extension |
 | Zed | Self-updater; nags against the read-only store |
 | Obsidian | Self-updater; nags against the read-only store |
 | Zotero | Self-updater; nags against the read-only store |
 | Ghostty | Sparkle self-updater; nags against the read-only store |
 | iTerm2 | Sparkle self-updater; nags against the read-only store |
-| codex | Self-updater. A CLI, not an app — install via its own installer |
+| Rancher Desktop | Privileged helper and a VM; supplies `docker`, `kubectl` and `helm` via `~/.rd/bin` |
+| Claude Code CLI | Self-updater, into `~/.local/share/claude/versions/` |
 | Dropbox | Linux-only in nixpkgs |
 | FreeCAD | Linux-only in nixpkgs |
 | Bambu Studio | Linux-only in nixpkgs |
@@ -73,14 +81,20 @@ These are not managed by Nix. Install from the vendor `.dmg`; most self-update.
 | dot | Not packaged |
 | Adobe Acrobat Reader | Not packaged (Preview covers most of this) |
 
-The first eight are a deliberate choice rather than a gap — all are packaged for
-Darwin and build fine. 1Password and Tailscale are excluded because Nix
+The first six are a deliberate choice rather than a gap — all are packaged for
+Darwin and build fine. Tailscale and Rancher Desktop are excluded because Nix
 repackaging can break the signature chains their privileged components depend
-on. The other six are excluded because they self-update.
+on. The rest of that group is excluded because it self-updates.
 
-`codex` is the only command-line tool among these, but it leaves no gap: it is
-installed globally via bun at `~/.bun/bin/codex`, and `$BUN_INSTALL/bin` sits
-ahead of the Nix profiles in `dot_zshrc`, so that copy wins.
+Two of these are command-line tools rather than apps. `docker`, `kubectl` and
+`helm` come from Rancher Desktop, which is why `~/.rd/bin` is on `PATH` in
+`dot_zshrc`; the `d` alias depends on it. The Claude Code CLI manages its own
+versions under `~/.local/share/claude`. Neither leaves a gap, but both are
+invisible to `darwin-rebuild`, so a fresh machine needs them installed by hand
+— see [`bootstrap.md`](bootstrap.md).
+
+`codex` used to be on this list. It is now a mise entry
+(`npm:@openai/codex`), pinned like everything else.
 
 ## Why self-updating apps are not managed here
 
@@ -107,14 +121,18 @@ Should that ever be revisited, two cautions apply:
 
 ## Notes
 
-- **Not everything comes from Nix.** `.chezmoidata/versions.yaml` pins the tmux
-  and vim plugins, which are fetched as chezmoi externals. `micromamba` and the
-  GUI applications are installed by hand. Language-level package managers —
-  `bun`, `cargo`, `go install`, `uv`, `pixi` — fetch their own binaries, and bin
-  directories sit ahead of the Nix profiles in `dot_zshrc`, so anything
-  installed through them shadows the Nix copy. That ordering also means a stale
-  binary left in `~/.local/bin` will win over the Nix one — remove it when a
-  tool moves into the flake.
+- **Not everything comes from Nix.** `.chezmoidata/versions.yaml` pins the vim
+  plugins, which are fetched as chezmoi externals, and the Doom revision.
+  Runtimes and global CLI tools come from mise. The GUI applications are
+  installed by hand. Language-level package managers — `cargo`, `go install`,
+  `pixi` — still fetch their own binaries, and their bin directories sit ahead
+  of the Nix profiles in `dot_zshrc`, so anything installed through them
+  shadows the Nix copy. That ordering also means a stale binary left in
+  `~/.local/bin` will win over the Nix one — remove it when a tool moves into
+  the flake. mise is the exception: it prepends its own directories at each
+  prompt, so it wins over both. The migration checklist in
+  [`bootstrap.md`](bootstrap.md#migrating-an-existing-machine) exists because
+  neither rule protects you from a tool whose mise install quietly failed.
 - **Unfree.** Every package in the closure is free, so no `allowUnfree` escape
   hatch is configured and adding an unfree package will fail the build until one
   is. Prefer a narrow `allowUnfreePredicate` allowlist over blanket
@@ -124,21 +142,18 @@ Should that ever be revisited, two cautions apply:
   `run_once_after_install-doom-emacs.sh.tmpl`.
 - **Ghostty.** If it is ever added here, the attribute is `ghostty-bin` — the
   source build is Linux-only in nixpkgs.
-- **micromamba is not managed by Nix.** nixpkgs 2.6.2 has no `aarch64-darwin`
-  substitute and fails to build from source — libmamba hits a `fmt`/libcxx-21
-  incompatibility (`no member named 'format' in namespace 'fmt'`). Because a
-  broken package in `environment.systemPackages` fails the entire system
-  closure, it is commented out of the flake. Install the standalone binary into
-  `~/.local/bin` instead, which is first on `PATH`:
-
-  ```bash
-  curl -Ls https://micro.mamba.pm/api/micromamba/osx-arm64/latest \
-    | tar -xvjO bin/micromamba > ~/.local/bin/micromamba
-  chmod +x ~/.local/bin/micromamba
-  ```
-
-  Retry `pkgs.micromamba` after a `nix flake update` once the Darwin build is
-  fixed upstream. The env store at `$MAMBA_ROOT_PREFIX`
+- **Fonts.** `fonts.packages` supplies `nerd-fonts.caskaydia-cove`, whose family
+  is `CaskaydiaCove Nerd Font` — the exact name `dot_config/ghostty` asks for,
+  and the glyph source starship and `eza --icons` need. It used to be a
+  hand-dropped `.otf` in `~/Library/Fonts`; if that copy is still there, delete
+  it, since two installs of one family compete.
+- **micromamba comes from mise, not Nix.** nixpkgs has no `aarch64-darwin`
+  substitute and it fails to build from source — libmamba hits a
+  `fmt`/libcxx-21 incompatibility (`no member named 'format' in namespace
+  'fmt'`) — and a broken package in `environment.systemPackages` fails the
+  entire closure. mise installs the same upstream standalone binary, pinned in
+  `dot_config/mise/config.toml`, which is strictly better than the `curl | tar`
+  this used to require. The env store at `$MAMBA_ROOT_PREFIX`
   (`~/.local/opt/micromamba`, set in `dot_zshenv`) is data, not a competing
   install — leave it in place regardless.
 - **Spotlight.** The closure ships two app bundles, `Emacs.app` and

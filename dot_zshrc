@@ -13,7 +13,10 @@ typeset -U path fpath
 # inherited from /etc/zshenv. `typeset -U` keeps the first occurrence of a
 # duplicate, so listing them is what fixes their position.
 path=(
+  # Not (N-/): the first `go install` creates it.
+  "$GOPATH/bin"
   "$HOME/.local/bin"(N-/)
+  "$HOME/.cargo/bin"(N-/)
   "$BUN_INSTALL/bin"(N-/)
   "$HOME/.rd/bin"(N-/)
   "$HOME/.config/emacs/bin"(N-/)
@@ -25,29 +28,14 @@ path=(
   "/Applications/Obsidian.app/Contents/MacOS"(N-/)
 )
 
-if (( $+commands[go] )); then
-  export GOPATH="$XDG_DATA_HOME/go"
-  # Not (N-/): this is created by the first `go install`, so keep it on PATH.
-  path=("$GOPATH/bin" $path)
-fi
-
 export MANPATH="$HOME/.local/share/man:${MANPATH:-}"
-
-[[ -f "$HOME/.cargo/env" ]] && source "$HOME/.cargo/env"
-[[ -f "$HOME/.atuin/bin/env" ]] && source "$HOME/.atuin/bin/env"
-
-gcloud_sdk="$HOME/.local/opt/google-cloud-sdk"
-[[ -f "$gcloud_sdk/path.zsh.inc" ]] && source "$gcloud_sdk/path.zsh.inc"
-
-if [[ -d "$HOME/.config/nvm" ]]; then
-  export NVM_DIR="$HOME/.config/nvm"
-  [[ -f "$NVM_DIR/nvm.sh" ]] && source "$NVM_DIR/nvm.sh"
-fi
 
 GPG_TTY=$(tty 2>/dev/null) && export GPG_TTY
 
 # --- completions ------------------------------------------------------------
 
+# Nix packages' completions arrive on fpath already, via the
+# /run/current-system/sw entry that /etc/zshenv adds. This is for the rest.
 fpath=("$XDG_DATA_HOME/zsh/site-functions"(N-/) $fpath)
 
 autoload -Uz compinit
@@ -58,9 +46,6 @@ else
   compinit -C
 fi
 autoload -U +X bashcompinit && bashcompinit
-
-[[ -f "$gcloud_sdk/completion.zsh.inc" ]] && source "$gcloud_sdk/completion.zsh.inc"
-unset gcloud_sdk
 
 # --- ssh agent --------------------------------------------------------------
 
@@ -78,8 +63,12 @@ unset use_forwarded_agent
 # --- tool integrations ------------------------------------------------------
 
 (( $+commands[direnv] )) && eval "$(direnv hook zsh)"
-(( $+commands[mise] )) && eval "$(mise activate zsh)"
 (( $+commands[pixi] )) && eval "$(pixi completion --shell zsh)"
+
+# mise supplies node, python, go and every global CLI tool — see
+# ~/.config/mise/config.toml. Anything below this line may depend on it;
+# nothing above it can, which is why GOPATH is set in .zshenv.
+(( $+commands[mise] )) && eval "$(mise activate zsh)"
 
 if (( $+commands[micromamba] )); then
   export MAMBA_EXE="$commands[micromamba]"
@@ -101,7 +90,6 @@ alias ...='cd ../..'
 alias ....='cd ../../..'
 
 (( $+commands[bun] )) && alias bunx='bun x'
-(( $+commands[helix] )) && alias hx='helix'
 (( $+commands[docker] )) && alias d='docker'
 (( $+commands[rails] )) && alias r='rails'
 (( $+commands[opencode] )) && alias c='opencode'

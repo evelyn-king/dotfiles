@@ -1,7 +1,10 @@
+# Tool and runtime versions are not here — they live in
+# dot_config/mise/config.toml. This file pins what chezmoi itself fetches.
+doom:
+  repo: https://github.com/doomemacs/doomemacs.git
+  rev: ad55ed08df3a1d3398d136d07b60ba2ad00fb91b
+
 plugins:
-  tmux:
-    tpm:
-      url: https://github.com/tmux-plugins/tpm/archive/99469c4a9b1ccf77fade25842dc7bafbc8ce9946.tar.gz
   vim:
     gruvbox:
       url: https://github.com/morhetz/gruvbox/archive/697c00291db857ca0af00ec154e5bd514a79191f.tar.gz

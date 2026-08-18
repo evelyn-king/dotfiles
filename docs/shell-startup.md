@@ -41,12 +41,35 @@ The exception is `$GOPATH/bin`, added unconditionally because the first
 
 ## Ordering constraints
 
-Two things in `.zshrc` are order-sensitive:
+Three things in `.zshrc` are order-sensitive:
 
 - `compinit` must run before anything calling `compdef`, which is why
   completions are set up before the tool integrations.
+- **Nothing above `mise activate` may depend on a mise-managed tool.** mise
+  supplies `node`, `python`, `go` and every global CLI tool, but it does not
+  activate until the tool-integration block, well after PATH is built. This is
+  why `GOPATH` is exported in `.zshenv` rather than guarded behind a
+  `$+commands[go]` check in `.zshrc` — such a check runs before activation and
+  would always be false, silently dropping `$GOPATH/bin` from PATH.
 - `starship`, `zoxide`, and `atuin` init last, so `/etc/zshrc` has finished its
   prompt reset before `starship` installs its own.
+
+## Completions
+
+`/etc/zshenv`, written by the Nix installer, already puts
+`/run/current-system/sw/share/zsh/site-functions` on `fpath`, so every package
+in the closure that ships a completion gets one without any help here — that
+covers `gcloud`, `az`, `chezmoi`, `bat`, `eza` and about forty others. The
+`fpath` line in `.zshrc` is only for completions from outside the closure.
+
+## Reach
+
+`mise activate` runs in `.zshrc`, so mise's runtimes and tools exist at an
+interactive prompt and nowhere else — not in a non-interactive shell, not in a
+process launched from a GUI app. That is not a change: `~/.local/bin` was
+always equally interactive-only, since PATH is built here too. It matters more
+now that `node`, `python` and `go` are among the affected tools. If it ever
+bites, `mise activate --shims` is the alternative.
 
 ## Machine-local additions
 

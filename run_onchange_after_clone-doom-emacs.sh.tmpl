@@ -1,0 +1,41 @@
+#!/usr/bin/env bash
+
+# Put Doom's own tree at ~/.config/emacs, pinned.
+#
+# chezmoi manages dot_config/doom (the config) but not Doom itself, which is a
+# git checkout rather than a set of files. Without this,
+# run_once_after_install-doom-emacs.sh runs `doom install` against a directory
+# that nothing ever creates, and a fresh machine silently ends up with no Doom.
+#
+# Doom rev: {{ .doom.rev }}
+
+set -euo pipefail
+
+repo="{{ .doom.repo }}"
+rev="{{ .doom.rev }}"
+dest="$HOME/.config/emacs"
+
+command -v git >/dev/null 2>&1 || exit 0
+
+if [ ! -d "$dest/.git" ]; then
+  if [ -e "$dest" ]; then
+    echo "doom: $dest exists but is not a git checkout; leaving it alone." >&2
+    exit 0
+  fi
+  echo "doom: cloning $repo"
+  git clone --filter=blob:none "$repo" "$dest"
+fi
+
+if [ "$(git -C "$dest" rev-parse HEAD)" = "$rev" ]; then
+  exit 0
+fi
+
+# Refuse to discard local work — Doom's tree is also where you'd hack on it.
+if ! git -C "$dest" diff --quiet HEAD 2>/dev/null; then
+  echo "doom: $dest has uncommitted changes; not moving it to $rev." >&2
+  exit 0
+fi
+
+echo "doom: checking out $rev"
+git -C "$dest" fetch --quiet origin "$rev" 2>/dev/null || git -C "$dest" fetch --quiet origin
+git -C "$dest" checkout --quiet --detach "$rev"

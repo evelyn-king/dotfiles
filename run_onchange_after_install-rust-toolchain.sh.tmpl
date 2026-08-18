@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+# Give the Nix `rustup` a toolchain to point at.
+#
+# rustup itself is in the flake, but it ships no toolchain: a fresh machine has
+# `rustup` and `cargo` on PATH and every invocation fails until a default is
+# installed. dot_cargo/config.toml already sets rustc-wrapper = "sccache", and
+# sccache is in the flake, so nothing else is needed here.
+#
+# Script version: 2026-08-17-rust-default-toolchain
+
+set -euo pipefail
+
+command -v rustup >/dev/null 2>&1 || exit 0
+
+if rustup show active-toolchain >/dev/null 2>&1; then
+  exit 0
+fi
+
+echo "rustup: no default toolchain; installing stable."
+rustup default stable

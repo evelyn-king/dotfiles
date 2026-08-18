@@ -53,15 +53,17 @@
         lazygit
 
         # --- languages, runtimes, package managers ---
+        # node, python and go are NOT here: mise owns the runtimes, pinned in
+        # dot_config/mise/config.toml. bun and uv stay because mise shells out
+        # to them for its npm: and pipx: backends. micromamba is not here
+        # either — nixpkgs has no aarch64-darwin build; mise fetches the
+        # upstream standalone binary. See docs/nix-darwin.md.
         bun
-        go
         luarocks
         lua-language-server
-        # micromamba — NOT from Nix. 2.6.2 has no Darwin substitute and fails to
-        # build from source (libmamba fmt/libcxx-21 incompatibility). Install the
-        # standalone binary instead; see docs/nix-darwin.md.
-        nodejs
+        mise
         pixi
+        rustup
         uv
 
         # --- editors ---
@@ -91,6 +93,7 @@
         azure-cli
         chezmoi
         gnupg
+        google-cloud-sdk
         herdr
         ollama
         pinentry_mac
@@ -103,16 +106,20 @@
         # emacs-macport is the only GUI app bundle in this closure, because it
         # is the only one with no self-updater. The apps deliberately left out:
         #
-        #   1Password, Tailscale   privileged helpers (code-signature-checked
-        #                          browser integration; a network system
-        #                          extension) that Nix repackaging can break.
+        #   Tailscale              installs a network system extension, whose
+        #                          signature chain Nix repackaging can break.
         #   Zed, Obsidian, Zotero, self-updaters. The store is read-only, so the
-        #   Ghostty, iTerm2, codex update always fails and the tool nags.
+        #   Ghostty, iTerm2        update always fails and the app nags.
         #                          Ghostty would be `ghostty-bin` here — the
         #                          source build is Linux-only.
         #
         # See docs/nix-darwin.md.
       ];
+
+      # Ghostty pins "CaskaydiaCove Nerd Font" by name and starship and
+      # `eza --icons` need the glyphs, so the font belongs to the system rather
+      # than to whoever last dropped an .otf into ~/Library/Fonts.
+      fonts.packages = [ pkgs.nerd-fonts.caskaydia-cove ];
 
       # GUI apps land in /Applications/Nix Apps as symlinks, which Spotlight and
       # the Dock handle poorly. mac-app-util writes real aliases instead. It is a

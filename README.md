@@ -2,6 +2,16 @@
 
 Dotfiles managed directly with `chezmoi`.
 
+## Bootstrap
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/evelyn-king/dotfiles/main/bootstrap.sh | bash
+```
+
+Takes a factory Mac to a working system: Xcode CLT, Determinate Nix, the clone,
+the first `darwin-rebuild switch`, then `chezmoi apply`. What is left over is a
+short manual checklist. See [`docs/bootstrap.md`](docs/bootstrap.md).
+
 ## Structure
 
 - `.chezmoi.toml.tmpl` bootstraps chezmoi and selects the repo root as `sourceDir`
@@ -21,7 +31,7 @@ Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes witho
 
 ## Packages
 
-macOS packages come from nix-darwin. The declaration is `nix/flake.nix`, which
+System packages come from nix-darwin. The declaration is `nix/flake.nix`, which
 is repo content rather than a dotfile, so it is read from the source tree
 directly and listed in `.chezmoiignore`.
 
@@ -30,13 +40,23 @@ darwin-rebuild switch --flake ~/.local/share/chezmoi/nix#lagrange
 nix flake update --flake ~/.local/share/chezmoi/nix    # move the pin
 ```
 
-`nix/flake.lock` pins nixpkgs to an exact commit, so the package set is
-reproducible and moves only when you update it and review the diff.
+Language runtimes and global CLI tools come from mise instead, declared in
+[`dot_config/mise/config.toml`](dot_config/mise/config.toml). `chezmoi apply`
+installs them; adding one is a one-line edit.
+
+```bash
+mise upgrade --bump                                    # move the pins
+```
+
+Both are pinned to exact versions — `nix/flake.lock` and `mise.lock` — so the
+whole set is reproducible and moves only when you update it and review the
+diff. Nothing else is version-managed.
 
 GUI applications are installed by hand rather than through Nix — the store is
 read-only, so an app that updates itself fails forever. See
-[`docs/nix-darwin.md`](docs/nix-darwin.md) for that reasoning, the list of
-hand-installed apps, and the exceptions.
+[`docs/nix-darwin.md`](docs/nix-darwin.md) for that reasoning, the division of
+labour between the two package managers, the list of hand-installed apps, and
+the exceptions.
 
 ## Shell
 
