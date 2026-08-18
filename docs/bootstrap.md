@@ -54,7 +54,8 @@ Everything past them is a deliberate omission, not a gap.
 ## Layer 2: mise
 
 `chezmoi apply` runs `run_onchange_after_mise-install.sh.tmpl`, which is keyed
-on the hash of `dot_config/mise/config.toml`. Adding a tool is a one-line edit
+on the hash of `dot_config/mise/conf.d/10-dotfiles.toml`. Adding a tool is a
+one-line edit
 plus `chezmoi apply` — there is no separate command to remember.
 
 ```bash

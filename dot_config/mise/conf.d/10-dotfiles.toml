@@ -1,0 +1,107 @@
+# Language runtimes and every global CLI tool.
+#
+# This is a conf.d file rather than ~/.config/mise/config.toml itself, because
+# that file has another writer: `mise use -g` targets it by path, so anything
+# on the machine that installs a tool that way — an agent CLI wrapper updating
+# itself, a `mise use -g` run by hand — writes there. Keeping the repo's
+# declarations in conf.d gives each writer its own file instead of leaving the
+# two to overwrite each other in turn. mise reads both.
+#
+# Two ordering facts, verified against mise 2026.8.3:
+#   - conf.d wins over config.toml for any tool declared in both.
+#   - within conf.d, LOWER-numbered filenames take precedence. That is the
+#     reverse of the systemd .d convention, so 10- here beats a later 20-.
+#
+# The consequence worth knowing: `mise use -g <tool>` for a tool declared below
+# is silently ineffective, because it writes to the file this one overrides.
+# Change the version here instead.
+#
+# Versions are exact and move deliberately: `mise upgrade --bump` rewrites this
+# file, so an upgrade arrives as one reviewable diff rather than as silent
+# drift between machines.
+#
+# The coding agents are the deliberate exception, and sit at "latest". They are
+# clients for a remote service and ship their own updaters, so a pin there is a
+# liability rather than a guarantee — it only fixes the version of the client
+# you talk to a moving server with. `mup` is what pulls them forward.
+#
+# This is the only thing the repo installs. Everything else — the system
+# packages, the editors, the fonts, `bun` and `uv` themselves — is yours to put
+# on the machine by whatever means that machine prefers: brew, apt, pacman, nix.
+# Configs detect what they find at runtime rather than assuming a provider.
+#
+# `bun` and `uv` are deliberately absent below. mise shells out to them for its
+# `npm:` and `pipx:` backends, so installing them through mise would be a
+# needless ordering dependency; without them mise falls back to slower defaults
+# rather than failing.
+#
+# `mise activate` runs in the interactive rc, so these are interactive-shell
+# tools. See docs/shell-startup.md for the activation point.
+
+[settings]
+# Applies to project mise.toml files, which is the only place mise keeps a
+# lockfile — and only when a mise.lock already exists there to be filled in.
+# Global config, this file included, is never locked, so "latest" below really
+# does float.
+lockfile = true
+# uv and bun are faster than pipx/npm and both come from the flake.
+npm.package_manager = "bun"
+
+[tools]
+
+# --- runtimes ---------------------------------------------------------------
+# go and python are pinned to what the machine ran before mise took them over:
+# go came from the flake, python from a hand-installed /usr/local/bin copy.
+# node moved off that lineage to 26.7.0 — the version already in use on the
+# newest machine, and what `mise latest node` resolves to. Only the npm: tools
+# below run on it now; codex and opencode are prebuilt binaries.
+node = "26.7.0"
+python = "3.13.7"
+go = "1.26.5"
+
+# --- coding agents ----------------------------------------------------------
+# Unpinned on purpose; see the header. codex and opencode are named as mise
+# registry entries rather than npm packages, which resolves them to prebuilt
+# binaries (aqua) — so unlike the npm: entries further down they do not run on
+# the node pinned above, and they agree with what a machine that installs its
+# own agent CLIs would call them. claude and pi are registry entries for the
+# same reason.
+claude = "latest"
+codex = "latest"
+opencode = "latest"
+pi = "latest"
+# Registry-backed too, but only as an alias for the same npm package, so the
+# npm: spelling stays here to keep the backend visible.
+"npm:@google/gemini-cli" = "latest"
+"npm:@just-every/code" = "latest"
+
+# --- python tooling ---------------------------------------------------------
+"pipx:black" = "26.5.1"
+"pipx:conda-lock" = "4.0.0"
+"pipx:docling-slim" = "2.120.1"
+"pipx:markdown-code-runner" = "2.7.0"
+"pipx:mypy" = "2.1.0"
+"pipx:poethepoet" = "0.48.0"
+"pipx:ruff" = "0.15.15"
+"pipx:tuitorial" = "0.16.0"
+"pipx:unidep[all]" = "3.3.2"
+# pre-commit-uv makes pre-commit build its hook environments with uv. It is an
+# injected dependency rather than a tool, hence uvx_args rather than an entry.
+"pipx:pre-commit" = { version = "4.6.0", uvx_args = "--with pre-commit-uv" }
+
+# --- javascript tooling -----------------------------------------------------
+"npm:@doist/todoist-cli" = "3.1.8"
+"npm:@googleworkspace/cli" = "0.22.5"
+"npm:tree-sitter-cli" = "0.26.12"
+
+# --- other ------------------------------------------------------------------
+# Unpinned on the same reasoning as the agents: gh is a client for a service
+# that moves without asking, and usage is mise's own completion helper, which
+# wants to track mise rather than this file.
+gh = "latest"
+usage = "latest"
+
+# mise fetches the upstream standalone binary, pinned, and resolves the right
+# artefact per platform — which is the reason it lives here rather than being
+# left to each machine's package manager.
+micromamba = "2.9.0-0"

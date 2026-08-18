@@ -4,7 +4,7 @@
 - `.chezmoi.toml.tmpl` bootstraps chezmoi and selects the repo root as `sourceDir`.
 - The repo root is the chezmoi source state for files under `$HOME`.
 - `.chezmoidata/` carries template data (`versions.yaml`).
-- `dot_config/mise/config.toml` declares language runtimes and global CLI tools, pinned. It is the only thing this repo installs.
+- `dot_config/mise/conf.d/10-dotfiles.toml` declares language runtimes and global CLI tools, pinned except for the coding agents. It sits in `conf.d` so that `mise use -g`, which writes to `~/.config/mise/config.toml`, has a file of its own. It is the only thing this repo installs.
 - `.chezmoitemplates/shell-*.sh` hold the shared shell bodies, stitched into `~/.zshrc` and `~/.bashrc` at apply time; see `docs/shell-startup.md`.
 - `dot_zshenv.tmpl`, `dot_zshrc.tmpl`, `dot_bash_profile` and `dot_bashrc.tmpl` are the shell entry points.
 - Top-level docs like `README.md` and `AGENTS.md` describe usage and repository conventions.

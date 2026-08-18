@@ -38,7 +38,8 @@ Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes witho
 ## Packages
 
 Language runtimes and global CLI tools come from mise, declared in
-[`dot_config/mise/config.toml`](dot_config/mise/config.toml). `chezmoi apply`
+[`dot_config/mise/conf.d/10-dotfiles.toml`](dot_config/mise/conf.d/10-dotfiles.toml).
+`chezmoi apply`
 installs them; adding one is a one-line edit.
 
 ```bash

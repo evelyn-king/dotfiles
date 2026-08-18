@@ -40,7 +40,8 @@ command -v direnv >/dev/null 2>&1 && eval "$(direnv hook "$__shell")"
 command -v pixi >/dev/null 2>&1 && eval "$(pixi completion --shell "$__shell")"
 
 # mise supplies node, python, go and every global CLI tool — see
-# ~/.config/mise/config.toml. Anything below this line may depend on it;
+# ~/.config/mise/conf.d/10-dotfiles.toml. Anything below this line may depend
+# on it;
 # nothing above it can, which is why GOPATH is set in the env file.
 command -v mise >/dev/null 2>&1 && eval "$(mise activate "$__shell")"
 
@@ -63,6 +64,12 @@ fi
 alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
+
+# The coding agents in ~/.config/mise/conf.d/10-dotfiles.toml sit at "latest",
+# and mise keeps no lockfile for global config, so this is what pulls them
+# forward. MISE_MINIMUM_RELEASE_AGE=0 waives mise's new-release cooldown, which
+# would otherwise hold back exactly the fast-moving CLIs this is for.
+command -v mise >/dev/null 2>&1 && alias mup='MISE_MINIMUM_RELEASE_AGE=0 mise up'
 
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
 command -v docker >/dev/null 2>&1 && alias d='docker'
