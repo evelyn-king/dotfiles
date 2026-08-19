@@ -18,7 +18,7 @@ set -euo pipefail
 
 REPO_HTTPS="https://github.com/evelyn-king/dotfiles.git"
 REPO_SSH="git@github.com:evelyn-king/dotfiles.git"
-BRANCH="${DOTFILES_BRANCH:-machinetype/portable}"
+BRANCH="${DOTFILES_BRANCH:-machinetype/omarchy}"
 
 say() { printf '\n\033[1m==>\033[0m %s\n' "$1"; }
 warn() { printf '\033[1;33mbootstrap:\033[0m %s\n' "$1" >&2; }
