@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# Install the runtimes and global CLI tools declared in
-# ~/.config/mise/conf.d/10-dotfiles.toml.
+# Install the runtimes and global CLI tools declared in ~/.config/mise/conf.d.
 #
-# Re-runs whenever that file changes, so adding a tool is a one-line edit plus
-# `chezmoi apply` rather than a remembered command. This replaces the old
-# sync-uv and sync-bun scripts, which had to be run by hand and had drifted
-# from what was actually installed.
+# Re-runs whenever either layer's tool list changes, so adding a tool is a
+# one-line edit plus `chezmoi apply` rather than a remembered command. This
+# replaces the old sync-uv and sync-bun scripts, which had to be run by hand
+# and had drifted from what was actually installed.
 #
-# tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
+# full tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
+# standalone tool list hash: {{ include "dot_config/mise/conf.d/20-standalone.toml" | sha256sum }}
 # mise executable: {{ lookPath "mise" | quote }}
 
 set -euo pipefail

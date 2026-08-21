@@ -7,7 +7,7 @@
 # ~/.local/bin, and nothing else assumed.
 #
 # PREDICATES — all keys AND together; a layer with no predicate never activates
-# on its own and must be named in `layers.force`.
+# on its own and must be named in `layerForce`.
 #
 #   os:        chezmoi's .chezmoi.os                        ("darwin", "linux")
 #   osRelease: matches /etc/os-release ID or any ID_LIKE word ("ubuntu")

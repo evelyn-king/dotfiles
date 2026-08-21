@@ -14,10 +14,10 @@ Resolution is a fixpoint iteration rather than a single ordered pass, because
 Go templates range over maps in alphabetical order and the file's own ordering
 is therefore lost. Each pass recomputes the whole set from scratch, so a layer
 that `conflicts` with one activated in an earlier pass still settles correctly.
-Four passes covers a dependency depth of four; the deepest chain in
-.chezmoidata/layers.yaml is two (omarchy -> desktop). If a fifth were ever
-needed the axes would be wrong, so this does not detect non-convergence — it
-just stops.
+Four passes support dependency chains of four layers; the deepest chain in
+.chezmoidata/layers.yaml is two (omarchy -> desktop). A fifth verification pass
+must produce the same set or rendering fails, catching both deeper chains and
+non-converging conflicts.
 */ -}}
 {{- /* Guarded with hasKey rather than `| default`: chezmoi runs templates with
        missingkey=error, so `.facts` on a machine that has not been through
@@ -33,7 +33,7 @@ just stops.
 {{- if hasKey . "layerDisable" }}{{ $disabled = .layerDisable }}{{ end -}}
 
 {{- /* PATH probes are hoisted out of the passes: lookPath stats the
-       filesystem, and re-running it four times per layer per apply is the one
+       filesystem, and repeating it for every layer on every pass is the one
        place this design could plausibly get slow. */ -}}
 {{- $found := dict -}}
 {{- range $name, $def := $defs -}}
@@ -64,7 +64,8 @@ just stops.
        missing key. Every predicate is optional, so dotted access would force
        each layer in layers.yaml to spell out all seven. */ -}}
 {{- $active := dict -}}
-{{- range $pass := until 4 -}}
+{{- $fourth := dict -}}
+{{- range $pass := until 5 -}}
 {{-   $next := dict -}}
 {{-   range $name, $def := $defs -}}
 {{-     $d := index $def "detect" | default dict -}}
@@ -121,7 +122,11 @@ just stops.
 {{-     end -}}
 {{-   end -}}
 
+{{-   if eq $pass 3 -}}{{- $fourth = $next -}}{{- end -}}
 {{-   $active = $next -}}
+{{- end -}}
+{{- if not (deepEqual $fourth $active) -}}
+{{-   fail "layer resolution did not converge within four passes" -}}
 {{- end -}}
 
 active:

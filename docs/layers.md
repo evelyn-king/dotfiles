@@ -230,9 +230,9 @@ dependents with it.
   for a password reports `root = false`. Nothing depends on it there — the
   `nixdarwin` layer keys on `darwin-rebuild` being present, and that script only
   nags — but the name overpromises. Either rename it or accept the caveat.
-- **Fixpoint iteration is capped at four passes** and does not detect
-  non-convergence. The deepest chain today is two. A fifth would mean the axes
-  are wrong.
+- **Fixpoint iteration supports chains of up to four layers.** A fifth pass
+  verifies that the result is stable, so deeper chains and non-converging
+  conflicts fail explicitly. The deepest chain today is two.
 - **`{{- /*` needs exactly one space after the trim marker.** Go's lexer checks
   for `/*` at a fixed offset, so an indented comment parses as a command and
   fails with `unexpected "/" in command`. Cost two debugging cycles; noted here
