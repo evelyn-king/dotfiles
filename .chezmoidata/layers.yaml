@@ -1,0 +1,109 @@
+# Layer definitions. This file is the whole map: what turns a layer on, and
+# what that layer owns. Nothing else in the repo needs editing to add one.
+#
+# Anything NOT claimed by a layer below belongs to `base` and is applied
+# everywhere. Base is not listed because it has no predicate — it is the floor,
+# and the floor is defined in docs/layers.md as: POSIX sh, no root, a writable
+# ~/.local/bin, and nothing else assumed.
+#
+# PREDICATES — all keys AND together; a layer with no predicate never activates
+# on its own and must be named in `layers.force`.
+#
+#   os:        chezmoi's .chezmoi.os                        ("darwin", "linux")
+#   osRelease: matches /etc/os-release ID or any ID_LIKE word ("ubuntu")
+#   has:       every binary named must be on PATH
+#   hasAny:    at least one binary named must be on PATH
+#   fact:      map of facts.sh outputs to required values     (root: true)
+#   requires:  every layer named must itself be active
+#   conflicts: no layer named may be active
+#
+# OWNERSHIP — `owns` lists target paths relative to $HOME, and `scripts` lists
+# run_ script names AFTER chezmoi strips the run_*_ prefix. Both are fed
+# straight to .chezmoiignore when the layer is off.
+#
+# Two rules, enforced by convention rather than by code:
+#   1. A path is owned by at most one layer. Two layers claiming one path means
+#      the axes are wrong; split the file instead.
+#   2. A layer keyed on `has:` may only ADD. Installing a tool must never cause
+#      a file to disappear, because .chezmoiignore does not remove — see
+#      docs/layers.md#layers-are-not-toggles.
+
+layers:
+
+  # --- substrate ------------------------------------------------------------
+  # Broad platform facts. These own almost nothing directly; they exist so that
+  # narrower layers can say `requires: [linux]` instead of restating `os:`.
+
+  linux:
+    detect: {os: linux}
+
+  darwin:
+    detect: {os: darwin}
+
+  debian:
+    detect: {osRelease: debian}
+
+  # --- provisioning ---------------------------------------------------------
+  # How this machine gets software. Mutually exclusive in practice but not
+  # declared so: a nix-on-Ubuntu box legitimately has both apt and nix.
+
+  root:
+    detect: {fact: {root: "true"}}
+
+  apt:
+    detect:
+      requires: [debian, root]
+      has: [apt-get]
+
+  nix:
+    detect: {hasAny: [nix, nix-env]}
+
+  nixdarwin:
+    detect:
+      requires: [darwin, nix]
+      has: [darwin-rebuild]
+    scripts: [darwin-rebuild.sh]
+
+  mise:
+    detect: {has: [mise]}
+    owns: [.config/mise]
+    scripts: [mise-install.sh]
+
+  # --- graphical ------------------------------------------------------------
+
+  desktop:
+    detect: {fact: {desktop: "true"}}
+    owns:
+      - .config/ghostty
+      - .config/zed
+
+  omarchy:
+    detect:
+      osRelease: omarchy
+      requires: [desktop]
+    owns:
+      - .config/hypr
+      - .config/omarchy
+      - .config/mimeapps.list
+      - .config/xdg-terminals.list
+      - .local/share/applications
+      - .local/share/icons
+    scripts: [omarchy-*.sh]
+
+  # --- toolchains -----------------------------------------------------------
+  # Keyed on the tool being present, so each is strictly additive: the config
+  # for a compiler you do not have is noise, and appears the moment you do.
+
+  rust:
+    detect: {hasAny: [cargo, rustup]}
+    owns: [.cargo, .rustup]
+    scripts: [install-rust-toolchain.sh]
+
+  emacs:
+    detect: {hasAny: [emacs, emacsclient]}
+    owns: [.config/doom]
+    scripts: [clone-doom-emacs.sh, install-doom-emacs.sh, sync-doom.sh]
+
+  conda:
+    detect: {hasAny: [micromamba, mamba, conda]}
+    owns: [.condarc, .mambarc, .config/dask]

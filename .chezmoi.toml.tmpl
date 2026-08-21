@@ -1,7 +1,44 @@
 sourceDir = {{ .chezmoi.sourceDir | quote }}
 
-# Prefer zsh, but do not hard-fail on a machine that only has bash — this
-# branch assumes you install your own programs, so zsh may genuinely be absent.
+# Prefer zsh, but do not hard-fail on a machine that only has bash. The base
+# layer assumes no root, and a box you cannot apt-install on is a box where zsh
+# may genuinely be absent.
 [cd]
   command = {{ if lookPath "zsh" }}"zsh"{{ else }}"bash"{{ end }}
   args = ["-i"]
+
+{{/* ------------------------------------------------------------------------
+     Everything below is written ONCE, by `chezmoi init`, into
+     ~/.config/chezmoi/chezmoi.toml — and is not re-evaluated on apply. That is
+     the slow clock; .chezmoitemplates/layers.yaml.tmpl is the fast one. See
+     docs/layers.md#two-clocks.
+
+     Facts live here because each costs a subprocess and none of them changes
+     without a deliberate act (being granted sudo, attaching a display,
+     migrating to a musl host). Re-run `chezmoi init` after such an act.
+   ------------------------------------------------------------------------ */}}
+{{- $facts := output "sh" "-c" (includeTemplate "facts.sh" .) | fromYaml }}
+
+[data.facts]
+  # Can this machine install software system-wide? False is the answer for an
+  # unprivileged shell on a shared Ubuntu box, and it is what turns the
+  # `standalone` layer on.
+  root = {{ $facts.root }}
+  # Which prebuilt binaries will actually run here. Deliberately separate from
+  # `root`: a no-root Ubuntu LTS host is glibc and runs ordinary release
+  # tarballs perfectly well. Only `musl` forces the static-only tool set.
+  libc = {{ $facts.libc | quote }}
+  # Is there a GUI session to configure, as opposed to a GUI merely installed.
+  desktop = {{ $facts.desktop }}
+  # Whether ~/.local/bin exists and is writable. If this is false the
+  # standalone layer cannot function and says so rather than failing later.
+  prefixWritable = {{ $facts.prefixWritable }}
+
+# Manual overrides, applied inside the resolver's fixpoint loop so that a
+# forced layer also satisfies the `requires` of everything downstream. Edit
+# ~/.config/chezmoi/chezmoi.toml directly; these are per-machine and untracked
+# by design. Use them to answer a question detection cannot: `desktop` on a box
+# you only ever reach over SSH with X forwarding, say.
+[data]
+  layerForce = []
+  layerDisable = []

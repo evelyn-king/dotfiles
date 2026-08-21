@@ -1,5 +1,6 @@
 # Tool and runtime versions are not here — they live in
-# dot_config/mise/config.toml. This file pins what chezmoi itself fetches.
+# dot_config/mise/conf.d/. This file pins what chezmoi itself fetches.
+
 doom:
   repo: https://github.com/doomemacs/doomemacs.git
   rev: ad55ed08df3a1d3398d136d07b60ba2ad00fb91b

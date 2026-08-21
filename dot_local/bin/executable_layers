@@ -1,0 +1,78 @@
+#!/bin/sh
+#
+# Show which configuration layers are active on this machine, and why.
+#
+#   layers          # summary
+#   layers -v       # also list what each active layer owns
+#
+# Shells out to chezmoi rather than being a rendered template, so it reports
+# what the resolver says RIGHT NOW. A rendered file would report what was true
+# at the last apply, which is exactly the discrepancy you run this to find.
+
+set -eu
+
+command -v chezmoi >/dev/null 2>&1 || {
+  echo "layers: chezmoi is not on PATH." >&2
+  exit 1
+}
+
+verbose=0
+[ "${1:-}" = "-v" ] && verbose=1
+
+# One chezmoi invocation. Each is ~100ms and this is a diagnostic, but three
+# round trips to print one screen is still worth avoiding.
+chezmoi execute-template "$(
+  cat <<'TMPL'
+{{- $L := includeTemplate "layers.yaml.tmpl" . | fromYaml -}}
+facts
+{{- if hasKey . "facts" }}
+{{- range $k, $v := .facts }}
+  {{ printf "%-16s%v" $k $v }}
+{{- end }}
+{{- else }}
+  (none — this machine has not been through `chezmoi init`)
+{{- end }}
+
+active
+{{- $any := dict "n" 0 }}
+{{- range $name, $on := $L.active }}{{ if $on }}{{ $_ := set $any "n" 1 }}
+  {{ $name }}
+{{- end }}{{ end }}
+{{- if eq $any.n 0 }}
+  (none — base only)
+{{- end }}
+
+inactive
+{{- range $name, $on := $L.active }}{{ if not $on }}
+  {{ $name }}
+{{- end }}{{ end }}
+TMPL
+)"
+
+[ "$verbose" -eq 1 ] || exit 0
+
+printf '\nowned paths\n'
+chezmoi execute-template "$(
+  cat <<'TMPL'
+{{- $L := includeTemplate "layers.yaml.tmpl" . | fromYaml -}}
+{{- range $name, $def := .layers }}
+{{- if index $L.active $name }}
+{{- range index $def "owns" | default list }}
+  {{ printf "%-14s%s" $name . }}
+{{- end }}
+{{- range index $def "scripts" | default list }}
+  {{ printf "%-14s%s (script)" $name . }}
+{{- end }}
+{{- end }}
+{{- end }}
+TMPL
+)"
+
+cat <<'EOF'
+
+Layers are resolved from .chezmoidata/layers.yaml. `facts` above are frozen at
+`chezmoi init`; everything else is re-detected on every apply. If a fact is
+wrong — you were granted sudo, you attached a display — re-run `chezmoi init`.
+To override a layer regardless of detection, edit layerForce / layerDisable in
+~/.config/chezmoi/chezmoi.toml.
+EOF

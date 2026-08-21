@@ -1,0 +1,131 @@
+{{- /*
+Resolve the active layer set. Emits YAML; callers do:
+
+    {{ $L := includeTemplate "layers.yaml.tmpl" . | fromYaml }}
+    {{ if $L.active.omarchy }}...{{ end }}
+
+Evaluated on EVERY apply, unlike the facts in ~/.config/chezmoi/chezmoi.toml,
+which are frozen at `chezmoi init`. That split is deliberate: everything read
+here is free (a map lookup or a PATH scan), so capability layers follow the
+machine as tools come and go, while the facts that cost a subprocess are paid
+for once. See docs/layers.md#two-clocks.
+
+Resolution is a fixpoint iteration rather than a single ordered pass, because
+Go templates range over maps in alphabetical order and the file's own ordering
+is therefore lost. Each pass recomputes the whole set from scratch, so a layer
+that `conflicts` with one activated in an earlier pass still settles correctly.
+Four passes covers a dependency depth of four; the deepest chain in
+.chezmoidata/layers.yaml is two (omarchy -> desktop). If a fifth were ever
+needed the axes would be wrong, so this does not detect non-convergence — it
+just stops.
+*/ -}}
+{{- /* Guarded with hasKey rather than `| default`: chezmoi runs templates with
+       missingkey=error, so `.facts` on a machine that has not been through
+       `chezmoi init` yet is a hard failure, not an empty map. Every one of
+       these is legitimately absent on a first run. */ -}}
+{{- $facts := dict -}}
+{{- if hasKey . "facts" }}{{ $facts = .facts }}{{ end -}}
+{{- $defs := dict -}}
+{{- if hasKey . "layers" }}{{ $defs = .layers }}{{ end -}}
+{{- $forced := list -}}
+{{- if hasKey . "layerForce" }}{{ $forced = .layerForce }}{{ end -}}
+{{- $disabled := list -}}
+{{- if hasKey . "layerDisable" }}{{ $disabled = .layerDisable }}{{ end -}}
+
+{{- /* PATH probes are hoisted out of the passes: lookPath stats the
+       filesystem, and re-running it four times per layer per apply is the one
+       place this design could plausibly get slow. */ -}}
+{{- $found := dict -}}
+{{- range $name, $def := $defs -}}
+{{-   $d := index $def "detect" | default dict -}}
+{{-   range concat (index $d "has" | default list) (index $d "hasAny" | default list) -}}
+{{-     $_ := set $found . (ne (lookPath .) "") -}}
+{{-   end -}}
+{{- end -}}
+
+{{- /* What-if overrides. `layerProbes` forces a binary to count as present or
+       absent regardless of PATH, which answers "what would this machine look
+       like once nix is installed" without installing nix. It is also the only
+       way to exercise the resolver against a machine you are not sitting at,
+       which is what scripts/layer-matrix.sh uses it for. */ -}}
+{{- if hasKey . "layerProbes" -}}
+{{-   range $k, $v := .layerProbes -}}{{- $_ := set $found $k $v -}}{{- end -}}
+{{- end -}}
+
+{{- /* .chezmoi.osRelease exists but is EMPTY on darwin, so the inner keys need
+       the same guard as the outer one. */ -}}
+{{- $osRelease := .chezmoi.osRelease -}}
+{{- $osIds := list -}}
+{{- if hasKey $osRelease "id" }}{{ $osIds = append $osIds $osRelease.id }}{{ end -}}
+{{- if hasKey $osRelease "idLike" }}{{ $osIds = concat $osIds (splitList " " $osRelease.idLike) }}{{ end -}}
+
+{{- /* `index $d "has"` throughout, never `$d.has`: missingkey=error applies to
+       dotted key access but NOT to `index`, which returns the zero value for a
+       missing key. Every predicate is optional, so dotted access would force
+       each layer in layers.yaml to spell out all seven. */ -}}
+{{- $active := dict -}}
+{{- range $pass := until 4 -}}
+{{-   $next := dict -}}
+{{-   range $name, $def := $defs -}}
+{{-     $d := index $def "detect" | default dict -}}
+{{-     $s := dict "ok" (not (empty $d)) -}}
+
+{{-     if hasKey $d "os" -}}
+{{-       $_ := set $s "ok" (and $s.ok (eq (index $d "os") $.chezmoi.os)) -}}
+{{-     end -}}
+
+{{-     if hasKey $d "osRelease" -}}
+{{-       $_ := set $s "ok" (and $s.ok (has (index $d "osRelease") $osIds)) -}}
+{{-     end -}}
+
+{{-     range index $d "has" | default list -}}
+{{-       $_ := set $s "ok" (and $s.ok (index $found .)) -}}
+{{-     end -}}
+
+{{-     if index $d "hasAny" -}}
+{{-       $any := dict "v" false -}}
+{{-       range index $d "hasAny" -}}{{- if index $found . -}}{{- $_ := set $any "v" true -}}{{- end -}}{{- end -}}
+{{-       $_ := set $s "ok" (and $s.ok $any.v) -}}
+{{-     end -}}
+
+{{-     range $k, $v := index $d "fact" | default dict -}}
+{{-       $_ := set $s "ok" (and $s.ok (eq (printf "%v" (index $facts $k)) (printf "%v" $v))) -}}
+{{-     end -}}
+
+{{-     range index $d "requires" | default list -}}
+{{-       $_ := set $s "ok" (and $s.ok (hasKey $active .)) -}}
+{{-     end -}}
+
+{{-     range index $d "conflicts" | default list -}}
+{{-       $_ := set $s "ok" (and $s.ok (not (hasKey $active .))) -}}
+{{-     end -}}
+
+{{- /* Manual overrides are applied inside the loop, not after it, so that a
+           forced layer satisfies the `requires` of everything downstream and a
+           disabled one correctly takes its dependents with it. */ -}}
+{{-     if has $name $forced -}}{{- $_ := set $s "ok" true -}}{{- end -}}
+{{-     if has $name $disabled -}}{{- $_ := set $s "ok" false -}}{{- end -}}
+
+{{-     if $s.ok -}}{{- $_ := set $next $name true -}}{{- end -}}
+{{-   end -}}
+
+{{- /* `implies` runs after the predicate sweep, so a layer can unlock another
+         whose own detection has not caught up yet. That is what makes the first
+         apply on a bare machine work: `standalone` is about to install mise, so
+         it turns the mise layer on now rather than leaving its config unwritten
+         until a second apply. Explicit disables still win — an implied layer is
+         a default, not an override. */ -}}
+{{-   range $name, $_ := $next -}}
+{{-     range index (index $defs $name) "implies" | default list -}}
+{{-       if not (has . $disabled) -}}{{- $_ := set $next . true -}}{{- end -}}
+{{-     end -}}
+{{-   end -}}
+
+{{-   $active = $next -}}
+{{- end -}}
+
+active:
+{{- range $name, $_ := $defs }}
+  {{ $name }}: {{ hasKey $active $name }}
+{{- end }}
+names: [{{ range $i, $n := keys $active | sortAlpha }}{{ if $i }}, {{ end }}{{ $n }}{{ end }}]

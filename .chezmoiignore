@@ -1,3 +1,4 @@
+{{- /* Repo content, not dotfiles. Read from the source tree directly. */ -}}
 AGENTS.md
 bootstrap.sh
 CLAUDE.md
@@ -6,3 +7,27 @@ docs/**
 LICENSE
 nix/**
 README.md
+scripts/**
+
+{{/* --------------------------------------------------------------------------
+     Layer dispatch. This block is generic and should never need editing:
+     adding a layer is a block in .chezmoidata/layers.yaml and nothing else.
+
+     A path claimed by an inactive layer is ignored; a path claimed by nobody is
+     base and applies everywhere. Script names are matched AFTER chezmoi strips
+     the run_*_ prefix, which is why layers.yaml lists `mise-install.sh` rather
+     than the source filename.
+
+     Note what "ignored" does and does not mean: chezmoi stops MANAGING the
+     path, it does not delete an already-applied copy. Layers are therefore not
+     toggles, and every `has:`-keyed layer is required to be additive-only.
+     See docs/layers.md#layers-are-not-toggles.
+   -------------------------------------------------------------------------- */ -}}
+{{- $L := includeTemplate "layers.yaml.tmpl" . | fromYaml -}}
+{{- range $name, $def := .layers -}}
+{{- if not (index $L.active $name) }}
+{{ range index $def "owns" | default list }}{{ . }}
+{{ end }}{{ range index $def "scripts" | default list }}{{ . }}
+{{ end }}
+{{- end -}}
+{{- end -}}
