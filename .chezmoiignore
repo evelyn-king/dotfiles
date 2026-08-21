@@ -1,6 +1,7 @@
 {{- /* Repo content, not dotfiles. Read from the source tree directly. */ -}}
 AGENTS.md
 bootstrap.sh
+bootstrap-standalone.sh
 CLAUDE.md
 .mailmap
 docs/**

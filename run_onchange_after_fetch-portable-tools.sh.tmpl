@@ -1,0 +1,139 @@
+#!/bin/sh
+{{/* .facts is written by `chezmoi init`, and the standalone layer cannot be
+     active without it, so at apply time this is always present. The guard is
+     for `chezmoi execute-template --file`, which renders regardless of
+     .chezmoiignore and would otherwise fail on a machine where this script is
+     correctly inactive. */ -}}
+{{- $libc := "glibc" -}}
+{{- if hasKey . "facts" }}{{ if hasKey .facts "libc" }}{{ $libc = .facts.libc }}{{ end }}{{ end -}}
+#
+# Fetch mise into ~/.local/bin on a machine that has no other way to get it.
+#
+# Only runs when the `standalone` layer is active — .chezmoiignore drops this
+# script otherwise — which means: no root, no nix, and a writable ~/.local/bin.
+# See docs/layers.md#the-standalone-layer.
+#
+# This fetches exactly one binary, and that is the whole design. mise resolves
+# prebuilt artefacts for its own tools, so the moment it exists the machine can
+# install the rest of ~/.config/mise/conf.d/20-standalone.toml without a
+# compiler, a package manager or a privilege escalation. Adding a second entry
+# here almost always means something belongs in that toml instead.
+#
+# POSIX sh, matching bootstrap-standalone.sh and for the same reason.
+#
+# mise version: {{ .standalone.mise.version }}
+# mise repo:    {{ .standalone.mise.repo }}
+# libc:         {{ $libc }}
+# mise on PATH: {{ lookPath "mise" | quote }}
+#
+# The rendered lookPath above is what makes this self-healing: installing mise
+# by some other means changes this script's hash, so chezmoi re-runs it and the
+# no-op branch below takes over rather than the initial state being cached
+# forever.
+
+set -eu
+
+VERSION="{{ .standalone.mise.version }}"
+REPO="{{ .standalone.mise.repo }}"
+LIBC="{{ $libc }}"
+BINDIR="$HOME/.local/bin"
+
+if command -v mise >/dev/null 2>&1; then
+  have=$(mise --version 2>/dev/null | awk '{print $1}')
+  case "$have" in
+  "${VERSION#v}"*) exit 0 ;;
+  esac
+  # A mise from elsewhere — the system package manager, a colleague's script.
+  # Leave it alone: this layer's job is to make sure there IS one, not to own
+  # a copy that something else is already maintaining.
+  case "$(command -v mise)" in
+  "$BINDIR/mise") ;;
+  *)
+    echo "mise: using the existing $(command -v mise) ($have); not overwriting." >&2
+    exit 0
+    ;;
+  esac
+fi
+
+# --- fetch helpers ----------------------------------------------------------
+
+if command -v curl >/dev/null 2>&1; then
+  fetch() { curl -fsSL "$1"; }
+elif command -v wget >/dev/null 2>&1; then
+  fetch() { wget -qO- "$1"; }
+else
+  echo "mise: neither curl nor wget; cannot fetch. Install mise by hand." >&2
+  exit 0
+fi
+
+if command -v sha256sum >/dev/null 2>&1; then
+  sha256() { sha256sum "$1" | cut -d' ' -f1; }
+elif command -v shasum >/dev/null 2>&1; then
+  sha256() { shasum -a 256 "$1" | cut -d' ' -f1; }
+else
+  echo "mise: no sha256 tool; refusing to install an unverified binary." >&2
+  exit 1
+fi
+
+# --- pick the asset ---------------------------------------------------------
+#
+# mise names by x64/arm64 rather than amd64/arm64, and publishes a musl variant
+# for both — unlike chezmoi, which has one for amd64 only. That asymmetry is
+# why bootstrap-standalone.sh warns on arm64 musl and this script does not.
+
+case "$(uname -m)" in
+x86_64 | amd64) march=x64 ;;
+aarch64 | arm64) march=arm64 ;;
+*)
+  echo "mise: unsupported architecture $(uname -m)." >&2
+  exit 1
+  ;;
+esac
+
+asset="mise-${VERSION}-linux-${march}"
+[ "$LIBC" = musl ] && asset="${asset}-musl"
+
+base="https://github.com/${REPO}/releases/download/${VERSION}"
+
+tmp=$(mktemp -d) || exit 1
+trap 'rm -rf "$tmp"' EXIT INT TERM
+
+echo "mise: fetching $asset"
+fetch "$base/$asset" >"$tmp/mise" || {
+  echo "mise: download failed; leaving the machine as it is." >&2
+  exit 1
+}
+
+# mise lists its artefacts with a ./ prefix; compared as exact strings so the
+# dots in the version cannot act as regex wildcards.
+sums=$(fetch "$base/SHASUMS256.txt") || {
+  echo "mise: could not fetch checksums." >&2
+  exit 1
+}
+want=$(printf '%s\n' "$sums" | while read -r h f; do
+  case "$f" in
+  "$asset" | "./$asset")
+    printf '%s' "$h"
+    break
+    ;;
+  esac
+done)
+[ -n "$want" ] || {
+  echo "mise: $asset is not listed in SHASUMS256.txt." >&2
+  exit 1
+}
+got=$(sha256 "$tmp/mise")
+[ "$want" = "$got" ] || {
+  echo "mise: checksum mismatch (want $want, got $got)." >&2
+  exit 1
+}
+
+mkdir -p "$BINDIR"
+mv "$tmp/mise" "$BINDIR/mise"
+chmod 755 "$BINDIR/mise"
+echo "mise: installed $VERSION to $BINDIR/mise"
+
+# Deliberately not running `mise install` here. run_onchange_after_mise-install
+# is a separate script that already does it, runs on every relevant change, and
+# ordering between the two is alphabetical — fetch-portable-tools sorts before
+# mise-install, so the tools land on this same apply.

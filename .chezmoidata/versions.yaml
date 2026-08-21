@@ -1,6 +1,16 @@
 # Tool and runtime versions are not here — they live in
 # dot_config/mise/conf.d/. This file pins what chezmoi itself fetches.
 
+# The one binary the standalone layer fetches for itself. Pinned like
+# everything else here: an unprivileged box is exactly where you least want a
+# silent version change, because you have no package manager to roll back with.
+# Bump this and `chezmoi apply` re-fetches — the version is rendered into
+# run_onchange_after_fetch-portable-tools.sh, so changing it changes the script.
+standalone:
+  mise:
+    version: v2026.8.9
+    repo: jdx/mise
+
 doom:
   repo: https://github.com/doomemacs/doomemacs.git
   rev: ad55ed08df3a1d3398d136d07b60ba2ad00fb91b

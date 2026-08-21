@@ -10,6 +10,7 @@
 - `dot_config/mise/conf.d/10-dotfiles.toml` declares language runtimes and global CLI tools, pinned. It is the counterpart to the flake, not an overlap — see `docs/nix-darwin.md` for the division of labour.
 - `.chezmoitemplates/shell-*.sh` hold the shared shell bodies rendered into the zsh and bash entry points; see `docs/shell-startup.md`.
 - `bootstrap.sh` takes a fresh Mac to the point chezmoi can take over. Repo content, also in `.chezmoiignore`; see `docs/bootstrap.md`.
+- `bootstrap-standalone.sh` is its counterpart for an unprivileged machine: no root, no nix, POSIX `sh`. Installs chezmoi only; see `docs/layers.md`.
 - `scripts/` holds repo tooling, not dotfiles. Also in `.chezmoiignore`.
 - `dot_zshenv.tmpl`, `dot_zshrc.tmpl`, `dot_bash_profile`, and `dot_bashrc.tmpl` are the shell entry points.
 - Top-level docs like `README.md` and `AGENTS.md` describe usage and repository conventions.

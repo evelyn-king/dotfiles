@@ -1,0 +1,55 @@
+# The reduced tool set for a machine with no root and no package manager.
+#
+# This file REPLACES conf.d/10-dotfiles.toml rather than supplementing it: the
+# `mise-full` layer that owns that file is switched off whenever `standalone`
+# is on, so on a constrained host this is the only tool list mise sees. See
+# docs/layers.md#the-standalone-layer.
+#
+# What is deliberately absent, and why:
+#
+#   Language runtimes. node, python and go are each a few hundred MB once their
+#   package trees exist, and a shared box often has a quota. Add the one you
+#   need with `mise use -g python@3.13` rather than carrying all three.
+#
+#   The coding agents. claude, codex and opencode are npm or aqua entries that
+#   want a node runtime, which the line above declines to install by default.
+#
+#   micromamba, rust, doom. Their layers key on the tool already being present,
+#   so they cannot activate here anyway.
+#
+# Everything below is a prebuilt binary from mise's aqua/ubi backends, which is
+# what makes this work without a compiler on the box.
+
+[settings]
+lockfile = true
+
+[tools]
+
+# --- the shell itself -------------------------------------------------------
+# shell-interactive.sh guards every one of these with `command -v`, so a
+# failed install degrades to a plainer shell rather than a broken one.
+starship = "latest"
+zoxide = "latest"
+direnv = "latest"
+fzf = "latest"
+
+# --- file and text ----------------------------------------------------------
+bat = "latest"
+eza = "latest"
+fd = "latest"
+ripgrep = "latest"
+jq = "latest"
+
+# --- git --------------------------------------------------------------------
+# gh is a client for a moving service; lazygit is the only TUI here because it
+# is one static binary and replaces several remembered command sequences.
+gh = "latest"
+lazygit = "latest"
+
+# --- editor -----------------------------------------------------------------
+# The one entry that can genuinely fail on a musl host: upstream neovim ships
+# glibc-linked releases only. On Alpine this install errors and the `n` helper
+# in shell-interactive.sh falls through to whatever vi the image provides.
+# Left in on purpose — the common standalone target is Ubuntu LTS, where it
+# works, and a loud failure on Alpine is better than a silent omission.
+neovim = "latest"

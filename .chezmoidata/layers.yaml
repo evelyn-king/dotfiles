@@ -64,10 +64,39 @@ layers:
       has: [darwin-rebuild]
     scripts: [darwin-rebuild.sh]
 
+  # The floor layer, and the only one that activates on the ABSENCE of a
+  # capability. When nothing else will install software for us, the dotfiles
+  # have to do it themselves — see docs/layers.md#the-standalone-layer.
+  standalone:
+    detect:
+      fact: {prefixWritable: "true"}
+      conflicts: [root, nix]
+    # mise is the whole point of this layer: one static binary that can install
+    # everything else without root. Implied rather than detected, so its config
+    # is written on the SAME apply that fetches it — see the note on `implies`
+    # in .chezmoitemplates/layers.yaml.tmpl.
+    implies: [mise]
+    owns: [.config/mise/conf.d/20-standalone.toml]
+    scripts: [fetch-portable-tools.sh]
+
+  # mise itself: the marker that a tool installer exists at all. It owns no
+  # config, only the script that acts on whatever conf.d files the layers below
+  # have written.
   mise:
     detect: {has: [mise]}
-    owns: [.config/mise]
     scripts: [mise-install.sh]
+
+  # The full tool list, and the reason this layer exists rather than the list
+  # simply living in base: a constrained host wants FEWER tools, and mise's
+  # conf.d cannot express that. Lower-numbered conf.d files win, so a
+  # 20-standalone.toml can only ever ADD to a 10-dotfiles.toml that is always
+  # present. Making the full list a layer is what lets the standalone host
+  # substitute a smaller one instead of inheriting the large one and adding.
+  mise-full:
+    detect:
+      requires: [mise]
+      conflicts: [standalone]
+    owns: [.config/mise/conf.d/10-dotfiles.toml]
 
   # --- graphical ------------------------------------------------------------
 
