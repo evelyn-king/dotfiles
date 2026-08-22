@@ -19,9 +19,7 @@ chezmoi_bin=$(command -v chezmoi) || {
   exit 1
 }
 
-scenario_record=$(
-  layer_scenarios | awk -F '|' -v want="$scenario" '$1 == want { print; found = 1 } END { exit !found }'
-) || {
+scenario_record=$(layer_scenario "$scenario") || {
   printf 'unknown scenario: %s\n' "$scenario" >&2
   exit 2
 }
@@ -43,26 +41,7 @@ status_output="$work/status"
 portable_script="$work/fetch-portable-tools.sh"
 mkdir -p "$home" "$cache" "$probe_path"
 
-toml_repo=$(printf '%s' "$repo" | sed 's/\\/\\\\/g; s/"/\\"/g')
-{
-  printf 'sourceDir = "%s"\n\n' "$toml_repo"
-  printf '[data]\n'
-  printf 'layerForce = []\n'
-  printf 'layerDisable = []\n\n'
-  printf '[data.facts]\n'
-  printf 'root = %s\n' "$root"
-  printf 'libc = "%s"\n' "$libc"
-  printf 'desktop = %s\n' "$desktop"
-  printf 'prefixWritable = true\n\n'
-  printf '[data.layerProbes]\n'
-  for binary in $LAYER_PROBE_BINARIES; do
-    value=false
-    case " $present " in
-    *" $binary "*) value=true ;;
-    esac
-    printf '"%s" = %s\n' "$binary" "$value"
-  done
-} >"$config"
+layer_scenario_config "$repo" "$root" "$libc" "$desktop" "$present" >"$config"
 
 sandbox_chezmoi() {
   HOME="$home" PATH="$probe_path" "$chezmoi_bin" \

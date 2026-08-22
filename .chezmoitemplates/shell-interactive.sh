@@ -125,13 +125,17 @@ jupyter_remote_load_env() {
     unset env_file
     return 1
   fi
+  # shellcheck disable=SC1090 # The caller selects this machine-local file.
   . "$env_file"
   unset env_file
 }
 
 # --- local overrides --------------------------------------------------------
 
-[ -f "$XDG_CONFIG_HOME/shell/extras.sh" ] && . "$XDG_CONFIG_HOME/shell/extras.sh"
+if [ -f "$XDG_CONFIG_HOME/shell/extras.sh" ]; then
+  # shellcheck disable=SC1091 # The local override is outside this repository.
+  . "$XDG_CONFIG_HOME/shell/extras.sh"
+fi
 
 # --- prompt (must stay last) ------------------------------------------------
 

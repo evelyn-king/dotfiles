@@ -2,11 +2,11 @@
 
 ## Implementation status
 
-Order items 1 through 4 are implemented: predicate-key rejection, the asserted
-layer matrix, declaration linting, and the macOS sandbox apply.
+Order items 1 through 5 are implemented: predicate-key rejection, the asserted
+layer matrix, declaration linting, sandbox applies, and shell checks.
 
-The next implementation step is **Step 4: test each shell with the right
-interpreter**, which is order item 5 below.
+The local regression suite is complete. The next implementation step is native
+Linux sandbox applies in containers, which is order item 6 below.
 
 This document began as the plan for testing the layer arrangement, written once
 the resolver landed and reviewed twice before any of it was committed. It lives

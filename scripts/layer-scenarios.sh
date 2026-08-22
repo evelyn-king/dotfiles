@@ -19,5 +19,36 @@ EOF
 
 # Every binary probed by a layer. A scenario's list is a whitelist, so the
 # checks force every binary absent before enabling the listed ones.
-# shellcheck disable=SC2034 # Used by scripts that source this file.
 LAYER_PROBE_BINARIES="apt-get nix nix-env darwin-rebuild mise cargo rustup emacs emacsclient micromamba mamba conda"
+
+layer_scenario() {
+  layer_scenarios |
+    awk -F '|' -v want="$1" '$1 == want { print; found = 1 } END { exit !found }'
+}
+
+layer_scenario_config() (
+  config_repo=$1
+  config_root=$2
+  config_libc=$3
+  config_desktop=$4
+  config_present=$5
+  config_repo=$(printf '%s' "$config_repo" | sed 's/\\/\\\\/g; s/"/\\"/g')
+
+  printf 'sourceDir = "%s"\n\n' "$config_repo"
+  printf '[data]\n'
+  printf 'layerForce = []\n'
+  printf 'layerDisable = []\n\n'
+  printf '[data.facts]\n'
+  printf 'root = %s\n' "$config_root"
+  printf 'libc = "%s"\n' "$config_libc"
+  printf 'desktop = %s\n' "$config_desktop"
+  printf 'prefixWritable = true\n\n'
+  printf '[data.layerProbes]\n'
+  for binary in $LAYER_PROBE_BINARIES; do
+    value=false
+    case " $config_present " in
+    *" $binary "*) value=true ;;
+    esac
+    printf '"%s" = %s\n' "$binary" "$value"
+  done
+)
