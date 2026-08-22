@@ -74,10 +74,11 @@ named in `layerForce`.
 `implies` runs after the predicate sweep and turns other layers on. It exists
 for one specific problem, described under the standalone layer below.
 
-Two rules hold by convention rather than by code:
+Two ownership rules apply:
 
 1. **A path has at most one owning layer.** Two layers claiming one path means
-   the axes overlap; split the file instead.
+   the axes overlap; split the file instead. The
+   [layer lint](../scripts/lint-layers.sh) enforces this.
 2. **A `has:`-keyed layer may only add.** See the next section for why.
 
 ## Layers are not toggles

@@ -1,0 +1,36 @@
+{{- /* Flatten layer declarations into records that a POSIX shell checker can
+       read without adding a YAML parser. Fields are tab-separated. */ -}}
+{{- $layers := .layers -}}
+{{- printf "force\t%s\n" (dict "layerForce" (keys $layers | sortAlpha) | toJson) -}}
+{{- range $name := keys $layers | sortAlpha -}}
+{{-   $def := index $layers $name -}}
+{{-   $detect := index $def "detect" | default dict -}}
+{{-   $planned := index $def "planned" | default false -}}
+{{-   printf "layer\t%s\t%v\n" $name $planned -}}
+{{-   range keys $def | sortAlpha -}}
+{{-     printf "layer-key\t%s\t%s\n" $name . -}}
+{{-   end -}}
+{{-   range keys $detect | sortAlpha -}}
+{{-     printf "detect-key\t%s\t%s\n" $name . -}}
+{{-   end -}}
+{{-   range keys (index $detect "fact" | default dict) | sortAlpha -}}
+{{-     printf "fact\t%s\t%s\n" $name . -}}
+{{-   end -}}
+{{-   if hasKey $detect "os" -}}
+{{-     printf "os\t%s\t%v\n" $name (index $detect "os") -}}
+{{-   end -}}
+{{-   range $kind := list "requires" "conflicts" -}}
+{{-     range index $detect $kind | default list -}}
+{{-       printf "reference\t%s\tdetect.%s\t%v\n" $name $kind . -}}
+{{-     end -}}
+{{-   end -}}
+{{-   range index $def "implies" | default list -}}
+{{-     printf "reference\t%s\timplies\t%v\n" $name . -}}
+{{-   end -}}
+{{-   range index $def "owns" | default list -}}
+{{-     printf "owns\t%s\t%v\t%v\n" $name $planned . -}}
+{{-   end -}}
+{{-   range index $def "scripts" | default list -}}
+{{-     printf "script\t%s\t%v\t%v\n" $name $planned . -}}
+{{-   end -}}
+{{- end -}}

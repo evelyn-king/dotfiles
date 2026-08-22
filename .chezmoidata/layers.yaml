@@ -21,9 +21,10 @@
 # run_ script names AFTER chezmoi strips the run_*_ prefix. Both are fed
 # straight to .chezmoiignore when the layer is off.
 #
-# Two rules, enforced by convention rather than by code:
+# Two rules:
 #   1. A path is owned by at most one layer. Two layers claiming one path means
-#      the axes are wrong; split the file instead.
+#      the axes are wrong; split the file instead. scripts/lint-layers.sh
+#      enforces this.
 #   2. A layer keyed on `has:` may only ADD. Installing a tool must never cause
 #      a file to disappear, because .chezmoiignore does not remove — see
 #      docs/layers.md#layers-are-not-toggles.
@@ -107,6 +108,9 @@ layers:
       - .config/zed
 
   omarchy:
+    # The declarations are placeholders for content that has not landed yet.
+    # The layer lint reports missing planned entries without failing.
+    planned: true
     detect:
       osRelease: omarchy
       requires: [desktop]
