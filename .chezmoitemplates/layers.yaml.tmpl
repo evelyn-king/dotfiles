@@ -32,6 +32,19 @@ non-converging conflicts.
 {{- $disabled := list -}}
 {{- if hasKey . "layerDisable" }}{{ $disabled = .layerDisable }}{{ end -}}
 
+{{- /* Reject misspelled predicates before resolution. Without this guard, a
+       non-empty detect map containing only unknown keys passes on every
+       machine because none of the predicate checks can make it false. */ -}}
+{{- $knownPredicates := list "os" "osRelease" "has" "hasAny" "fact" "requires" "conflicts" -}}
+{{- range $name, $def := $defs -}}
+{{-   $d := index $def "detect" | default dict -}}
+{{-   range keys $d -}}
+{{-     if not (has . $knownPredicates) -}}
+{{-       fail (printf "layer %q has unknown predicate key %q" $name .) -}}
+{{-     end -}}
+{{-   end -}}
+{{- end -}}
+
 {{- /* PATH probes are hoisted out of the passes: lookPath stats the
        filesystem, and repeating it for every layer on every pass is the one
        place this design could plausibly get slow. */ -}}
