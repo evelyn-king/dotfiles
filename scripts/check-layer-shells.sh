@@ -77,6 +77,7 @@ render .chezmoitemplates/shell-env.sh "$rendered/shell-env.sh"
 render .chezmoitemplates/shell-path.sh "$rendered/shell-path.sh"
 render .chezmoitemplates/shell-interactive.sh "$rendered/shell-interactive.sh"
 render run_onchange_after_fetch-portable-tools.sh.tmpl "$rendered/fetch-portable-tools.sh"
+render run_onchange_after_mise-install.sh.tmpl "$rendered/mise-install.sh"
 render dot_bashrc.tmpl "$home/.bashrc"
 render dot_zshenv.tmpl "$home/.zshenv"
 render dot_zshrc.tmpl "$home/.zshrc"
@@ -84,6 +85,7 @@ render dot_zshrc.tmpl "$home/.zshrc"
 for source in \
   bootstrap-standalone.sh \
   "$rendered/fetch-portable-tools.sh" \
+  "$rendered/mise-install.sh" \
   "$rendered/shell-env.sh" \
   "$rendered/shell-path.sh" \
   "$rendered/shell-interactive.sh"; do

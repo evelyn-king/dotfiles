@@ -20,11 +20,14 @@
 # run_onchange_after_fetch-portable-tools.sh, not here.
 #
 # Set BOOTSTRAP_DRY_RUN=1 to print the resolved plan and exit without touching
-# the network or the filesystem.
+# the network or the filesystem. BOOTSTRAP_REPO_URL and BOOTSTRAP_REPO_REF let
+# a test or review build apply a specific repository snapshot; normal installs
+# use the production URL and its default branch.
 
 set -eu
 
-REPO_HTTPS="https://github.com/evelyn-king/dotfiles.git"
+REPO_URL="${BOOTSTRAP_REPO_URL:-https://github.com/evelyn-king/dotfiles.git}"
+REPO_REF="${BOOTSTRAP_REPO_REF:-}"
 BINDIR="${BINDIR:-$HOME/.local/bin}"
 DRY="${BOOTSTRAP_DRY_RUN:-0}"
 
@@ -44,8 +47,10 @@ elif command -v wget >/dev/null 2>&1; then
   fetch() { wget -qO- "$1"; }
   # wget prints the redirect chain to stderr; the last Location wins.
   fetch_head_url() {
-    wget -qS --spider --max-redirect=10 "$1" 2>&1 |
-      sed -n 's/^ *Location: *\([^ ]*\).*/\1/p' | tail -1
+    wget -qS --spider "$1" 2>&1 |
+      sed -n 's/^ *Location: *\([^ ]*\).*/\1/p' |
+      tr -d '\r' |
+      tail -1
   }
 else
   die "neither curl nor wget is available; cannot fetch anything."
@@ -200,7 +205,11 @@ export PATH
 # clones over HTTPS without it, which is what makes a git-less bootstrap work.
 
 say "Applying dotfiles (chezmoi init --apply)."
-chezmoi init --apply --use-builtin-git=true "$REPO_HTTPS"
+if [ -n "$REPO_REF" ]; then
+  chezmoi init --apply --use-builtin-git=true --branch "$REPO_REF" "$REPO_URL"
+else
+  chezmoi init --apply --use-builtin-git=true "$REPO_URL"
+fi
 
 cat <<EOF
 

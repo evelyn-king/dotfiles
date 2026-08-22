@@ -2,12 +2,12 @@
 
 ## Implementation status
 
-Order items 1 through 6 are implemented: predicate-key rejection, the asserted
-layer matrix, declaration linting, sandbox applies, shell checks, and native
-Linux containers.
+Order items 1 through 7 are implemented: predicate-key rejection, the asserted
+layer matrix, declaration linting, sandbox applies, shell checks, native Linux
+containers, and standalone bootstrap containers.
 
-The local regression suite and native Linux sandbox applies are complete. The
-next implementation step is bootstrap containers, which is order item 7 below.
+The planned layer regression suite is complete. The focused network checks for
+the portable fetch and Vim externals remain separate work.
 
 This document began as the plan for testing the layer arrangement, written once
 the resolver landed and reviewed twice before any of it was committed. It lives
@@ -265,16 +265,15 @@ layer should activate:
 - Alpine without git, amd64
 - Alpine without git, arm64, with an explicit `--platform=linux/arm64`
 
-The arm64 musl gap is in the chezmoi download inside `bootstrap-standalone.sh`.
-mise publishes an arm64 musl binary, so only the chezmoi step needs the fallback.
+The bootstrap itself uses chezmoi's generic arm64 build because no musl asset is
+published; mise does publish an arm64 musl binary. The standalone tool template
+also omits eza on arm64 musl and neovim on every musl host because their release
+matrices do not support those targets.
 
-The bootstrap has to test the code under review. Today it cannot:
-`bootstrap-standalone.sh:27` hardcodes `REPO_HTTPS` and line 203 clones with no
-ref, so a container silently tests `main` on GitHub while claiming to test this
-branch. Add an injectable repository URL and ref for the runner, leave the
-production default alone, and point the container at the current commit. Keep one
-separate smoke test against the real GitHub URL to exercise the git-less
-built-in clone.
+The runner copies the current worktree into a temporary Git fixture and points
+`BOOTSTRAP_REPO_URL` and `BOOTSTRAP_REPO_REF` at its test commit. The production
+default remains `https://github.com/evelyn-king/dotfiles.git`. A separate clone
+smoke test uses that real URL with no `git` binary present.
 
 For the current-code cases, assert:
 
@@ -325,9 +324,12 @@ dependency the repo does not already declare. A pre-commit hook may call it, and
 it stays usable on its own.
 
 `scripts/check-layer-containers.sh` runs the native Linux sandbox checks.
-`--build` creates its pinned Ubuntu and Alpine images. Network and slow modes
-will land with the bootstrap and external checks. If CI arrives later, run the
-offline script on every change and schedule the others.
+`--build` creates its pinned Ubuntu and Alpine images. `--slow` adds the three
+standalone bootstrap cases and the production clone smoke test. Use
+`./scripts/check-layer-containers.sh --build --slow` the first time. The focused
+external network mode remains future work. `--slow-case=alpine-arm64`, for
+example, reruns one slow case for debugging or CI sharding. If CI arrives later,
+run the offline script on every change and schedule the others.
 
 ## Order
 

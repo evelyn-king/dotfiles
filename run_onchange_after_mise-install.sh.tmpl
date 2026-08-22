@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 # Install the runtimes and global CLI tools declared in ~/.config/mise/conf.d.
 #
@@ -8,10 +8,10 @@
 # and had drifted from what was actually installed.
 #
 # full tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
-# standalone tool list hash: {{ include "dot_config/mise/conf.d/20-standalone.toml" | sha256sum }}
+# standalone tool list hash: {{ include "dot_config/mise/conf.d/20-standalone.toml.tmpl" | sha256sum }}
 # mise executable: {{ lookPath "mise" | quote }}
 
-set -euo pipefail
+set -eu
 
 # mise is yours to install; on a machine without it there is nothing to do.
 # Its resolved path is rendered above so installing it changes this script and

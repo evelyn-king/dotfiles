@@ -19,6 +19,11 @@
 #
 # Everything below is a prebuilt binary from mise's aqua/ubi backends, which is
 # what makes this work without a compiler on the box.
+{{- $facts := dict -}}
+{{- if hasKey . "facts" }}{{ $facts = .facts }}{{ end -}}
+{{- $libc := index $facts "libc" | default "unknown" -}}
+{{- $omitEza := and (eq .chezmoi.arch "arm64") (eq $libc "musl") -}}
+{{- $omitNeovim := eq $libc "musl" -}}
 
 [settings]
 lockfile = true
@@ -35,7 +40,10 @@ fzf = "latest"
 
 # --- file and text ----------------------------------------------------------
 bat = "latest"
+# eza has no arm64 musl release. Keep ordinary `ls` on that one platform.
+{{ if not $omitEza -}}
 eza = "latest"
+{{ end -}}
 fd = "latest"
 ripgrep = "latest"
 jq = "latest"
@@ -47,9 +55,7 @@ gh = "latest"
 lazygit = "latest"
 
 # --- editor -----------------------------------------------------------------
-# The one entry that can genuinely fail on a musl host: upstream neovim ships
-# glibc-linked releases only. On Alpine this install errors and the `n` helper
-# in shell-interactive.sh falls through to whatever vi the image provides.
-# Left in on purpose — the common standalone target is Ubuntu LTS, where it
-# works, and a loud failure on Alpine is better than a silent omission.
+# Upstream neovim releases are glibc-linked. Alpine keeps its system vi instead.
+{{ if not $omitNeovim -}}
 neovim = "latest"
+{{ end -}}

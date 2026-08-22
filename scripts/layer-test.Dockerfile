@@ -32,3 +32,18 @@ RUN chezmoi --version
 FROM ${ALPINE_IMAGE} AS alpine
 COPY --from=chezmoi /usr/local/bin/chezmoi /usr/local/bin/chezmoi
 RUN chezmoi --version
+
+FROM ${UBUNTU_IMAGE} AS ubuntu-bootstrap
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ca-certificates curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && ! command -v git \
+    && ! command -v chezmoi \
+    && mkdir -p /home/test \
+    && chown 65532:65532 /home/test
+
+FROM ${ALPINE_IMAGE} AS alpine-bootstrap
+RUN ! command -v git \
+    && ! command -v chezmoi \
+    && mkdir -p /home/test \
+    && chown 65532:65532 /home/test
