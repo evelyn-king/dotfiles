@@ -20,39 +20,18 @@ set -euo pipefail
 
 cd "$(dirname "$0")/.."
 
+. scripts/layer-scenarios.sh
+
 GOLDEN="scripts/layer-matrix.golden"
 LAYERS_DOC="docs/layers.md"
 BEGIN_MARKER="<!-- BEGIN GENERATED LAYER MATRIX -->"
 END_MARKER="<!-- END GENERATED LAYER MATRIX -->"
 
-# name | os | os-release id | id_like | root | libc | desktop | present binaries
-#
-# "present binaries" is the whitelist: anything named in layers.yaml and absent
-# from this list is forced to look missing, so a scenario describes a machine
-# completely rather than inheriting stray tools from the host running the test.
-scenarios() {
-  cat <<'EOF'
-ubuntu-noroot|linux|ubuntu|debian|false|glibc|false|apt-get
-ubuntu-noroot-tooled|linux|ubuntu|debian|false|glibc|false|apt-get mise cargo
-ubuntu-root|linux|ubuntu|debian|true|glibc|false|apt-get mise
-ubuntu-desktop|linux|ubuntu|debian|true|glibc|true|apt-get mise cargo emacs
-alpine-noroot|linux|alpine||false|musl|false|
-nixos-server|linux|nixos||true|glibc|false|nix mise
-omarchy|linux|omarchy|arch|true|glibc|true|nix mise cargo rustup emacs micromamba
-macbook|darwin|||false|none|true|nix darwin-rebuild mise cargo rustup emacs micromamba
-ci-container|linux|debian|debian|true|glibc|false|
-EOF
-}
-
-# Every binary any layer might probe. Each is set false, then the scenario's
-# own list flips its entries true.
-ALL_BINARIES="apt-get nix nix-env darwin-rebuild mise cargo rustup emacs emacsclient micromamba mamba conda"
-
 render() {
   local os="$1" id="$2" idlike="$3" root="$4" libc="$5" desktop="$6" present="$7"
 
   local probes="" b
-  for b in $ALL_BINARIES; do
+  for b in $LAYER_PROBE_BINARIES; do
     case " $present " in
     *" $b "*) probes="$probes \"$b\" true" ;;
     *) probes="$probes \"$b\" false" ;;
@@ -90,7 +69,7 @@ render_matrix() {
       continue
     fi
     printf '%-22s %s\n' "$name" "$out"
-  done < <(scenarios)
+  done < <(layer_scenarios)
 
   if [ "$matched" -eq 0 ]; then
     printf 'unknown scenario: %s\n' "$want" >&2
