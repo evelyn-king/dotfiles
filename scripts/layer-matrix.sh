@@ -4,6 +4,7 @@
 #
 #   ./scripts/layer-matrix.sh            # every scenario
 #   ./scripts/layer-matrix.sh ubuntu-noroot
+#   ./scripts/layer-matrix.sh --update   # refresh expected output and docs
 #
 # Each scenario is a synthetic template context fed to
 # .chezmoitemplates/layers.yaml.tmpl in place of the real one. `chezmoi` is the
@@ -18,6 +19,11 @@
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
+
+GOLDEN="scripts/layer-matrix.golden"
+LAYERS_DOC="docs/layers.md"
+BEGIN_MARKER="<!-- BEGIN GENERATED LAYER MATRIX -->"
+END_MARKER="<!-- END GENERATED LAYER MATRIX -->"
 
 # name | os | os-release id | id_like | root | libc | desktop | present binaries
 #
@@ -68,18 +74,114 @@ render() {
     sed -n 's/^names: //p'
 }
 
-want="${1:-}"
-status=0
-while IFS='|' read -r name os id idlike root libc desktop present; do
-  [ -n "$name" ] || continue
-  [ -z "$want" ] || [ "$want" = "$name" ] || continue
-  # A template error prints to stderr and yields an empty line, which is easy
-  # to skim past. Treat it as the failure it is.
-  if ! out=$(render "$os" "$id" "$idlike" "$root" "$libc" "$desktop" "$present") || [ -z "$out" ]; then
-    printf '%-22s !! resolution failed\n' "$name"
-    status=1
-    continue
+render_matrix() {
+  local want="$1" status=0 matched=0
+  local name os id idlike root libc desktop present out
+
+  while IFS='|' read -r name os id idlike root libc desktop present; do
+    [ -n "$name" ] || continue
+    [ -z "$want" ] || [ "$want" = "$name" ] || continue
+    matched=1
+    # A template error prints to stderr and yields an empty line, which is easy
+    # to skim past. Treat it as the failure it is.
+    if ! out=$(render "$os" "$id" "$idlike" "$root" "$libc" "$desktop" "$present") || [ -z "$out" ]; then
+      printf '%-22s !! resolution failed\n' "$name"
+      status=1
+      continue
+    fi
+    printf '%-22s %s\n' "$name" "$out"
+  done < <(scenarios)
+
+  if [ "$matched" -eq 0 ]; then
+    printf 'unknown scenario: %s\n' "$want" >&2
+    return 2
   fi
-  printf '%-22s %s\n' "$name" "$out"
-done < <(scenarios)
-exit $status
+  return "$status"
+}
+
+update_layers_doc() {
+  local matrix="$1" output="$2"
+
+  awk -v begin="$BEGIN_MARKER" -v end="$END_MARKER" -v matrix="$matrix" '
+    BEGIN {
+      while ((getline line < matrix) > 0) rendered = rendered line "\n"
+      close(matrix)
+    }
+    $0 == begin {
+      begins++
+      print
+      print "```"
+      print "$ ./scripts/layer-matrix.sh"
+      printf "%s", rendered
+      print "```"
+      replacing = 1
+      next
+    }
+    $0 == end {
+      ends++
+      replacing = 0
+      print
+      next
+    }
+    !replacing { print }
+    END {
+      if (begins != 1 || ends != 1 || replacing) exit 1
+    }
+  ' "$LAYERS_DOC" >"$output"
+}
+
+usage() {
+  printf 'usage: %s [scenario | --update]\n' "$0" >&2
+}
+
+want=""
+update=0
+case "$#" in
+0) ;;
+1)
+  if [ "$1" = "--update" ]; then
+    update=1
+  else
+    want="$1"
+  fi
+  ;;
+*)
+  usage
+  exit 2
+  ;;
+esac
+
+actual=$(mktemp "${TMPDIR:-/tmp}/layer-matrix.XXXXXX")
+expected="$GOLDEN"
+expected_output=""
+doc_output=""
+trap 'rm -f "$actual" ${expected_output:+"$expected_output"} ${doc_output:+"$doc_output"}' EXIT
+
+if ! render_matrix "$want" >"$actual"; then
+  sed -n '1,$p' "$actual"
+  exit 1
+fi
+
+if [ "$update" -eq 1 ]; then
+  doc_output=$(mktemp "${TMPDIR:-/tmp}/layer-matrix-doc.XXXXXX")
+  if ! update_layers_doc "$actual" "$doc_output"; then
+    printf 'could not replace the generated matrix in %s\n' "$LAYERS_DOC" >&2
+    exit 1
+  fi
+  chmod 0644 "$actual" "$doc_output"
+  mv "$actual" "$GOLDEN"
+  mv "$doc_output" "$LAYERS_DOC"
+  sed -n '1,$p' "$GOLDEN"
+  exit 0
+fi
+
+if [ -n "$want" ]; then
+  expected_output=$(mktemp "${TMPDIR:-/tmp}/layer-matrix-expected.XXXXXX")
+  awk -v want="$want" '$1 == want { print }' "$GOLDEN" >"$expected_output"
+  expected="$expected_output"
+fi
+
+if ! diff -u "$expected" "$actual"; then
+  exit 1
+fi
+sed -n '1,$p' "$actual"

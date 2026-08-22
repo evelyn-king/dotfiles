@@ -181,6 +181,7 @@ scripts verify before making anything executable.
 sitting at, by feeding a synthetic context to the resolver in place of the real
 one:
 
+<!-- BEGIN GENERATED LAYER MATRIX -->
 ```
 $ ./scripts/layer-matrix.sh
 ubuntu-noroot          [debian, linux, mise, standalone]
@@ -193,6 +194,12 @@ omarchy                [conda, desktop, emacs, linux, mise, mise-full, nix, omar
 macbook                [conda, darwin, desktop, emacs, mise, mise-full, nix, nixdarwin, rust]
 ci-container           [debian, linux, root]
 ```
+<!-- END GENERATED LAYER MATRIX -->
+
+The script compares each run with
+[`scripts/layer-matrix.golden`](../scripts/layer-matrix.golden). Run
+`./scripts/layer-matrix.sh --update` after an intentional change; it rewrites
+the golden file and the generated block above.
 
 This is the regression test for `layers.yaml`. A predicate that is subtly wrong
 shows up as a machine gaining or losing a layer it should not have, which is
