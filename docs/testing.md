@@ -2,11 +2,12 @@
 
 ## Implementation status
 
-Order items 1 through 5 are implemented: predicate-key rejection, the asserted
-layer matrix, declaration linting, sandbox applies, and shell checks.
+Order items 1 through 6 are implemented: predicate-key rejection, the asserted
+layer matrix, declaration linting, sandbox applies, shell checks, and native
+Linux containers.
 
-The local regression suite is complete. The next implementation step is native
-Linux sandbox applies in containers, which is order item 6 below.
+The local regression suite and native Linux sandbox applies are complete. The
+next implementation step is bootstrap containers, which is order item 7 below.
 
 This document began as the plan for testing the layer arrangement, written once
 the resolver landed and reviewed twice before any of it was committed. It lives
@@ -231,6 +232,17 @@ One Ubuntu image covers `ubuntu-noroot`, `ubuntu-noroot-tooled`, `ubuntu-root`,
 and `ubuntu-desktop` by varying facts and `layerProbes`. Alpine covers
 `alpine-noroot`.
 
+Build the pinned images once, then run the checks offline:
+
+```sh
+./scripts/check-layer-containers.sh --build
+./scripts/check-layer-containers.sh
+```
+
+The build downloads chezmoi 2.70.5 and verifies the release checksum. Normal
+runs disable container networking, mount the repository read-only, and use a
+read-only root filesystem with a temporary `/tmp`.
+
 `ci-container` stays resolver-only. Running it natively would mean forcing
 `apt-get` to look absent inside an image that ships it, which describes no real
 machine. The only new input a native run would add is the os-release file, and
@@ -312,10 +324,10 @@ test runner.
 dependency the repo does not already declare. A pre-commit hook may call it, and
 it stays usable on its own.
 
-`scripts/check-layer-containers.sh` runs step 5. Default mode runs the native
-Linux sandbox checks. `--network` runs the portable fetch and the vim externals.
-`--slow` runs bootstrap and the heavy hooks. If CI arrives later, run the offline
-script on every change and schedule the others.
+`scripts/check-layer-containers.sh` runs the native Linux sandbox checks.
+`--build` creates its pinned Ubuntu and Alpine images. Network and slow modes
+will land with the bootstrap and external checks. If CI arrives later, run the
+offline script on every change and schedule the others.
 
 ## Order
 

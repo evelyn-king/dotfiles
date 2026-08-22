@@ -34,20 +34,27 @@ cache="$work/cache"
 config="$work/chezmoi.toml"
 state="$work/state.boltdb"
 probe_path="$work/path"
+source="$work/source"
 records="$work/records"
 managed_paths="$work/managed-paths"
 managed_scripts="$work/managed-scripts"
 status_output="$work/status"
 portable_script="$work/fetch-portable-tools.sh"
-mkdir -p "$home" "$cache" "$probe_path"
+mkdir -p "$home" "$cache" "$probe_path" "$source"
 
-layer_scenario_config "$repo" "$root" "$libc" "$desktop" "$present" >"$config"
+# Chezmoi resolves an uncached external before its type filter takes effect.
+# Use a source copy without the external manifest; network coverage is a
+# separate check.
+cp -R "$repo/." "$source"
+: >"$source/dot_vim/pack/plugins/start/.chezmoiexternal.toml.tmpl"
+
+layer_scenario_config "$source" "$root" "$libc" "$desktop" "$present" >"$config"
 
 sandbox_chezmoi() {
   HOME="$home" PATH="$probe_path" "$chezmoi_bin" \
     -D "$home" \
     -c "$config" \
-    -S "$repo" \
+    -S "$source" \
     --cache "$cache" \
     --persistent-state "$state" \
     --color=false \
@@ -91,10 +98,12 @@ sandbox_chezmoi apply \
   --refresh-externals=never
 
 sandbox_chezmoi managed \
-  --exclude=scripts \
+  --exclude=scripts,externals \
+  --refresh-externals=never \
   --path-style=relative >"$managed_paths"
 sandbox_chezmoi managed \
   --include=scripts \
+  --refresh-externals=never \
   --path-style=relative >"$managed_scripts"
 
 path_is_managed() {
