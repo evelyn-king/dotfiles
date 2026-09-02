@@ -62,6 +62,10 @@ Install these through Omarchy's package flow:
 ## Notes
 
 - Omarchy installs a system `rust` package by default, but this repo expects `rustup`.
+- Ghostty's font chain names `JetBrainsMono Nerd Font` explicitly. Omarchy
+  already ships it as `ttf-jetbrains-mono-nerd-basic`, so it is not listed
+  above. The preferred CaskaydiaCove face has no Omarchy package and is macOS
+  only, from `nix/flake.nix`.
 - `zsh` is not part of a stock Omarchy install, and this repo is zsh-first:
   `~/.bashrc` hands off to zsh whenever it is present. Leave the package out
   and the bash fallback is what you actually get on every login.

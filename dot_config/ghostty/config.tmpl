@@ -6,9 +6,16 @@
 theme = "Rose Pine Moon"
 
 # First match wins; the rest are fallbacks for hosts missing the primary font.
+# CaskaydiaCove is the macOS primary and is installed by nix/flake.nix. Omarchy
+# packages no equivalent and ships JetBrainsMono Nerd Font instead, so name it
+# exactly rather than letting the chain fall through: fontconfig answers an
+# unknown family with its nearest match instead of failing, which looks like it
+# worked while ignoring every face actually asked for. The unpatched
+# "JetBrains Mono" stays last for a host that has only that.
 font-family = ""
 font-family = "CaskaydiaCove Nerd Font Mono"
 font-family = "FiraCode Nerd Font Mono"
+font-family = "JetBrainsMono Nerd Font"
 font-family = "JetBrains Mono"
 font-style = Regular
 {{- if $omarchy }}
