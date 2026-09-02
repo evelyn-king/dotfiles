@@ -1,9 +1,11 @@
 # Shell startup layout
 
-Startup files are flat and self-contained. The shared bodies live in
-`.chezmoitemplates/` and chezmoi inlines them at apply time, so no rendered
-file sources another at runtime. The two per-machine hooks at the bottom of
-this page are the only files read from `~/.config/shell`.
+Startup files are flat. The shared bodies live in `.chezmoitemplates/` and
+chezmoi inlines them at apply time, so nothing under `.chezmoitemplates/` is
+sourced at runtime. The rendered files still read a handful of things at
+runtime, each covered below: `~/.bashrc` from `~/.bash_profile`, the vendored
+`~/.bash-preexec.sh`, Omarchy's own files, and the two per-machine hooks in
+`~/.config/shell`.
 
 | Template | Contents |
 | --- | --- |
@@ -49,6 +51,9 @@ reaches both copies still ends up with the same order.
 - micromamba's shell hook runs *before* `mise activate`, because it prepends
   `$MAMBA_ROOT_PREFIX/condabin` and would otherwise sit ahead of every mise tool
   path. micromamba is itself a mise tool, so it is resolved with `mise which`.
+- The rc file brings up completions before it includes
+  `shell-interactive.sh`. The tool hooks in there register completions, so
+  `compinit` and `bashcompinit` have to have run already.
 - The prompt block (starship, zoxide, atuin) stays last.
 
 ## Omarchy
