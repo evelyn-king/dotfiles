@@ -48,9 +48,9 @@ added interactively with `mise use -g`.
 `run_onchange_after_mise-install.sh.tmpl` installs them, and re-runs whenever
 those files change, so adding a tool is a one-line edit plus `chezmoi apply`.
 
-Most versions are pinned exactly. The coding agents, `gh` and `usage`
-intentionally float at `latest`, and `mise upgrade` skips global config, so
-`mup` is the command that moves them:
+Most versions are pinned exactly. The coding agents, `gh` and `usage` float
+at `latest` on purpose. `mise upgrade` skips global config, so `mup` is what
+moves them:
 
 ```bash
 mup
@@ -78,8 +78,8 @@ mise self-update
 ## Shell
 
 zsh and bash share environment, PATH and interactive setup bodies from
-`.chezmoitemplates/shell-*.sh`; the rendered startup files stay flat and
-self-contained, with nothing sourced at runtime.
+`.chezmoitemplates/shell-*.sh`. The rendered startup files stay flat and
+self-contained, with no shared body sourced at runtime.
 
 PATH is built twice, on purpose, and the order is load-bearing. See
 [docs/shell-startup.md](docs/shell-startup.md).
@@ -95,15 +95,15 @@ config sets its own theme directly, with no shared theme data or indirection
 layer. Add a selector back if a second theme ever earns its keep.
 
 Ghostty ships the theme itself, so that config just names it. Neovim, Vim and
-Doom pull a plugin: the Vim colorscheme is a pinned chezmoi external in
+Doom pull a plugin. The Vim colorscheme is a pinned chezmoi external in
 `.chezmoidata/versions.yaml`, and Doom pins the community port in
 `dot_config/doom/packages.el` because `doom-themes` has no Rosé Pine.
 
 btop, atuin and Zellij ship no Rosé Pine, so the theme files under each tool's
 `themes/` directory are repository content, hand-written from the palette. bat
-is the same idea with one extra step: its `.tmTheme` comes verbatim from
-[rose-pine/tm-theme](https://github.com/rose-pine/tm-theme), and bat only reads
-themes from a binary cache, so `run_onchange_after_build-bat-cache.sh.tmpl`
+is the same idea with one extra step. Its `.tmTheme` comes verbatim from
+[rose-pine/tm-theme](https://github.com/rose-pine/tm-theme), and bat reads
+themes only from a binary cache, so `run_onchange_after_build-bat-cache.sh.tmpl`
 runs `bat cache --build` whenever the theme or bat config changes. Zed installs
 the theme through `auto_install_extensions`.
 

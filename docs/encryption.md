@@ -7,8 +7,8 @@ encrypted file today:
   `~/.config/shell/secrets.sh` and sourced near the end of interactive shell
   startup.
 
-If the age identity file is absent, that file is skipped rather than failing
-`chezmoi apply`. `.chezmoiignore.tmpl` checks for the identity with `stat` and
+When the age identity file is absent, chezmoi skips that file instead of
+failing the apply. `.chezmoiignore.tmpl` checks for the identity with `stat` and
 ignores the target when it is missing, so a fresh machine can apply before the
 key is in place.
 
@@ -17,8 +17,8 @@ key is in place.
 - Identity (private, never committed): `~/.config/chezmoi/personal-key.txt`
 - Recipient (public, committed in `.chezmoi.toml.tmpl`)
 
-Both are overridable, which is what makes rolling a key possible without
-editing the template first:
+Two environment variables override them, which is what lets you roll a key
+without editing the template first:
 
 - `CHEZMOI_AGE_IDENTITY`
 - `CHEZMOI_AGE_RECIPIENT`

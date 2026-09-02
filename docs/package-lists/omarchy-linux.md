@@ -1,4 +1,4 @@
-# Omarchy Linux Package List
+# Omarchy Linux package list
 
 This repo assumes an Omarchy-flavored Arch Linux base on any Linux host that
 `.chezmoitemplates/omarchy-detect.tmpl` recognizes; no hostname list is
@@ -68,14 +68,15 @@ Install these through Omarchy's package flow:
   only, from `nix/flake.nix`.
 - `zsh` is not part of a stock Omarchy install, and this repo is zsh-first:
   `~/.bashrc` hands off to zsh whenever it is present. Leave the package out
-  and the bash fallback is what you actually get on every login.
+  and every login lands in the bash fallback.
 - `~/.bashrc` replaces Omarchy's rather than extending it, so what Omarchy's
   copy provided is re-sourced piecemeal instead. See
   [../shell-startup.md](../shell-startup.md).
-- Web apps and Omarchy desktop defaults are intentionally documented outside the package list.
+- Web apps and Omarchy desktop defaults are not tracked here. Omarchy manages
+  them.
 - This list is the source of truth for pacman and AUR packages. mise does not
   declare system packages on Linux; it owns only the portable CLI tools in
   `dot_config/mise/conf.d/20-linux.toml`, installed into `$HOME`.
-- Theming is no longer wired to Omarchy. Every config names Rose Pine Moon
+- Theming is no longer wired to Omarchy. Every config names Rosé Pine Moon
   directly, so switching the Omarchy theme changes the desktop chrome but not
   the terminal, editors or btop.

@@ -1,4 +1,4 @@
-# macOS Package List
+# macOS package list
 
 Apple Silicon macOS machines use nix-darwin. The declaration is
 [`nix/flake.nix`](../../nix/flake.nix), which is repository content rather than
@@ -38,5 +38,5 @@ itself must already be installed.
 
 `run_after_darwin-rebuild.sh.tmpl` compares the running system against the
 flake on every `chezmoi apply` and nags when they differ. It deliberately does
-not activate: `darwin-rebuild switch` requires root, and `chezmoi apply` must
+not activate. `darwin-rebuild switch` requires root, and `chezmoi apply` must
 never escalate.

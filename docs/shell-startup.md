@@ -1,14 +1,15 @@
-# Shell Startup Layout
+# Shell startup layout
 
-Startup files are flat and self-contained. Nothing is sourced from
-`~/.config/shell` at runtime; the shared bodies live in `.chezmoitemplates/`
-and chezmoi inlines them at apply time.
+Startup files are flat and self-contained. The shared bodies live in
+`.chezmoitemplates/` and chezmoi inlines them at apply time, so no rendered
+file sources another at runtime. The two per-machine hooks at the bottom of
+this page are the only files read from `~/.config/shell`.
 
 | Template | Contents |
 | --- | --- |
 | `shell-env.sh` | environment for every shell, the Omarchy bootstrap, plus PATH for non-interactive ones |
 | `shell-path.sh` | the PATH build itself |
-| `shell-interactive.sh` | completions' consumers, tool hooks, aliases, prompt |
+| `shell-interactive.sh` | ssh agent, tool hooks, aliases, Omarchy extras, local overrides, prompt |
 
 | Rendered file | Includes |
 | --- | --- |
@@ -25,7 +26,7 @@ Edit the templates, never the rendered files.
 
 Interactive shells build PATH in the rc file. macOS runs `path_helper` from
 `/etc/zprofile` and `/etc/profile`, and it reorders anything an earlier stage
-prepended, so the rc file is the first point where an ordering actually sticks.
+prepended, so the rc file is the first point where an ordering sticks.
 
 `path_helper` only runs for login shells, though. A non-interactive shell never
 reaches it, and under zsh never reads `~/.zshrc` at all. Without a second build
@@ -38,7 +39,7 @@ non-interactive guard.
 The body is idempotent and first-occurrence-wins, so a shell that somehow
 reaches both copies still ends up with the same order.
 
-## Ordering rules worth knowing
+## Ordering rules
 
 - The mise shims lead, ahead of `~/.local/bin`, so a hand-installed binary
   cannot outrank a pinned version for non-interactive shells.
@@ -56,30 +57,29 @@ Omarchy's own `~/.bashrc` is two things: `default/bash/env-bootstrap`, and then
 `default/bash/rc`. This repo replaces that file, so both would otherwise be
 lost.
 
-`env-bootstrap` is re-sourced, from `shell-env.sh` rather than from `~/.bashrc`.
-It exports `OMARCHY_PATH` and appends the mise shims and `~/.local/bin` to
-PATH, and Omarchy's own comment calls it "needed even for non-interactive
-shells" — without it an SSH command, systemd user unit, cron job or git hook
-gets neither. Putting it in the shared body also hands the variable to zsh,
-which Omarchy's bash-only chain never did. Whatever it appends to PATH is
-reordered by `shell-path.sh`, so the mise shims still lead.
+`shell-env.sh` re-sources `env-bootstrap` in place of `~/.bashrc`. It exports
+`OMARCHY_PATH` and appends the mise shims and `~/.local/bin` to PATH.
+Omarchy's own comment calls it "needed even for non-interactive shells", and
+that is right. Without it an SSH command, systemd user unit, cron job or git
+hook gets neither. Putting it in the shared body also hands `OMARCHY_PATH` to
+zsh, which Omarchy's bash-only chain never did. `shell-path.sh` reorders
+whatever it appends, so the mise shims still lead.
 
 `default/bash/rc` is deliberately *not* sourced. It re-runs `mise activate`,
 `starship init` and `zoxide init` on top of the copies in
-`shell-interactive.sh`, and its aliases override this repo's: its `c` passes
-`--auto`, its `cx` a different permission mode, and it points `cd` at a zoxide
-wrapper that fights `zoxide init --cmd cd`. What that chain offers and this
-repo lacked is taken piecemeal instead — the `omarchy` dispatcher's bash
-completions, `set +h`, and the `h`, `a`, `ic`, `ix` and `icx` aliases, each
-guarded on its tool being present.
+`shell-interactive.sh`, and its aliases override this repo's. Its `c` passes
+`--auto`, its `cx` uses a different permission mode, and it points `cd` at a
+zoxide wrapper that fights `zoxide init --cmd cd`. This repo takes the rest of
+that chain piecemeal instead: the `omarchy` dispatcher's bash completions,
+`set +h`, and the `h`, `a`, `ic`, `ix` and `icx` aliases, each guarded on its
+tool being present.
 
 Omarchy's `default/bash/fns` directory is sourced only by Bash. Those files are
 not a cross-shell API: several rely on Bash-specific `read` behavior or on
 array indexing whose meaning differs in zsh. zsh instead loads
-`shell-omarchy-zsh.zsh`, which contains native ports of the small surface used
-there. At present that is `tdl`, needed by the `ic`, `ix` and `icx` aliases.
-This makes an upstream addition to the Bash directory unable to break zsh
-startup.
+`shell-omarchy-zsh.zsh`, which holds native ports of the few functions used
+there. At present that is `tdl`, needed by the `ic`, `ix` and `icx` aliases. An
+upstream addition to the Bash directory therefore cannot break zsh startup.
 
 Two pieces need no action: `~/.inputrc` is already Omarchy's
 `default/bash/inputrc` plus vi mode, and `default/bash/functions` is only the
@@ -89,8 +89,8 @@ Two pieces need no action: `~/.inputrc` is already Omarchy's
 
 Two hooks, both sourced near the end of `shell-interactive.sh`:
 
-- `~/.config/shell/secrets.sh` — tracked but age-encrypted. See
+- `~/.config/shell/secrets.sh`, tracked but age-encrypted. See
   [encryption.md](encryption.md).
-- `~/.config/shell/extras.sh` — untracked. Nothing in this repo creates or
+- `~/.config/shell/extras.sh`, untracked. Nothing in this repo creates or
   manages it. This is where a per-machine `JUPYTER_PORT` or
   `MAMBA_ROOT_PREFIX` override belongs.
