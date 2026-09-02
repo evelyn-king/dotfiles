@@ -73,9 +73,17 @@ repo lacked is taken piecemeal instead — the `omarchy` dispatcher's bash
 completions, `set +h`, and the `h`, `a`, `ic`, `ix` and `icx` aliases, each
 guarded on its tool being present.
 
-Two pieces need no action: `~/.inputrc` is already Omarchy's `default/bash/inputrc`
-plus vi mode, and `default/bash/functions` is only the `fns/*` loop that
-`shell-interactive.sh` already runs.
+Omarchy's `default/bash/fns` directory is sourced only by Bash. Those files are
+not a cross-shell API: several rely on Bash-specific `read` behavior or on
+array indexing whose meaning differs in zsh. zsh instead loads
+`shell-omarchy-zsh.zsh`, which contains native ports of the small surface used
+there. At present that is `tdl`, needed by the `ic`, `ix` and `icx` aliases.
+This makes an upstream addition to the Bash directory unable to break zsh
+startup.
+
+Two pieces need no action: `~/.inputrc` is already Omarchy's
+`default/bash/inputrc` plus vi mode, and `default/bash/functions` is only the
+`fns/*` loop that `shell-interactive.sh` runs when the active shell is Bash.
 
 ## Per-machine overrides
 

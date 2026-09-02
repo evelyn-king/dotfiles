@@ -183,8 +183,11 @@ jupyter_remote_load_env() {
 # --- omarchy ----------------------------------------------------------------
 
 # Omarchy ships shell functions (tdl, worktrees, rsyncing, ...) with its
-# desktop. Detected at runtime rather than gated on a hostname, so a rebuilt or
-# renamed machine needs no change here.
+# desktop. They are an explicitly Bash-owned interface, so only Bash sources
+# them. zsh gets the small, native adapter in shell-omarchy-zsh.zsh instead;
+# sourcing these files in zsh happened to work until a function used different
+# array indexing or `read` semantics, and any upstream addition could break it
+# again.
 #
 # Three roots, for the same reasons .chezmoitemplates/omarchy-detect.tmpl
 # checks three: OMARCHY_PATH is what `omarchy dev link` repoints, but it is
@@ -193,20 +196,22 @@ jupyter_remote_load_env() {
 # into /usr/share/omarchy; Omarchy 3 used a clone in the home directory.
 # Omarchy 4 also moved the functions from default/fns to default/bash/fns, so
 # each root is tried in both layouts. First directory that exists wins.
-for __dir in \
-  "${OMARCHY_PATH:-}/default/bash/fns" \
-  "${OMARCHY_PATH:-}/default/fns" \
-  /usr/share/omarchy/default/bash/fns \
-  /usr/share/omarchy/default/fns \
-  "$HOME/.local/share/omarchy/default/bash/fns" \
-  "$HOME/.local/share/omarchy/default/fns"; do
-  [ -d "$__dir" ] || continue
-  for __fn in "$__dir"/*; do
-    [ -f "$__fn" ] && [ -r "$__fn" ] && . "$__fn"
+if [ "$__shell" = bash ]; then
+  for __dir in \
+    "${OMARCHY_PATH:-}/default/bash/fns" \
+    "${OMARCHY_PATH:-}/default/fns" \
+    /usr/share/omarchy/default/bash/fns \
+    /usr/share/omarchy/default/fns \
+    "$HOME/.local/share/omarchy/default/bash/fns" \
+    "$HOME/.local/share/omarchy/default/fns"; do
+    [ -d "$__dir" ] || continue
+    for __fn in "$__dir"/*; do
+      [ -f "$__fn" ] && [ -r "$__fn" ] && . "$__fn"
+    done
+    break
   done
-  break
-done
-unset __dir __fn
+  unset __dir __fn
+fi
 
 # Omarchy's own tools, aliased as default/bash/aliases does. Only these three:
 # the rest of that file collides with the aliases above, since its `c` passes
