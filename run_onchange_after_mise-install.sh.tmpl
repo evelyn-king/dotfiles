@@ -10,6 +10,7 @@
 # Linux lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
 {{- end }}
 # mise executable: {{ lookPath "mise" | quote }}
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . }}
 
 set -euo pipefail
 
@@ -18,13 +19,23 @@ set -euo pipefail
 # makes chezmoi retry on the next apply.
 command -v mise >/dev/null 2>&1 || exit 0
 
-# The npm: backend is configured to use bun, and pipx: uses uv when present.
-# Without them mise falls back to slower defaults rather than failing, so this
-# is a warning and not an exit.
+# The npm backend is configured to require bun. The pipx backend requires uv or
+# pipx, and this repo standardizes on uv. Stock Omarchy ships neither package,
+# so install them before asking mise to install tools that depend on them.
+missing_backends=()
 for backend in bun uv; do
-  command -v "$backend" >/dev/null 2>&1 ||
-    echo "mise: $backend not on PATH; backend installs will use a fallback." >&2
+  command -v "$backend" >/dev/null 2>&1 || missing_backends+=("$backend")
 done
+
+if ((${#missing_backends[@]})); then
+{{- if $omarchy }}
+  echo "mise: installing required Omarchy packages: ${missing_backends[*]}"
+  omarchy pkg add "${missing_backends[@]}"
+{{- else }}
+  printf 'mise: missing required backend command: %s\n' "${missing_backends[*]}" >&2
+  exit 1
+{{- end }}
+fi
 
 {{- if eq .chezmoi.os "linux" }}
 # The lockfile is repo content and is never applied to $HOME, so the locked

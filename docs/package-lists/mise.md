@@ -54,7 +54,10 @@ configuration.
 ## Installation and updates
 
 `run_onchange_after_mise-install.sh.tmpl` runs the install after the
-configuration file changes. Apply a declaration change with:
+configuration file changes. Its npm and pipx backends require `bun` and `uv`.
+On Omarchy the hook installs either missing package with `omarchy pkg add`
+before running mise. Nix supplies both commands on macOS; other hosts must
+provide them before applying. Apply a declaration change with:
 
 ```bash
 chezmoi apply
