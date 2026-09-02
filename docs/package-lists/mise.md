@@ -66,3 +66,11 @@ chezmoi apply
 Run `mup` to update floating tools and their lock resolution. On Linux, review
 and commit the resulting `dot_config/mise/mise.lock` change. Update mise itself
 separately with `mise self-update`.
+
+mise hides releases younger than a day so a compromised publish has time to be
+pulled before it lands here. The coding agents ship several times a day, which
+is the whole reason they float, so `minimum_release_age_excludes` in the shared
+configuration waives the cooldown for those entries only. It belongs in the
+configuration rather than in `mup`'s environment because `mise lock` and `mise
+install` both read it: waiving the cooldown for the bump alone resolves a
+version that the install, and every later `chezmoi apply`, then refuses.

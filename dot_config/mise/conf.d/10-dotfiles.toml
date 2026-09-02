@@ -18,6 +18,20 @@
 lockfile = true
 # uv and bun are faster than the pipx/npm defaults.
 npm.package_manager = "bun"
+# mise hides releases younger than a day, which is supply-chain protection
+# worth keeping. The coding agents ship several times a day and are the reason
+# they are pinned to "latest" at all, so waive the cooldown for those alone.
+# This has to live in config rather than in `mup`'s environment: `mise lock`
+# and `mise install` both consult it, and a waiver applied to only the first
+# bumps the lockfile to a version the second (and `chezmoi apply`) refuses.
+minimum_release_age_excludes = [
+  "claude",
+  "codex",
+  "opencode",
+  "pi",
+  "npm:@google/gemini-cli",
+  "npm:@just-every/code",
+]
 
 [tools]
 

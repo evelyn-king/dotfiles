@@ -83,9 +83,10 @@ alias ....='cd ../../..'
 {{ if eq .chezmoi.os "darwin" }}
 # The coding agents in ~/.config/mise/conf.d/10-dotfiles.toml sit at "latest",
 # but `mise upgrade` skips global config. Refresh the untracked Mac lock, then
-# install the resolved versions. MISE_MINIMUM_RELEASE_AGE=0 waives mise's
-# new-release cooldown for these fast-moving CLIs.
-command -v mise >/dev/null 2>&1 && alias mup='MISE_MINIMUM_RELEASE_AGE=0 mise lock --global --bump && mise install'
+# install the resolved versions. The new-release cooldown is waived for those
+# agents by minimum_release_age_excludes in that file, so both halves of this
+# agree on which versions exist.
+command -v mise >/dev/null 2>&1 && alias mup='mise lock --global --bump && mise install'
 
 # The counterpart to the drift check in run_after_darwin-rebuild.sh: that script
 # only nags, because `chezmoi apply` must not escalate. This is the explicit
@@ -101,7 +102,7 @@ if command -v mise >/dev/null 2>&1; then
   mup() {
     local mise_config_dir={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
 
-    MISE_MINIMUM_RELEASE_AGE=0 MISE_CONFIG_DIR="$mise_config_dir" \
+    MISE_CONFIG_DIR="$mise_config_dir" \
       mise lock --global --platform linux-x64 --bump &&
       MISE_CONFIG_DIR="$mise_config_dir" mise install --locked
   }

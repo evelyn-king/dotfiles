@@ -52,8 +52,10 @@ macOS counterparts.
 the file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
 
 Most versions are pinned exactly. Rust tracks the stable release channel; the
-coding agents, `gh` and `usage` float at `latest` on purpose. `mise upgrade`
-skips global config, so `mup` is what moves them:
+coding agents, `gh` and `usage` float at `latest` on purpose. mise holds new
+releases for a day before it will resolve them; the coding agents opt out of
+that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
+`mup` is what moves them:
 
 ```bash
 mup
