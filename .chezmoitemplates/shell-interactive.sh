@@ -133,14 +133,13 @@ fi
 if command -v docker >/dev/null 2>&1; then
   alias d='docker'
 fi
-command -v helix >/dev/null 2>&1 && alias hx='helix'
-command -v opencode >/dev/null 2>&1 && alias c='opencode'
-command -v rails >/dev/null 2>&1 && alias r='rails'
+command -v opencode >/dev/null 2>&1 && alias c='opencode --auto'
+command -v codex >/dev/null 2>&1 && alias cy='codex --approve-for-me'
 command -v tmux >/dev/null 2>&1 && alias t='tmux attach || tmux new -s main'
 
 # Clear scrollback as well as the screen before handing the terminal over.
 command -v claude >/dev/null 2>&1 &&
-  alias cx='printf "\033[2J\033[3J\033[H" && claude --allow-dangerously-skip-permissions'
+  alias cx='printf "\033[2J\033[3J\033[H" && claude --permission-mode auto'
 
 # `n` with no argument opens the current directory rather than an empty buffer.
 n() {
