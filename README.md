@@ -34,19 +34,21 @@ Package ownership depends on the host.
 
 mise is the only package manager this repo drives on both. See
 [docs/package-lists/macos.md](docs/package-lists/macos.md) and
-[docs/package-lists/omarchy-linux.md](docs/package-lists/omarchy-linux.md).
+[docs/package-lists/omarchy-linux.md](docs/package-lists/omarchy-linux.md) for
+system packages, and [docs/package-lists/mise.md](docs/package-lists/mise.md)
+for the runtimes and CLI tools managed by mise.
 
 ### mise
 
 Language runtimes and global CLI tools are declared in
 [`dot_config/mise/conf.d/10-dotfiles.toml`](dot_config/mise/conf.d/10-dotfiles.toml).
-`dot_config/mise/conf.d/20-linux.toml` adds the portable tools that macOS gets
-from Nix instead. These are `conf.d` files rather than
-`~/.config/mise/config.toml` so repo-managed tools stay separate from globals
-added interactively with `mise use -g`.
+The file lives under `conf.d` rather than at `~/.config/mise/config.toml` so
+repo-managed tools stay separate from globals added interactively with
+`mise use -g`. Omarchy owns Linux system CLI packages; Nix owns their macOS
+counterparts.
 
 `run_onchange_after_mise-install.sh.tmpl` installs them, and re-runs whenever
-those files change, so adding a tool is a one-line edit plus `chezmoi apply`.
+the file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
 
 Most versions are pinned exactly. The coding agents, `gh` and `usage` float
 at `latest` on purpose. `mise upgrade` skips global config, so `mup` is what

@@ -7,7 +7,6 @@
 
 # shared tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
 {{- if eq .chezmoi.os "linux" }}
-# Linux tool list hash: {{ include "dot_config/mise/conf.d/20-linux.toml" | sha256sum }}
 # Linux lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
 {{- end }}
 # mise executable: {{ lookPath "mise" | quote }}

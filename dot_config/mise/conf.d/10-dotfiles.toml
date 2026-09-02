@@ -7,8 +7,8 @@
 # Update pinned versions in this file. Entries set to "latest" intentionally
 # float.
 #
-# On macOS, Nix supplies uv and bun. The Linux fragment declares both through
-# mise so npm and pipx backends have the same fast installers there.
+# Nix supplies uv and bun on macOS; Omarchy supplies them on Linux. mise uses
+# those system tools as the fast installers for its npm and pipx backends.
 #
 # Interactive shells use `mise activate`; static shims cover noninteractive
 # SSH commands, cron jobs, and hooks.

@@ -25,7 +25,6 @@ nix
 {{- end }}
 
 {{- if ne .chezmoi.os "linux" }}
-.config/mise/conf.d/20-linux.toml
 linux-package-drift.sh
 .config/superfile/**
 {{- end }}

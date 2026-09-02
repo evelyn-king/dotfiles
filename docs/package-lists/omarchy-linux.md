@@ -31,32 +31,53 @@ whichever root the detection finds. `default/bash/env-bootstrap` is sourced by
 
 Install these through Omarchy's package flow:
 
+- `ast-grep`
 - `atuin`
+- `bat`
 - `bitwarden`
 - `bitwarden-cli`
+- `btop`
 - `bun`
 - `chezmoi`
 - `cmake`
 - `direnv`
 - `dropbox`
 - `dropbox-cli`
+- `duf`
+- `dust`
 - `emacs-wayland`
+- `eza`
+- `fd`
 - `firefox`
 - `freecad`
+- `fzf`
+- `git-delta`
+- `graphviz`
+- `hyperfine`
 - `keychain`
+- `lazygit`
+- `lua-language-server`
 - `neovim`
 - `ollama-cuda`
 - `pinentry`
+- `pixi`
+- `ripgrep`
+- `sccache`
 - `shellcheck`
+- `starship`
 - `tailscale`
+- `tealdeer`
+- `uv`
 - `vim`
 - `visual-studio-code-bin`
+- `zellij`
+- `zoxide`
 - `zsh`
 
 ## AUR packages
 
 - `bambustudio-nvidia-bin`
-- `sccache-bin`
+- `google-cloud-cli`
 - `slack-desktop-wayland`
 
 ## Notes
@@ -74,9 +95,9 @@ Install these through Omarchy's package flow:
   [../shell-startup.md](../shell-startup.md).
 - Web apps and Omarchy desktop defaults are not tracked here. Omarchy manages
   them.
-- This list is the source of truth for pacman and AUR packages. mise does not
-  declare system packages on Linux; it owns only the portable CLI tools in
-  `dot_config/mise/conf.d/20-linux.toml`, installed into `$HOME`.
+- This list is the source of truth for pacman and AUR packages. mise owns only
+  the shared language runtimes and global CLI tools in
+  `dot_config/mise/conf.d/10-dotfiles.toml`.
 - Theming is no longer wired to Omarchy. Every config names Rosé Pine Moon
   directly, so switching the Omarchy theme changes the desktop chrome but not
   the terminal, editors or btop.
