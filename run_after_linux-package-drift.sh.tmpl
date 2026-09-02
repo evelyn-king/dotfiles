@@ -22,6 +22,7 @@ if [ -d "$shims" ]; then
     for shim in "$shims"/*; do
       [ -f "$shim" ] && [ -x "$shim" ] || continue
       name=${shim##*/}
+      managed=$(mise which "$name" 2>/dev/null || true)
       for dir in \
         "$HOME/.local/bin" \
         "$HOME/bin" \
@@ -31,8 +32,16 @@ if [ -d "$shims" ]; then
         "$HOME/.local/share/npm/bin" \
         "$HOME/.npm-global/bin"; do
         [ -d "$dir" ] || continue
-        [ -f "$dir/$name" ] && [ -x "$dir/$name" ] || continue
-        printf '    %-24s %s\n' "$name" "$dir/$name"
+        candidate="$dir/$name"
+        [ -f "$candidate" ] && [ -x "$candidate" ] || continue
+        # Some mise backends use a standard tool-owned directory instead of
+        # keeping executables below mise's install root. Rustup's proxies in
+        # ~/.cargo/bin are the managed binaries, not shadow copies.
+        if [ -n "$managed" ] &&
+          [ "$(readlink -f "$candidate")" = "$(readlink -f "$managed")" ]; then
+          continue
+        fi
+        printf '    %-24s %s\n' "$name" "$candidate"
       done
     done
   )

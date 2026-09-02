@@ -1,11 +1,11 @@
 # Language runtimes and every global CLI tool.
 #
 # This is a conf.d file rather than ~/.config/mise/config.toml itself. That
-# separates repo-managed tools from globals added interactively with
-# `mise use -g`.
+# keeps the declarative tool list separate from mise's generated global state;
+# chezmoi removes config.toml on apply.
 #
-# Update pinned versions in this file. Entries set to "latest" intentionally
-# float.
+# Update pinned versions in this file. Entries set to "latest" or a release
+# channel such as "stable" intentionally float.
 #
 # Nix supplies uv and bun on macOS; Omarchy supplies them on Linux. mise uses
 # those system tools as the fast installers for its npm and pipx backends.
@@ -25,6 +25,7 @@ npm.package_manager = "bun"
 node = "26.8.0"
 python = "3.14.7"
 go = "1.27.0"
+rust = { version = "stable", profile = "default" }
 
 # --- coding agents ----------------------------------------------------------
 claude = "latest"

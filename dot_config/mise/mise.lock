@@ -159,6 +159,13 @@ checksum = "sha256:a0f39e822fd3b96a2605f30f954acf9a2cdf91faa1385a13e24bc407a41e0
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260825/cpython-3.14.7+20260825-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
+[[tools.rust]]
+version = "stable"
+backend = "core:rust"
+
+[tools.rust.options]
+profile = "default"
+
 [[tools.usage]]
 version = "6.4.1"
 backend = "aqua:jdx/usage"

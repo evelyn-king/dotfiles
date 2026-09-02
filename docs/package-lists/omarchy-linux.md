@@ -31,6 +31,9 @@ whichever root the detection finds. `default/bash/env-bootstrap` is sourced by
 
 Install these through Omarchy's package flow:
 
+- `age`
+- `aspell`
+- `aspell-en`
 - `ast-grep`
 - `atuin`
 - `bat`
@@ -49,8 +52,8 @@ Install these through Omarchy's package flow:
 - `eza`
 - `fd`
 - `firefox`
-- `freecad`
 - `fzf`
+- `ghostty`
 - `git-delta`
 - `graphviz`
 - `hyperfine`
@@ -65,24 +68,26 @@ Install these through Omarchy's package flow:
 - `sccache`
 - `shellcheck`
 - `starship`
+- `superfile`
 - `tailscale`
 - `tealdeer`
 - `uv`
 - `vim`
 - `visual-studio-code-bin`
+- `zed`
 - `zellij`
 - `zoxide`
 - `zsh`
 
 ## AUR packages
 
-- `bambustudio-nvidia-bin`
 - `google-cloud-cli`
-- `slack-desktop-wayland`
+- `slack-desktop`
 
 ## Notes
 
-- Omarchy installs a system `rust` package by default, but this repo expects `rustup`.
+- mise owns Rust and installs rustup with the stable toolchain. Do not install a
+  separate system `rust` or `rustup` package.
 - Ghostty's font chain names `JetBrainsMono Nerd Font` explicitly. Omarchy
   already ships it as `ttf-jetbrains-mono-nerd-basic`, so it is not listed
   above. The preferred CaskaydiaCove face has no Omarchy package and is macOS

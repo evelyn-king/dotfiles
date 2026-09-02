@@ -5,9 +5,12 @@ Linux. Their declarations live in
 [`dot_config/mise/conf.d/10-dotfiles.toml`](../../dot_config/mise/conf.d/10-dotfiles.toml).
 
 The TOML file is the source of truth for requested versions. Most tools have
-exact pins. Coding agents, `gh`, and `usage` track `latest` by design. On Linux,
+exact pins. Coding agents, `gh`, and `usage` track `latest` by design, while
+Rust tracks the stable release channel. On Linux,
 [`dot_config/mise/mise.lock`](../../dot_config/mise/mise.lock) resolves them to
-reviewable versions and checksums for `linux-x64`.
+reviewable versions and checksums for `linux-x64` where the backend exposes a
+fixed artifact. The Rust entry remains `stable`; rustup resolves that channel
+when mise installs or updates it.
 
 ## Shared tools
 
@@ -18,6 +21,7 @@ These tools install on both macOS and Linux.
 | `node` | `node`, `npm`, `npx` | Node.js runtime and package tooling |
 | `python` | `python`, `pip` | Python runtime and package tooling |
 | `go` | `go` | Go compiler and toolchain |
+| `rust` | `rustup`, `rustc`, `cargo`, `rustfmt`, `cargo-clippy` | Rust stable toolchain, installed through rustup by mise |
 | `claude` | `claude` | Claude Code coding agent |
 | `codex` | `codex` | OpenAI Codex coding agent |
 | `opencode` | `opencode` | opencode coding agent |

@@ -11,6 +11,17 @@
 # Omarchy 4 replaced the bash menu-override stub with extensions/omarchy-menu.jsonc.
 .config/omarchy/extensions/menu.sh
 
+# All global mise tools come from the repo-managed conf.d file. Remove the
+# interactive global config and Omarchy's mise wrappers so neither can create a
+# second declaration that overrides the locked repo version.
+.config/mise/config.toml
+.local/bin/claude
+.local/bin/codex
+.local/bin/gemini
+.local/bin/gh
+.local/bin/opencode
+.local/bin/pi
+
 # --- migration cleanup ------------------------------------------------------
 
 # AeroSpace and git config both moved to their XDG paths.

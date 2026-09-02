@@ -43,16 +43,17 @@ for the runtimes and CLI tools managed by mise.
 Language runtimes and global CLI tools are declared in
 [`dot_config/mise/conf.d/10-dotfiles.toml`](dot_config/mise/conf.d/10-dotfiles.toml).
 The file lives under `conf.d` rather than at `~/.config/mise/config.toml` so
-repo-managed tools stay separate from globals added interactively with
-`mise use -g`. Omarchy owns Linux system CLI packages; Nix owns their macOS
-counterparts.
+repo-managed tools stay separate from mise's interactive global state. This
+repo removes `~/.config/mise/config.toml`; declare every global tool in
+`10-dotfiles.toml`. Omarchy owns Linux system CLI packages; Nix owns their
+macOS counterparts.
 
 `run_onchange_after_mise-install.sh.tmpl` installs them, and re-runs whenever
 the file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
 
-Most versions are pinned exactly. The coding agents, `gh` and `usage` float
-at `latest` on purpose. `mise upgrade` skips global config, so `mup` is what
-moves them:
+Most versions are pinned exactly. Rust tracks the stable release channel; the
+coding agents, `gh` and `usage` float at `latest` on purpose. `mise upgrade`
+skips global config, so `mup` is what moves them:
 
 ```bash
 mup
@@ -61,7 +62,9 @@ mup
 On macOS `mup` refreshes the untracked global lock under `~/.config/mise` and
 installs the resolved versions. On Linux it refreshes the committed
 `dot_config/mise/mise.lock` for `linux-x64` and installs with locked
-resolution; review and commit the lockfile change afterwards.
+resolution; review and commit the lockfile change afterwards. Rust is the one
+channel-based exception: its lock entry remains `stable`, and rustup resolves
+that channel when mise installs or updates it.
 
 Like `nix/flake.lock`, that lock is repo content rather than a home file. mise
 rewrites a lock in place whenever it installs, so an applied second copy under

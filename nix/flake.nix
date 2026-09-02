@@ -60,7 +60,6 @@
         lua-language-server
         mise
         pixi
-        rustup
         uv
 
         # --- editors ---
@@ -89,8 +88,10 @@
         sqlite
 
         # --- documents, data and ML ---
+        (aspellWithDicts (dicts: with dicts; [ en ]))
         llama-cpp
         pandoc
+        poppler-utils
         tesseract
 
         # --- network and misc ---

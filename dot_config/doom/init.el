@@ -38,7 +38,7 @@
 
        :checkers
        syntax
-       (spell +flyspell)
+       (spell +aspell +flyspell)
 
        :tools
        debugger
