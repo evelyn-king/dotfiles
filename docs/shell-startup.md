@@ -6,7 +6,7 @@ and chezmoi inlines them at apply time.
 
 | Template | Contents |
 | --- | --- |
-| `shell-env.sh` | environment for every shell, plus PATH for non-interactive ones |
+| `shell-env.sh` | environment for every shell, the Omarchy bootstrap, plus PATH for non-interactive ones |
 | `shell-path.sh` | the PATH build itself |
 | `shell-interactive.sh` | completions' consumers, tool hooks, aliases, prompt |
 
@@ -14,7 +14,7 @@ and chezmoi inlines them at apply time.
 | --- | --- |
 | `~/.zshenv` | `shell-env.sh` |
 | `~/.zshrc` | `shell-path.sh`, zsh completions, `shell-interactive.sh` |
-| `~/.bashrc` | `shell-env.sh`, `shell-path.sh`, bash history/completions/preexec, `shell-interactive.sh` |
+| `~/.bashrc` | `shell-env.sh`, `shell-path.sh`, bash history/completions/preexec, Omarchy completions, `shell-interactive.sh` |
 | `~/.bash_profile` | sources `~/.bashrc` |
 | `~/.profile` | `shell-env.sh` |
 | `~/.zprofile` | nothing; a comment explaining why |
@@ -49,6 +49,33 @@ reaches both copies still ends up with the same order.
   `$MAMBA_ROOT_PREFIX/condabin` and would otherwise sit ahead of every mise tool
   path. micromamba is itself a mise tool, so it is resolved with `mise which`.
 - The prompt block (starship, zoxide, atuin) stays last.
+
+## Omarchy
+
+Omarchy's own `~/.bashrc` is two things: `default/bash/env-bootstrap`, and then
+`default/bash/rc`. This repo replaces that file, so both would otherwise be
+lost.
+
+`env-bootstrap` is re-sourced, from `shell-env.sh` rather than from `~/.bashrc`.
+It exports `OMARCHY_PATH` and appends the mise shims and `~/.local/bin` to
+PATH, and Omarchy's own comment calls it "needed even for non-interactive
+shells" — without it an SSH command, systemd user unit, cron job or git hook
+gets neither. Putting it in the shared body also hands the variable to zsh,
+which Omarchy's bash-only chain never did. Whatever it appends to PATH is
+reordered by `shell-path.sh`, so the mise shims still lead.
+
+`default/bash/rc` is deliberately *not* sourced. It re-runs `mise activate`,
+`starship init` and `zoxide init` on top of the copies in
+`shell-interactive.sh`, and its aliases override this repo's: its `c` passes
+`--auto`, its `cx` a different permission mode, and it points `cd` at a zoxide
+wrapper that fights `zoxide init --cmd cd`. What that chain offers and this
+repo lacked is taken piecemeal instead — the `omarchy` dispatcher's bash
+completions, `set +h`, and the `h`, `a`, `ic`, `ix` and `icx` aliases, each
+guarded on its tool being present.
+
+Two pieces need no action: `~/.inputrc` is already Omarchy's `default/bash/inputrc`
+plus vi mode, and `default/bash/functions` is only the `fns/*` loop that
+`shell-interactive.sh` already runs.
 
 ## Per-machine overrides
 

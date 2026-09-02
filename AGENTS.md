@@ -34,6 +34,9 @@
   `dot_zshrc.tmpl` / `dot_bashrc.tmpl` copies of them.
 - Edit the agent git policy in `.chezmoitemplates/git-rewrite-policy.py`, never the
   per-tool hook adapters that include it.
+- Edit Omarchy detection in `.chezmoitemplates/omarchy-detect.tmpl`, never the
+  `$omarchy` variables in `.chezmoiignore.tmpl` and
+  `dot_config/ghostty/config.tmpl` that include it.
 - Declare tools in `dot_config/mise/conf.d/`, macOS system packages in
   `nix/flake.nix`. Do not add a package to both.
 - `dot_config/mise/mise.lock` and `nix/flake.lock` are repo content. Never apply
