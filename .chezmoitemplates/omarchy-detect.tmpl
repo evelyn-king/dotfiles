@@ -1,0 +1,40 @@
+{{- /*
+Renders "true" on an Omarchy host and the empty string everywhere else.
+
+Consume it with includeTemplate, which returns the rendered text:
+
+  {{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
+  {{ if $omarchy }}...{{ end }}
+
+Four signals, because no single one covers every way an apply is invoked:
+
+  osRelease.id       Omarchy sets ID=omarchy in /etc/os-release. This needs no
+                     environment and no filesystem probe, so it is the one
+                     signal a systemd unit, a cron job or `ssh host chezmoi
+                     apply` can always see.
+  OMARCHY_PATH       Set by `omarchy dev link` to a working tree outside both
+                     standard locations. Checked first so a dev-linked tree
+                     still counts, but never relied on alone: it is exported
+                     only by shells that ran Omarchy's env-bootstrap.
+  /usr/share/omarchy Omarchy 4 ships the desktop as a package here.
+  ~/.local/share/... Omarchy 3 and earlier used a git clone in the home
+                     directory. Kept so an unmigrated host still matches.
+
+Keying off OMARCHY_PATH alone, with the v3 clone path as the only fallback,
+is what silently took the non-Omarchy branch on Omarchy 4 whenever the
+variable was absent.
+*/ -}}
+{{- $omarchy := false -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   $envPath := env "OMARCHY_PATH" -}}
+{{-   if and $envPath (ne (stat $envPath) nil) -}}
+{{-     $omarchy = true -}}
+{{-   else if eq (.chezmoi.osRelease.id | default "") "omarchy" -}}
+{{-     $omarchy = true -}}
+{{-   else if ne (stat "/usr/share/omarchy") nil -}}
+{{-     $omarchy = true -}}
+{{-   else if ne (stat (joinPath .chezmoi.homeDir ".local/share/omarchy")) nil -}}
+{{-     $omarchy = true -}}
+{{-   end -}}
+{{- end -}}
+{{- if $omarchy }}true{{ end -}}

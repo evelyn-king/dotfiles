@@ -185,17 +185,29 @@ jupyter_remote_load_env() {
 
 # Omarchy ships shell functions (tdl, worktrees, rsyncing, ...) with its
 # desktop. Detected at runtime rather than gated on a hostname, so a rebuilt or
-# renamed machine needs no change here. Omarchy 4 moved these from default/fns
-# to default/bash/fns; check both so either version works.
-__omarchy_root=${OMARCHY_PATH:-$HOME/.local/share/omarchy}
-for __dir in "$__omarchy_root/default/bash/fns" "$__omarchy_root/default/fns"; do
+# renamed machine needs no change here.
+#
+# Three roots, for the same reasons .chezmoitemplates/omarchy-detect.tmpl
+# checks three: OMARCHY_PATH is what `omarchy dev link` repoints, but it is
+# exported only by shells that ran Omarchy's env-bootstrap and this file
+# replaces the ~/.bashrc that used to run it; Omarchy 4 packages the desktop
+# into /usr/share/omarchy; Omarchy 3 used a clone in the home directory.
+# Omarchy 4 also moved the functions from default/fns to default/bash/fns, so
+# each root is tried in both layouts. First directory that exists wins.
+for __dir in \
+  "${OMARCHY_PATH:-}/default/bash/fns" \
+  "${OMARCHY_PATH:-}/default/fns" \
+  /usr/share/omarchy/default/bash/fns \
+  /usr/share/omarchy/default/fns \
+  "$HOME/.local/share/omarchy/default/bash/fns" \
+  "$HOME/.local/share/omarchy/default/fns"; do
   [ -d "$__dir" ] || continue
   for __fn in "$__dir"/*; do
     [ -f "$__fn" ] && [ -r "$__fn" ] && . "$__fn"
   done
   break
 done
-unset __omarchy_root __dir __fn
+unset __dir __fn
 
 # --- local overrides --------------------------------------------------------
 

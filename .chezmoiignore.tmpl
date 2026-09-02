@@ -1,10 +1,7 @@
-{{- /* Omarchy ships its desktop into ~/.local/share/omarchy. Detect it rather
-       than keying off a hostname, so a rebuilt or renamed machine needs no
-       change here. */ -}}
-{{- $omarchy := and
-  (eq .chezmoi.os "linux")
-  (ne (stat (env "OMARCHY_PATH" | default (joinPath .chezmoi.homeDir ".local/share/omarchy"))) nil)
--}}
+{{- /* Detected rather than gated on a hostname, so a rebuilt or renamed
+       machine needs no change here. Shared with dot_config/ghostty/config.tmpl;
+       edit .chezmoitemplates/omarchy-detect.tmpl, not this. */ -}}
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
 {{- $ageIdentity := env "CHEZMOI_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/personal-key.txt") -}}
 
 # Repo content, not dotfiles: read from the source tree, never applied to $HOME.
