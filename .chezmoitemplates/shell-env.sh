@@ -65,6 +65,30 @@ export JUPYTER_REMOTE_ENV_FILE="${JUPYTER_REMOTE_ENV_FILE:-$XDG_STATE_HOME/jupyt
 export DOCKER_DEFAULT_PLATFORM=linux/amd64
 {{- end }}
 
+# --- omarchy environment ----------------------------------------------------
+
+# Omarchy's env-bootstrap exports OMARCHY_PATH and appends the mise shims and
+# ~/.local/bin to PATH. Omarchy sources it from ~/.bashrc, which this repo
+# replaces wholesale, so without this it is lost for every shell that never
+# reaches /etc/profile.d: SSH commands, systemd user units, cron jobs and git
+# hooks. Its own comment calls it "needed even for non-interactive shells".
+#
+# Sourcing it here rather than from ~/.bashrc also hands zsh the variable,
+# which Omarchy's bash-only rc chain never did. Roots and their order match
+# .chezmoitemplates/omarchy-detect.tmpl; first hit wins. Whatever it appends to
+# PATH is reordered by shell-path.sh below, whose first-occurrence-wins rule
+# puts the mise shims back in front.
+for __dir in \
+  "${OMARCHY_PATH:-}" \
+  /usr/share/omarchy \
+  "$HOME/.local/share/omarchy"; do
+  if [ -r "$__dir/default/bash/env-bootstrap" ]; then
+    . "$__dir/default/bash/env-bootstrap"
+    break
+  fi
+done
+unset __dir
+
 # --- PATH for non-interactive shells ---------------------------------------
 
 # Interactive shells skip this. They build PATH in ~/.zshrc / ~/.bashrc so that

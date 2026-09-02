@@ -57,6 +57,23 @@ fi
 
 export BASH_COMPLETION_USER_DIR="$XDG_DATA_HOME/bash-completion"
 
+# The `omarchy` dispatcher ships its own completion. Omarchy loads it from
+# $OMARCHY_PATH/default/bash/rc, which this file replaces. Sourcing that whole
+# chain instead would re-run `mise activate`, `starship init` and `zoxide init`
+# on top of the copies in shell-interactive.sh and would override this repo's
+# aliases, so take only the completions. They need bash arrays and
+# `complete -I`, so this cannot move into the shared POSIX body.
+if [ -n "${OMARCHY_PATH:-}" ] && [ -r "$OMARCHY_PATH/default/bash/completions" ]; then
+  . "$OMARCHY_PATH/default/bash/completions"
+fi
+
+# --- command hashing --------------------------------------------------------
+
+# mise rewrites its shim directory as tools are installed, so a remembered path
+# can point at a shim that has since moved. Omarchy turns hashing off in
+# default/bash/shell for the same reason. zsh needs no equivalent.
+set +h
+
 # --- preexec ----------------------------------------------------------------
 
 # bash has no preexec/precmd. atuin's bash integration needs them, so this must

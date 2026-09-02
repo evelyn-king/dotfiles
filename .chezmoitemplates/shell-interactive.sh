@@ -209,6 +209,20 @@ for __dir in \
 done
 unset __dir __fn
 
+# Omarchy's own tools, aliased as default/bash/aliases does. Only these three:
+# the rest of that file collides with the aliases above, since its `c` passes
+# --auto, its `cx` a different permission mode, and it points `cd` at a zoxide
+# wrapper that fights `zoxide init --cmd cd`. Where the two disagree this repo
+# keeps its own. tdl is a function from the fns sourced just above, so these
+# have to come after that loop.
+command -v herdr >/dev/null 2>&1 && alias h='herdr'
+command -v omarchy-agent >/dev/null 2>&1 && alias a='omarchy-agent --inline'
+if command -v tdl >/dev/null 2>&1; then
+  alias ic='tdl c'
+  alias ix='tdl cx'
+  alias icx='tdl c cx'
+fi
+
 # --- local overrides --------------------------------------------------------
 
 # Tracked but encrypted. Rendered from
