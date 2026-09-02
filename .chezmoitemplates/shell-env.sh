@@ -1,0 +1,90 @@
+# Environment shared by every shell. Included verbatim into ~/.zshenv and the
+# top of ~/.bashrc, so it must stay POSIX: no arrays, no zsh glob qualifiers.
+#
+# Interactive shells do NOT build PATH here; they build it in the rc file, after
+# macOS path_helper has run. See shell-path.sh for why, and the block at the
+# bottom of this file for the non-interactive case that path_helper never
+# touches.
+
+export EDITOR=nvim
+export VISUAL=$EDITOR
+
+export XDG_CONFIG_HOME="$HOME/.config"
+export XDG_DATA_HOME="$HOME/.local/share"
+export XDG_STATE_HOME="$HOME/.local/state"
+
+# Set here rather than behind a `go` check in the interactive rc: go comes from
+# mise, which does not activate until well after PATH is built, so a guard
+# there would always be false.
+export GOPATH="$XDG_DATA_HOME/go"
+
+# Preserve a valid inherited locale. Minimal Linux images often inherit an
+# en_US.UTF-8 that was never generated, while macOS and Linux do not guarantee
+# the same spelling. Pick the first available UTF-8 locale, then POSIX C as a
+# last resort. LC_ALL is used only for the probe and is never exported.
+if [ -z "${LANG:-}" ] || ! LC_ALL="$LANG" locale charmap >/dev/null 2>&1; then
+  LANG=C
+  for __locale in C.UTF-8 en_US.UTF-8 C; do
+    if LC_ALL="$__locale" locale charmap >/dev/null 2>&1; then
+      LANG=$__locale
+      break
+    fi
+  done
+  unset __locale
+fi
+export LANG
+
+# Emacs on macOS starts its daemon in the per-user Darwin temp directory.
+# emacsclient searches under TMPDIR, so a generic /tmp value makes the two
+# processes disagree about the server socket. Preserve deliberate custom paths,
+# but replace generic or missing values with the native per-user directory.
+{{ if eq .chezmoi.os "darwin" }}
+if [ -z "${TMPDIR:-}" ] || [ "${TMPDIR:-}" = /tmp ] || [ "${TMPDIR:-}" = /private/tmp ]; then
+  __darwin_tmpdir=$(getconf DARWIN_USER_TEMP_DIR 2>/dev/null)
+  TMPDIR=${__darwin_tmpdir:-/tmp}
+  unset __darwin_tmpdir
+fi
+export TMPDIR
+{{- else }}
+export TMPDIR="${TMPDIR:-/tmp}"
+{{- end }}
+
+export NLTK_DATA="$XDG_DATA_HOME/nltk_data"
+export BUN_INSTALL="$HOME/.bun"
+
+export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/opt/micromamba}"
+
+export JUPYTER_BIND_HOST=127.0.0.1
+export JUPYTER_ENV_NAME=jupyter
+export JUPYTER_PORT=8888
+export JUPYTER_REMOTE_ENV_FILE="${JUPYTER_REMOTE_ENV_FILE:-$XDG_STATE_HOME/jupyter-remote/current.env}"
+{{ if eq .chezmoi.os "darwin" }}
+# Apple silicon runs amd64 images under emulation rather than failing to find a
+# matching manifest. Not set on Linux, where the host arch is the right default
+# and forcing amd64 on an arm box would emulate for no reason.
+export DOCKER_DEFAULT_PLATFORM=linux/amd64
+{{- end }}
+
+# --- PATH for non-interactive shells ---------------------------------------
+
+# Interactive shells skip this. They build PATH in ~/.zshrc / ~/.bashrc so that
+# it lands after macOS path_helper, which runs from /etc/zprofile and
+# /etc/profile and reorders whatever an earlier stage prepended.
+#
+# path_helper only runs for LOGIN shells, though. A non-interactive shell never
+# reaches it, and under zsh never reads ~/.zshrc at all. Without this block such
+# a shell inherits whatever bare PATH its parent handed over: no ~/.local/bin,
+# no nix profiles, no ~/.cargo/bin. That is what made
+# `ssh host jupyter-remote-lab` fail with "command not found" while the same
+# command worked interactively. Cron and launchd jobs and git hooks hit it too.
+#
+# Nothing reorders PATH after this point in a non-interactive shell, so building
+# it here is safe. The body is idempotent, first occurrence wins, so an
+# interactive shell that somehow reached both copies still ends up with the same
+# order.
+case $- in
+*i*) ;;
+*)
+{{ template "shell-path.sh" . }}
+;;
+esac

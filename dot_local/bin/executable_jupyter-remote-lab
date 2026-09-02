@@ -73,14 +73,10 @@ validate_port() {
 }
 
 default_mamba_root_prefix() {
-  local host_env_file="${HOME}/.config/shell/15_host_env.sh"
-
-  if [ -f "${host_env_file}" ]; then
-    # shellcheck source=/dev/null
-    source "${host_env_file}"
-  fi
-
-  printf '%s\n' "${MAMBA_ROOT_PREFIX_DEFAULT:-}"
+  # MAMBA_ROOT_PREFIX is exported by shell startup (shell-env.sh) with this same
+  # default. Repeated here so the script also works when invoked from an
+  # environment that never ran it.
+  printf '%s\n' "${MAMBA_ROOT_PREFIX:-${HOME}/.local/opt/micromamba}"
 }
 
 resolve_env_runner() {

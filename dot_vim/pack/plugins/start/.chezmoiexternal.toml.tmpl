@@ -1,18 +1,9 @@
-["gruvbox"]
+["rose-pine"]
 type = "archive"
-url = "{{ .plugins.vim.gruvbox.url }}"
+url = "{{ .plugins.vim.rose_pine.url }}"
 exact = true
 stripComponents = 1
-{{- with .plugins.vim.gruvbox.include }}
-include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
-{{- end }}
-
-["nord"]
-type = "archive"
-url = "{{ .plugins.vim.nord.url }}"
-exact = true
-stripComponents = 1
-{{- with .plugins.vim.nord.include }}
+{{- with .plugins.vim.rose_pine.include }}
 include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
 {{- end }}
 

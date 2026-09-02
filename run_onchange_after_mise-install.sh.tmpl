@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+
+# Install the runtimes and global CLI tools declared in the mise conf.d files.
+#
+# Re-runs whenever those files change, so adding a tool is a one-line edit plus
+# `chezmoi apply` rather than a remembered command.
+
+# shared tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
+{{- if eq .chezmoi.os "linux" }}
+# Linux tool list hash: {{ include "dot_config/mise/conf.d/20-linux.toml" | sha256sum }}
+# Linux lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
+{{- end }}
+# mise executable: {{ lookPath "mise" | quote }}
+
+set -euo pipefail
+
+# mise is yours to install; on a machine without it there is nothing to do.
+# Its resolved path is rendered above so installing it changes this script and
+# makes chezmoi retry on the next apply.
+command -v mise >/dev/null 2>&1 || exit 0
+
+# The npm: backend is configured to use bun, and pipx: uses uv when present.
+# Without them mise falls back to slower defaults rather than failing, so this
+# is a warning and not an exit.
+for backend in bun uv; do
+  command -v "$backend" >/dev/null 2>&1 ||
+    echo "mise: $backend not on PATH; backend installs will use a fallback." >&2
+done
+
+{{- if eq .chezmoi.os "linux" }}
+# The lockfile is repo content and is never applied to $HOME, so the locked
+# install reads it from the source tree, which is also what `mup` does.
+MISE_CONFIG_DIR={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }} \
+  mise install --locked
+{{- else }}
+mise install
+{{- end }}

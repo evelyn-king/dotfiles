@@ -1,0 +1,20 @@
+#!/usr/bin/env bash
+
+# Give the package-managed `rustup` a toolchain to point at.
+#
+# rustup ships no compiler toolchain. Its rustc and cargo proxies fail until a
+# default is installed. Package declarations install rustup; this hook installs
+# the stable toolchain. The rendered ~/.cargo/config.toml uses sccache when it is
+# available, so cargo also needs sccache to remain on PATH after rendering.
+# rustup executable: {{ lookPath "rustup" | quote }}
+
+set -euo pipefail
+
+# Rendering the resolved path makes a later rustup install change this script,
+# so chezmoi retries it rather than preserving the initial no-op forever.
+command -v rustup >/dev/null 2>&1 || exit 0
+
+# settings.toml declares stable as the default. Install that toolchain directly
+# so a directory override or RUSTUP_TOOLCHAIN cannot make this check pass early.
+echo "rustup: ensuring the stable toolchain is installed."
+rustup toolchain install stable

@@ -1,0 +1,59 @@
+#!/usr/bin/env bash
+
+# Keep Doom's checkout pinned, then install or sync it against the managed
+# config. `doom install` is idempotent and performs the required sync.
+#
+# Executable paths are part of the rendered script so installing either
+# dependency after an initial apply causes chezmoi to retry this hook.
+# git executable: {{ lookPath "git" | quote }}
+# Emacs executable: {{ lookPath "emacs" | quote }}
+# Doom rev: {{ .doom.rev }}
+# config.el hash: {{ include "dot_config/doom/config.el" | sha256sum }}
+# init.el hash: {{ include "dot_config/doom/init.el" | sha256sum }}
+# packages.el hash: {{ include "dot_config/doom/packages.el" | sha256sum }}
+
+set -euo pipefail
+
+if ! command -v git >/dev/null 2>&1; then
+  echo "Git is not installed; skipping Doom Emacs setup."
+  exit 0
+fi
+if ! command -v emacs >/dev/null 2>&1; then
+  echo "Emacs is not installed; skipping Doom Emacs setup."
+  exit 0
+fi
+
+repo={{ .doom.repo | quote }}
+rev={{ .doom.rev | quote }}
+dest="$HOME/.config/emacs"
+
+if [ ! -d "$dest/.git" ]; then
+  if [ -e "$dest" ]; then
+    echo "doom: $dest exists but is not a git checkout." >&2
+    exit 1
+  fi
+  echo "doom: cloning $repo"
+  git clone --filter=blob:none "$repo" "$dest"
+fi
+
+if [ "$(git -C "$dest" rev-parse HEAD)" != "$rev" ]; then
+  # Moving the checkout must not discard local work. Returning failure keeps
+  # this hook pending so a later apply retries after the checkout is clean.
+  if ! git -C "$dest" diff --quiet HEAD 2>/dev/null; then
+    echo "doom: $dest has uncommitted changes; not moving it to $rev." >&2
+    exit 1
+  fi
+
+  echo "doom: checking out $rev"
+  git -C "$dest" fetch --quiet origin "$rev" 2>/dev/null ||
+    git -C "$dest" fetch --quiet origin
+  git -C "$dest" checkout --quiet --detach "$rev"
+fi
+
+if [ ! -x "$dest/bin/doom" ]; then
+  echo "doom: $dest/bin/doom is missing or not executable." >&2
+  exit 1
+fi
+
+echo "doom: installing packages and syncing config"
+"$dest/bin/doom" install --aot --no-config --env

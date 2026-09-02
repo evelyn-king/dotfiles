@@ -1,0 +1,29 @@
+[theme]
+name = "rose-pine-moon"
+parent = "default"
+
+[colors]
+# foam
+AlertInfo = "#9ccfd8"
+
+# gold
+AlertWarn = "#f6c177"
+
+# love
+AlertError = "#eb6f92"
+
+# pine
+Annotation = "#3e8fb0"
+
+## default foreground color
+# text
+Base = "#e0def4"
+
+# subtle
+Guidance = "#908caa"
+
+# rose
+Important = "#ea9a97"
+
+# iris
+Title = "#c4a7e7"

@@ -1,0 +1,59 @@
+# Language runtimes and every global CLI tool.
+#
+# This is a conf.d file rather than ~/.config/mise/config.toml itself. That
+# separates repo-managed tools from globals added interactively with
+# `mise use -g`.
+#
+# Update pinned versions in this file. Entries set to "latest" intentionally
+# float.
+#
+# On macOS, Nix supplies uv and bun. The Linux fragment declares both through
+# mise so npm and pipx backends have the same fast installers there.
+#
+# Interactive shells use `mise activate`; static shims cover noninteractive
+# SSH commands, cron jobs, and hooks.
+
+[settings]
+# Project configs can opt into lockfiles; global locks are refreshed explicitly.
+lockfile = true
+# uv and bun are faster than the pipx/npm defaults.
+npm.package_manager = "bun"
+
+[tools]
+
+# --- runtimes ---------------------------------------------------------------
+node = "26.8.0"
+python = "3.14.7"
+go = "1.27.0"
+
+# --- coding agents ----------------------------------------------------------
+claude = "latest"
+codex = "latest"
+opencode = "latest"
+pi = "latest"
+"npm:@google/gemini-cli" = "latest"
+"npm:@just-every/code" = "latest"
+
+# --- python tooling ---------------------------------------------------------
+"pipx:black" = "26.5.1"
+"pipx:conda-lock" = "4.0.2"
+"pipx:conda-package-handling" = "2.5.0"
+"pipx:docling-slim" = "2.123.0"
+"pipx:markdown-code-runner" = "2.7.0"
+"pipx:mypy" = "2.3.1"
+"pipx:poethepoet" = "0.48.0"
+"pipx:ruff" = "0.16.4"
+"pipx:tuitorial" = "0.16.0"
+"pipx:unidep" = { version = "3.4.2", uvx_args = "--with unidep[all]" }
+"pipx:pre-commit" = { version = "4.6.2", uvx_args = "--with pre-commit-uv" }
+
+# --- javascript tooling -----------------------------------------------------
+"npm:@doist/todoist-cli" = "4.0.0"
+"npm:@googleworkspace/cli" = "0.22.5"
+"npm:tree-sitter-cli" = "0.26.13"
+
+# --- other ------------------------------------------------------------------
+gh = "latest"
+herdr = "0.8.2"
+usage = "latest"
+micromamba = "2.9.0-0"

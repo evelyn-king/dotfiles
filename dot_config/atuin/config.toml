@@ -3,7 +3,7 @@ enter_accept = true
 keymap_mode = "vim-normal"
 
 [stats]
-## Set commands where we should consider the subcommand for statistics. Eg, kubectl get vs just kubectl
+## Include the subcommand in statistics for these commands.
 common_subcommands = [
   "apt",
   "cargo",
@@ -18,10 +18,12 @@ common_subcommands = [
   "jj",
   "kubectl",
   "micromamba",
+  "mise",
   "nix",
   "nmcli",
   "npm",
   "pecl",
+  "pipx",
   "pnpm",
   "podman",
   "port",
@@ -29,19 +31,20 @@ common_subcommands = [
   "tmux",
   "uv",
   "yarn",
+  "zellij",
 ]
 
-## Set commands that should be totally stripped and ignored from stats
+## Strip these prefixes from statistics.
 common_prefix = ["sudo"]
 
-## Set commands that will be completely ignored from stats
+## Ignore these commands in statistics.
 ignored_commands = ["cd", "ls", "nvim", "vi", "vim"]
 
 [sync]
 records = true
 
 [theme]
-name = "gruvbox-dark"
+name = "rose-pine-moon"
 
 [tmux]
 enabled = true

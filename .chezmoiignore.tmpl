@@ -1,65 +1,44 @@
-{{- $profileName := .profile -}}
-{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
-{{- $profile := get .profiles $profileName | default dict -}}
-{{- $features := get $host "features" | default dict -}}
-{{- $personalAgeIdentity := env "CHEZMOI_PERSONAL_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/personal-key.txt") -}}
-{{- $workAgeIdentity := env "CHEZMOI_WORK_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/work-key.txt") -}}
-{{- $activeAgeIdentity := $personalAgeIdentity -}}
-{{- if eq $profileName "work" -}}
-{{- $activeAgeIdentity = $workAgeIdentity -}}
-{{- end -}}
-{{- $activeAgeIdentityExists := ne (stat $activeAgeIdentity) nil -}}
-{{- $omarchyDesktop := and
+{{- /* Omarchy ships its desktop into ~/.local/share/omarchy. Detect it rather
+       than keying off a hostname, so a rebuilt or renamed machine needs no
+       change here. */ -}}
+{{- $omarchy := and
   (eq .chezmoi.os "linux")
-  (get $profile "omarchy_desktop_allowed" | default false)
-  (get $features "omarchy_desktop" | default false)
+  (ne (stat (env "OMARCHY_PATH" | default (joinPath .chezmoi.homeDir ".local/share/omarchy"))) nil)
 -}}
+{{- $ageIdentity := env "CHEZMOI_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/personal-key.txt") -}}
 
+# Repo content, not dotfiles: read from the source tree, never applied to $HOME.
 AGENTS.md
 CLAUDE.md
-.mailmap
-docs/**
 LICENSE
 README.md
+.mailmap
+docs/**
 scripts/**
+nix
+# mise rewrites its lock in place on every install. Applying a second copy to
+# $HOME gives the two copies a way to diverge and leaves `chezmoi status`
+# permanently dirty, so the source tree keeps the only copy and the locked mise
+# commands point at it with MISE_CONFIG_DIR.
+.config/mise/mise.lock
 
 {{- if ne .chezmoi.os "darwin" }}
-.Brewfile
-.aerospace.toml
+.config/aerospace
 .hyprspace.toml
-.local/bin/check-homebrew
-.local/bin/dump-homebrew
-.local/bin/sync-homebrew
-{{- end }}
-
-{{- if not (or (eq .chezmoi.os "darwin") $omarchyDesktop) }}
-.config/ghostty/config
-{{- end }}
-
-{{- if ne .chezmoi.os "darwin" }}
-.config/ghostty/themes/**
-{{- end }}
-
-{{- if ne .chezmoi.os "darwin" }}
-Library/**
 {{- end }}
 
 {{- if ne .chezmoi.os "linux" }}
+.config/mise/conf.d/20-linux.toml
+linux-package-drift.sh
 .config/superfile/**
 {{- end }}
 
-{{- if not $omarchyDesktop }}
+{{- if not $omarchy }}
 .config/hypr/**
-.config/omarchy/**
 {{- end }}
 
-{{- if eq $profileName "personal" }}
-.icas.toml
-.config/shell/work/**
-{{- else if eq $profileName "work" }}
-.config/shell/personal/**
-{{- end }}
-
-{{- if not $activeAgeIdentityExists }}
-.config/shell/{{ $profileName }}/90_extras.sh
+{{- /* Optional. A machine without the age identity skips the encrypted extras
+       instead of failing the whole apply. */ -}}
+{{- if eq (stat $ageIdentity) nil }}
+.config/shell/secrets.sh
 {{- end }}

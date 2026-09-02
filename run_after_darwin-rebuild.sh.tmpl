@@ -1,0 +1,88 @@
+#!/usr/bin/env bash
+
+# Nag on every apply while the running system differs from nix/flake.nix.
+#
+# This deliberately does not activate. `darwin-rebuild switch` requires root,
+# and `chezmoi apply` must not escalate: this script is rendered from repo
+# content, so a sudo call here would hand root to anything that reaches the
+# source tree. Activation stays an explicit, separate command.
+
+set -euo pipefail
+
+flake="{{ .chezmoi.sourceDir }}/nix"
+
+command -v darwin-rebuild >/dev/null 2>&1 || exit 0
+
+# Compare the independently linked build outputs plus the activation script.
+# Deliberately do not compare `system.outPath`: it embeds
+# system.configurationRevision, the git revision of this whole repo, so every
+# commit would report drift even when nix/ did not change.
+if ! declared=$(nix eval --raw "$flake#darwinConfigurations.macbook" \
+  --apply 'c: let cfg = c.config; in
+    cfg.system.path.outPath + " " +
+    cfg.system.build.etc.outPath + " " +
+    cfg.system.build.applications.outPath + " " +
+    cfg.system.build.fonts.outPath + " " +
+    cfg.system.build.launchd.outPath + " " +
+    cfg.system.build.patches.outPath + " " +
+    builtins.hashString "sha256" cfg.system.activationScripts.script.text' \
+  2>/dev/null); then
+  echo "nix-darwin: cannot evaluate $flake; skipping the drift check." >&2
+  exit 0
+fi
+
+read -r want_sw want_etc want_apps want_fonts want_launchd want_patches want_activate <<<"$declared"
+have_sw=$(readlink /run/current-system/sw || true)
+have_etc=$(readlink /run/current-system/etc || true)
+have_apps=$(readlink /run/current-system/Applications || true)
+have_fonts=$(readlink /run/current-system/Library/Fonts || true)
+have_launchd=$(readlink /run/current-system/Library/LaunchAgents || true)
+have_patches=$(readlink /run/current-system/patches || true)
+
+# The built script replaces @out@ with its own generation path and gains one
+# trailing blank line. Normalize only those generated differences.
+have_activate=$(
+  sed -e 's|^systemConfig=.*$|systemConfig=@out@|' -e '${/^$/d;}' \
+    /run/current-system/activate |
+    shasum -a 256
+)
+have_activate=${have_activate%% *}
+
+drifted=""
+add_drift() {
+  drifted="${drifted:+$drifted, }$1"
+}
+
+if [ "$have_sw" != "$want_sw" ]; then
+  add_drift packages
+fi
+if [ "$have_etc" != "$want_etc/etc" ]; then
+  add_drift /etc
+fi
+if [ "$have_apps" != "$want_apps/Applications" ]; then
+  add_drift applications
+fi
+if [ "$have_fonts" != "$want_fonts/Library/Fonts" ]; then
+  add_drift fonts
+fi
+if [ "$have_launchd" != "$want_launchd/Library/LaunchAgents" ]; then
+  add_drift launchd
+fi
+if [ "$have_patches" != "$want_patches/patches" ]; then
+  add_drift patches
+fi
+if [ "$have_activate" != "$want_activate" ]; then
+  add_drift activation
+fi
+if [ -z "$drifted" ]; then
+  exit 0
+fi
+
+cat >&2 <<EOF
+
+  nix-darwin: the running system differs in $drifted.
+  Activate it when convenient:
+
+    sudo darwin-rebuild switch --flake $flake#macbook
+
+EOF

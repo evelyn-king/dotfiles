@@ -1,0 +1,14 @@
+# Herdr settings kept explicit across releases.
+onboarding = false
+
+[theme]
+name = "rose-pine"
+auto_switch = false
+
+[update]
+channel = "stable"
+version_check = false
+
+[experimental]
+allow_nested = true
+pane_history = false

@@ -1,7 +1,58 @@
 # Targets to delete from the destination on apply.
+#
+# Everything below the first section is a one-time migration cleanup for the
+# port from the Homebrew/externals/theme-selector layout. Prune those entries
+# once every machine has applied at least once, so a hand-written file at one
+# of these paths is not deleted out from under you later.
 
 # lazygit only reads config.yml; the old config.yaml was silently ignored.
 .config/lazygit/config.yaml
 
 # Omarchy 4 replaced the bash menu-override stub with extensions/omarchy-menu.jsonc.
 .config/omarchy/extensions/menu.sh
+
+# --- migration cleanup ------------------------------------------------------
+
+# AeroSpace and git config both moved to their XDG paths.
+.aerospace.toml
+.gitconfig
+
+# icas is a work tool and is not configured on personal machines.
+.icas.toml
+
+# nix-darwin owns macOS packages now; the Homebrew bundle workflow is retired.
+.Brewfile
+.local/bin/check-homebrew
+.local/bin/dump-homebrew
+.local/bin/sync-homebrew
+
+# mise owns these tool lists now (.config/mise/conf.d/10-dotfiles.toml).
+.local/bin/sync-uv
+.local/bin/sync-bun
+
+# The runtime-sourced shell fragments were replaced by flat startup files
+# rendered from .chezmoitemplates/shell-{env,path,interactive}.sh.
+.config/shell/00_init.sh
+.config/shell/05_prefer_zsh.sh
+.config/shell/05_zsh_completions.sh
+.config/shell/10_bash_init.sh
+.config/shell/15_host_env.sh
+.config/shell/25_nvim.sh
+.config/shell/30_env.sh
+.config/shell/30_interactive.sh
+.config/shell/35_keychain.sh
+.config/shell/40_python.sh
+.config/shell/45_omarchy.sh
+.config/shell/99_finish.sh
+.config/shell/base.sh
+.config/shell/interactive.sh
+.config/shell/lib.sh
+.config/shell/personal
+.config/shell/work
+
+# The theme selector is retired; every config names Rose Pine Moon directly.
+.config/themes
+.config/btop/themes/current.theme
+.config/btop/themes/gruvbox_dark_v2.theme
+.config/atuin/themes/gruvbox-dark.toml
+.config/omarchy/hooks/theme-set

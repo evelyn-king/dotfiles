@@ -1,0 +1,61 @@
+# git config at the XDG path
+
+[user]
+  name = "Evelyn King"
+  email = "evelyn@evieking.com"
+  signingkey = 08B79F9C4FA6D2E1
+
+[core]
+  autocrlf = false
+  editor = nvim
+
+[init]
+  defaultBranch = main
+
+[pull]
+  rebase = true
+
+[push]
+  autoSetupRemote = true
+
+[fetch]
+  prune = true
+
+[rerere]
+  enabled = true
+  autoupdate = true
+
+{{ if lookPath "git-lfs" -}}
+[filter "lfs"]
+  required = true
+  clean = git-lfs clean -- %f
+  smudge = git-lfs smudge -- %f
+  process = git-lfs filter-process
+
+{{ end }}
+
+[gpg]
+  format = openpgp
+  # GUI apps may not inherit a shell PATH. Resolve gpg while chezmoi applies
+  # the config so each host gets its own absolute executable path.
+  program = {{ lookPath "gpg" | quote }}
+
+[commit]
+  gpgsign = true
+
+# The section header is unconditional so that a helper can never end up
+# attached to whichever section happens to precede it.
+[credential]
+{{- if eq .chezmoi.os "darwin" }}
+  helper = osxkeychain
+{{- else if and (eq .chezmoi.os "linux") (contains "microsoft" (lower .chezmoi.kernel.osrelease)) }}
+  helper = "/mnt/c/Program Files/Git/mingw64/bin/git-credential-manager.exe"
+{{- else if eq .chezmoi.os "linux" }}
+  helper = cache --timeout=3600
+{{- else }}
+  helper = libsecret
+{{- end }}
+
+# Optional machine-local overrides.
+[include]
+  path = ~/.config/git/config.local

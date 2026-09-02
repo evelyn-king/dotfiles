@@ -45,9 +45,8 @@ if exists('+undofile')
 endif
 
 set undodir=~/.vim/undo-dir
-set undofile
 
 inoremap jk <Esc>
 
 set background=dark
-source ~/.config/themes/current/vim.vim
+colorscheme rosepine_moon

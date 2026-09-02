@@ -1,4 +1,4 @@
-# 💤 LazyVim
+# Neovim
 
-A starter template for [LazyVim](https://github.com/LazyVim/LazyVim).
-Refer to the [documentation](https://lazyvim.github.io/installation) to get started.
+This config uses [LazyVim](https://github.com/LazyVim/LazyVim), Rosé Pine Moon,
+silent update checks, and no animated scrolling.

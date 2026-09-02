@@ -1,25 +1,42 @@
 # macOS Package List
 
-Apple Silicon macOS machines use Homebrew as the primary package manager.
+Apple Silicon macOS machines use nix-darwin. The declaration is
+[`nix/flake.nix`](../../nix/flake.nix), which is repository content rather than
+a home file and is listed in `.chezmoiignore`.
 
-## Manifest
-
-The canonical package manifest is [`Brewfile`](../../Brewfile).
-
-To install from it later:
+The flake lives in the source tree and `.chezmoi.toml.tmpl` pins `sourceDir` to
+wherever the repo was cloned, so derive the path rather than hardcoding it:
 
 ```bash
-brew bundle --file Brewfile
+darwin-rebuild switch --flake "$(chezmoi source-path)/nix#macbook"
+nix flake update --flake "$(chezmoi source-path)/nix"   # move the pin
 ```
 
-## Coverage
+`nix-switch` is an alias for the first command, rendered with the source path
+already resolved. `darwinConfigurations` defines only `macbook`, for
+`aarch64-darwin`.
 
-The manifest currently includes:
+## Ownership
 
-- CLI tools such as `atuin`, `bitwarden-cli`, `bun`, `chezmoi`, `cmake`, `direnv`, `keychain`, `neovim`, `pinentry`, `shellcheck`, and `vim`
-- GUI apps such as `1password`, `Aerospace`, `Raycast`, `Ghostty`, `Dropbox`, `FreeCAD`, `OBS`, `Obsidian`, `Tailscale`, `Zed`, `Zen`, and `Zotero`
+| Source | Owns |
+| --- | --- |
+| `nix/flake.nix` `environment.systemPackages` | system CLI packages |
+| `nix/flake.nix` `homebrew.casks` | GUI applications |
+| `dot_config/mise/conf.d/10-dotfiles.toml` | language runtimes and global CLI tools |
 
-## Notes
+Anything managed by mise is deliberately absent from the Nix package list.
 
-- Hyprland and Omarchy desktop config are not applied on macOS.
-- The repo also keeps cross-platform tool bootstraps for things like `uv`, `micromamba`, Doom Emacs, and Rust.
+GUI applications come from Homebrew casks declared in the flake. nix-darwin
+installs and upgrades them during `darwin-rebuild switch`, while keeping them
+outside the read-only Nix store so their own updaters still work. Homebrew
+itself must already be installed.
+
+`system.primaryUser` in the flake must match the macOS short account name
+(`id -un`) or activation fails.
+
+## Drift
+
+`run_after_darwin-rebuild.sh.tmpl` compares the running system against the
+flake on every `chezmoi apply` and nags when they differ. It deliberately does
+not activate: `darwin-rebuild switch` requires root, and `chezmoi apply` must
+never escalate.

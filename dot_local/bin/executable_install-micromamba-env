@@ -32,14 +32,10 @@ require_command() {
 }
 
 default_mamba_root_prefix() {
-  host_env_file="${HOME}/.config/shell/15_host_env.sh"
-  if [ -f "${host_env_file}" ]; then
-    # shellcheck source=/dev/null
-    source "${host_env_file}"
-  else
-    printf '[%s] Missing source file: %s\n' "${SCRIPT_NAME}" "${host_env_file}" >&2
-  fi
-  printf '%s\n' "${MAMBA_ROOT_PREFIX_DEFAULT:-${HOME}/.local/opt/micromamba}"
+  # MAMBA_ROOT_PREFIX is exported by shell startup (shell-env.sh) with this same
+  # default. Repeated here so the script also works when invoked from an
+  # environment that never ran it.
+  printf '%s\n' "${MAMBA_ROOT_PREFIX:-${HOME}/.local/opt/micromamba}"
 }
 
 env_name_from_file() {
