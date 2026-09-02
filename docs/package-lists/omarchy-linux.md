@@ -29,60 +29,22 @@ whichever root the detection finds. `default/bash/env-bootstrap` is sourced by
 
 ## System packages
 
-Install these through Omarchy's package flow:
+Required pacman and AUR packages are declared in
+[`../../.chezmoidata/packages.yaml`](../../.chezmoidata/packages.yaml). Every
+`chezmoi apply` runs `run_after_install-omarchy-packages.sh.tmpl`, which asks
+Omarchy to restore missing entries. The hook is additive. It never removes an
+unlisted package, so manually installed packages remain installed.
 
-- `age`
-- `aspell`
-- `aspell-en`
-- `ast-grep`
-- `atuin`
-- `bat`
-- `bitwarden`
-- `bitwarden-cli`
-- `btop`
-- `bun`
-- `chezmoi`
-- `cmake`
-- `direnv`
-- `dropbox`
-- `dropbox-cli`
-- `duf`
-- `dust`
-- `emacs-wayland`
-- `eza`
-- `fd`
-- `firefox`
-- `fzf`
-- `ghostty`
-- `git-delta`
-- `graphviz`
-- `hyperfine`
-- `keychain`
-- `lazygit`
-- `lua-language-server`
-- `neovim`
-- `ollama-cuda`
-- `pinentry`
-- `pixi`
-- `ripgrep`
-- `sccache`
-- `shellcheck`
-- `starship`
-- `superfile`
-- `tailscale`
-- `tealdeer`
-- `uv`
-- `vim`
-- `visual-studio-code-bin`
-- `zed`
-- `zellij`
-- `zoxide`
-- `zsh`
+Removing an entry from the manifest does not uninstall it. Remove that package
+manually if it is no longer wanted. A no-op apply does not prompt for sudo;
+`omarchy pkg add` asks only when it finds a missing pacman package.
 
 ## AUR packages
 
-- `google-cloud-cli`
-- `slack-desktop`
+Keep packages that Omarchy can install through pacman under `pacman`,
+including packages from Omarchy's own repository. Put packages that require
+`yay` under `aur`. The hook uses `omarchy pkg add` and `omarchy pkg aur add`,
+respectively.
 
 ## Notes
 
@@ -100,9 +62,9 @@ Install these through Omarchy's package flow:
   [../shell-startup.md](../shell-startup.md).
 - Web apps and Omarchy desktop defaults are not tracked here. Omarchy manages
   them.
-- This list is the source of truth for pacman and AUR packages. mise owns only
-  the shared language runtimes and global CLI tools in
-  `dot_config/mise/conf.d/10-dotfiles.toml`.
+- `.chezmoidata/packages.yaml` is the source of truth for required pacman and
+  AUR packages. mise owns only the shared language runtimes and global CLI
+  tools in `dot_config/mise/conf.d/10-dotfiles.toml`.
 - Theming is no longer wired to Omarchy. Every config names Gruvbox
   directly, so switching the Omarchy theme changes the desktop chrome but not
   the terminal, editors or btop.

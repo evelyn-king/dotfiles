@@ -37,8 +37,10 @@
 - Edit Omarchy detection in `.chezmoitemplates/omarchy-detect.tmpl`, never the
   `$omarchy` variables in `.chezmoiignore.tmpl` and
   `dot_config/ghostty/config.tmpl` that include it.
-- Declare tools in `dot_config/mise/conf.d/`, macOS system packages in
-  `nix/flake.nix`. Do not add a package to both.
+- Declare runtimes and global CLI tools in `dot_config/mise/conf.d/`, Omarchy
+  system packages in `.chezmoidata/packages.yaml`, and macOS system packages
+  in `nix/flake.nix`. Do not declare the same tool in mise and a system package
+  list.
 - `dot_config/mise/mise.lock` and `nix/flake.lock` are repo content. Never apply
   them to `$HOME`; mise rewrites its lock in place and a second copy diverges.
 

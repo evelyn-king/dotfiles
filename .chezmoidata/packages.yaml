@@ -1,0 +1,54 @@
+# Packages that must remain installed on Omarchy hosts. The apply hook is
+# additive: it restores missing entries but never removes unlisted packages.
+omarchyPackages:
+  pacman:
+    - age
+    - aspell
+    - aspell-en
+    - ast-grep
+    - atuin
+    - bat
+    - bitwarden
+    - bitwarden-cli
+    - btop
+    - bun
+    - chezmoi
+    - cmake
+    - direnv
+    - dropbox
+    - dropbox-cli
+    - duf
+    - dust
+    - emacs-wayland
+    - eza
+    - fd
+    - firefox
+    - fzf
+    - ghostty
+    - git-delta
+    - graphviz
+    - hyperfine
+    - keychain
+    - lazygit
+    - lua-language-server
+    - neovim
+    - ollama-cuda
+    - pinentry
+    - pixi
+    - ripgrep
+    - sccache
+    - shellcheck
+    - starship
+    - superfile
+    - tailscale
+    - tealdeer
+    - uv
+    - vim
+    - visual-studio-code-bin
+    - zed
+    - zellij
+    - zoxide
+    - zsh
+  aur:
+    - google-cloud-cli
+    - slack-desktop

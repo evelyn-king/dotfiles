@@ -32,7 +32,9 @@ Package ownership depends on the host.
 | macOS | nix-darwin | Homebrew casks, declared in the flake | mise |
 | Omarchy Linux | pacman and the AUR, via Omarchy | Omarchy | mise |
 
-mise is the only package manager this repo drives on both. See
+mise is the only package manager this repo drives on both platforms. On
+Omarchy, an additive apply hook also restores missing system packages without
+removing packages installed by hand. See
 [docs/package-lists/macos.md](docs/package-lists/macos.md) and
 [docs/package-lists/omarchy-linux.md](docs/package-lists/omarchy-linux.md) for
 system packages, and [docs/package-lists/mise.md](docs/package-lists/mise.md)

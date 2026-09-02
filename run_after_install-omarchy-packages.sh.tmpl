@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Restore packages declared in .chezmoidata/packages.yaml on every apply.
+# Omarchy's package helpers skip packages that are already installed. They do
+# not remove unlisted packages, so packages installed by hand remain untouched.
+
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . }}
+
+set -euo pipefail
+
+{{ if $omarchy -}}
+pacman_packages=(
+{{- range .omarchyPackages.pacman }}
+  {{ . | quote }}
+{{- end }}
+)
+
+aur_packages=(
+{{- range .omarchyPackages.aur }}
+  {{ . | quote }}
+{{- end }}
+)
+
+if ((${#pacman_packages[@]})); then
+  omarchy pkg add "${pacman_packages[@]}"
+fi
+
+if ((${#aur_packages[@]})); then
+  omarchy pkg aur add "${aur_packages[@]}"
+fi
+{{- else }}
+exit 0
+{{- end }}
