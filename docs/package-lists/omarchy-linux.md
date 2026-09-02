@@ -103,6 +103,6 @@ Install these through Omarchy's package flow:
 - This list is the source of truth for pacman and AUR packages. mise owns only
   the shared language runtimes and global CLI tools in
   `dot_config/mise/conf.d/10-dotfiles.toml`.
-- Theming is no longer wired to Omarchy. Every config names Rosé Pine Moon
+- Theming is no longer wired to Omarchy. Every config names Gruvbox
   directly, so switching the Omarchy theme changes the desktop chrome but not
   the terminal, editors or btop.

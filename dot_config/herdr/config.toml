@@ -2,7 +2,7 @@
 onboarding = false
 
 [theme]
-name = "rose-pine"
+name = "gruvbox"
 auto_switch = false
 
 [update]

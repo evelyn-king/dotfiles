@@ -6,8 +6,8 @@ doom:
 
 plugins:
   vim:
-    rose_pine:
-      url: https://github.com/rose-pine/vim/archive/d7bc0ccbbd71d632f5737a1a880a0ed32d1be6bf.tar.gz
+    gruvbox:
+      url: https://github.com/morhetz/gruvbox/archive/697c00291db857ca0af00ec154e5bd514a79191f.tar.gz
       include:
         - "*/autoload/**"
         - "*/colors/**"

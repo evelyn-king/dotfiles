@@ -1,0 +1,29 @@
+[theme]
+name = "gruvbox-dark"
+parent = "default"
+
+[colors]
+# neutral green
+AlertInfo = "#98971a"
+
+# neutral orange
+AlertWarn = "#d65d0e"
+
+# neutral red
+AlertError = "#cc241d"
+
+# neutral blue
+Annotation = "#458588"
+
+## default foreground color
+# light 1
+Base = "#ebdbb2"
+
+# light 4
+Guidance = "#a89984"
+
+# neutral yellow
+Important = "#d79921"
+
+# neutral purple
+Title = "#b16286"

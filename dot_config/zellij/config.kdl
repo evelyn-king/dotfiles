@@ -198,4 +198,4 @@ plugins {
     }
 }
 
-theme "rose-pine-moon"
+theme "gruvbox-dark"

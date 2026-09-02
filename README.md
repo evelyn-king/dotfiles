@@ -97,26 +97,21 @@ Two per-machine escape hatches are sourced near the end of interactive startup:
 
 ## Theming
 
-Everything is [Rosé Pine Moon](https://rosepinetheme.com), dark only. Each
+Everything is [Gruvbox](https://github.com/morhetz/gruvbox), dark by default. Each
 config sets its own theme directly, with no shared theme data or indirection
 layer. Add a selector back if a second theme ever earns its keep.
 
-Ghostty ships the theme itself, so that config just names it. Neovim, Vim and
-Doom pull a plugin. The Vim colorscheme is a pinned chezmoi external in
-`.chezmoidata/versions.yaml`, and Doom pins the community port in
-`dot_config/doom/packages.el` because `doom-themes` has no Rosé Pine.
+Ghostty, Doom, bat, Zellij, Herdr, superfile and Zed ship Gruvbox themes.
+Neovim pulls `gruvbox.nvim`, while Vim uses a pinned chezmoi external from
+`.chezmoidata/versions.yaml`.
 
-btop, atuin and Zellij ship no Rosé Pine, so the theme files under each tool's
-`themes/` directory are repository content, hand-written from the palette. bat
-is the same idea with one extra step. Its `.tmTheme` comes verbatim from
-[rose-pine/tm-theme](https://github.com/rose-pine/tm-theme), and bat reads
-themes only from a binary cache, so `run_onchange_after_build-bat-cache.sh.tmpl`
-runs `bat cache --build` whenever the theme or bat config changes. Zed installs
-the theme through `auto_install_extensions`.
+btop and atuin use the repo-managed theme files under each tool's `themes/`
+directory. `run_onchange_after_build-bat-cache.sh.tmpl` rebuilds bat's binary
+cache whenever its config changes.
 
 tmux and starship deliberately stay on ANSI color names rather than hex, so
 they inherit whatever Ghostty is set to and never drift from it. Claude Code
-and opencode have no Rosé Pine option and stay on `auto`/`system`.
+and opencode stay on `auto`/`system`.
 
 Omarchy's own theme switching still themes the desktop chrome it owns, but no
 longer drives anything in this repo.
@@ -125,14 +120,13 @@ The palette, for hand-editing a theme file:
 
 | Token | Hex | | Token | Hex |
 | --- | --- | --- | --- | --- |
-| base | `#232136` | | love | `#eb6f92` |
-| surface | `#2a273f` | | gold | `#f6c177` |
-| overlay | `#393552` | | rose | `#ea9a97` |
-| muted | `#6e6a86` | | pine | `#3e8fb0` |
-| subtle | `#908caa` | | foam | `#9ccfd8` |
-| text | `#e0def4` | | iris | `#c4a7e7` |
-| highlight low | `#2a283e` | | highlight med | `#44415a` |
-| highlight high | `#56526e` | | | |
+| background | `#282828` | | red | `#cc241d` |
+| background soft | `#32302f` | | orange | `#d65d0e` |
+| background 1 | `#3c3836` | | yellow | `#d79921` |
+| foreground | `#ebdbb2` | | green | `#98971a` |
+| foreground 4 | `#a89984` | | aqua | `#689d6a` |
+| foreground 3 | `#bdae93` | | blue | `#458588` |
+| foreground 2 | `#d5c4a1` | | purple | `#b16286` |
 
 ## Agent git safety
 

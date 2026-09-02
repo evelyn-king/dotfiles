@@ -49,4 +49,5 @@ set undodir=~/.vim/undo-dir
 inoremap jk <Esc>
 
 set background=dark
-colorscheme rosepine_moon
+colorscheme gruvbox
+let g:airline_theme = 'gruvbox'

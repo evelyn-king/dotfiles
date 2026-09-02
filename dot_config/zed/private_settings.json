@@ -17,9 +17,6 @@
     "dock": "left"
   },
   "vim_mode": true,
-  "auto_install_extensions": {
-    "rose-pine-theme": true
-  },
   "icon_theme": "Zed (Default)",
-  "theme": "Rosé Pine Moon"
+  "theme": "Gruvbox Dark"
 }

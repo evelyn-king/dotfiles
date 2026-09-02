@@ -61,9 +61,14 @@
 .config/shell/personal
 .config/shell/work
 
-# The theme selector is retired; every config names Rose Pine Moon directly.
+# The theme selector is retired; every config names Gruvbox directly.
 .config/themes
 .config/btop/themes/current.theme
-.config/btop/themes/gruvbox_dark_v2.theme
-.config/atuin/themes/gruvbox-dark.toml
 .config/omarchy/hooks/theme-set
+
+# Rosé Pine assets were replaced by built-in or repo-managed Gruvbox themes.
+.config/atuin/themes/rose-pine-moon.toml
+.config/bat/themes/rose-pine-moon.tmTheme
+.config/btop/themes/rose-pine-moon.theme
+.config/zellij/themes/rose-pine-moon.kdl
+.vim/pack/plugins/start/rose-pine

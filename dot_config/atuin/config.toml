@@ -44,7 +44,7 @@ ignored_commands = ["cd", "ls", "nvim", "vi", "vim"]
 records = true
 
 [theme]
-name = "rose-pine-moon"
+name = "gruvbox-dark"
 
 [tmux]
 enabled = true

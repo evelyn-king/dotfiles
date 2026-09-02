@@ -1,2 +1,3 @@
 # bat config
---theme="rose-pine-moon"
+--theme-light="gruvbox-light"
+--theme-dark="gruvbox-dark"

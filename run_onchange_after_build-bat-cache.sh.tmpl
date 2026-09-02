@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
-# bat resolves custom themes from a binary cache, not from the themes directory,
-# so a managed .tmTheme only takes effect after this rebuild.
-# Theme hash: {{ include "dot_config/bat/themes/rose-pine-moon.tmTheme" | sha256sum }}
+# Keep bat's binary cache in sync with its managed config.
 # Config hash: {{ include "dot_config/bat/config" | sha256sum }}
 # bat executable: {{ lookPath "bat" | quote }}
 

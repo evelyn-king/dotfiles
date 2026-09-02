@@ -25,7 +25,7 @@ require("lazy").setup({
     lazy = false, -- Load custom plugins at startup.
     version = false, -- Use current commits; many plugin tags are stale.
   },
-  install = { colorscheme = { "rose-pine-moon", "habamax" } },
+  install = { colorscheme = { "gruvbox", "habamax" } },
   checker = {
     enabled = true,
     notify = false,
