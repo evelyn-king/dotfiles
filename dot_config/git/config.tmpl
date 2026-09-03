@@ -3,7 +3,7 @@
 [user]
   name = "Evelyn King"
   email = "evelyn@evieking.com"
-  signingkey = 08B79F9C4FA6D2E1
+  signingkey = B1DD4047A0B58992573E7C5F08B79F9C4FA6D2E1
 
 [core]
   autocrlf = false
@@ -38,10 +38,14 @@
   format = openpgp
   # GUI apps may not inherit a shell PATH. Resolve gpg while chezmoi applies
   # the config so each host gets its own absolute executable path.
+{{ with lookPath "gpg" -}}
   program = {{ lookPath "gpg" | quote }}
+{{ end -}}
 
 [commit]
-  gpgsign = true
+  # Fresh hosts stay usable before the secret key and pinentry are restored.
+  # config.local enables signing after git-signing-preflight succeeds.
+  gpgsign = false
 
 # The section header is unconditional so that a helper can never end up
 # attached to whichever section happens to precede it.

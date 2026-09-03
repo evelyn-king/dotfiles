@@ -158,3 +158,33 @@ machine, verify that an SSH command receives the managed environment:
 ```bash
 ssh <host> 'printf "%s %s\n" "$MAMBA_ROOT_PREFIX" "$LANG"; printf "%s\n" "$PATH"'
 ```
+
+## Git commit signing
+
+Fresh hosts create unsigned commits until the signing key and pinentry work.
+After the platform setup installs GPG, restore the secret key from its secure
+backup. Do not put the backup or exported owner-trust data in this repository.
+
+Confirm the imported key has ultimate owner trust. If it does not, run
+`gpg --edit-key B1DD4047A0B58992573E7C5F08B79F9C4FA6D2E1 trust` and choose
+ultimate trust. Then run the signing probe from a terminal:
+
+```bash
+chezmoi apply
+git-signing-preflight
+```
+
+The probe checks the configured full fingerprint, GPG executable, secret key,
+owner trust, agent, pinentry, and a disposable signature. Only enable signing
+after it passes:
+
+```bash
+git config --file ~/.config/git/config.local commit.gpgsign true
+test "$(git config --get commit.gpgsign)" = true
+```
+
+The machine-local override is not managed by chezmoi. Test the next terminal
+commit and the next commit from each GUI Git client, then check them with
+`git log --show-signature -1`. Run
+`git config --file ~/.config/git/config.local --unset-all commit.gpgsign` to
+return the host to unsigned commits.

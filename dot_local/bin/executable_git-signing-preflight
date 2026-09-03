@@ -1,0 +1,70 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+umask 077
+
+SCRIPT_NAME="git-signing-preflight"
+
+die() {
+  printf '[%s] %s\n' "${SCRIPT_NAME}" "$*" >&2
+  exit 1
+}
+
+require_command() {
+  command -v "$1" >/dev/null 2>&1 || die "Missing required command: $1"
+}
+
+cleanup() {
+  rm -f -- "${PROBE_FILE:-}" "${SIGNATURE_FILE:-}"
+  if [ -n "${PROBE_DIR:-}" ]; then
+    rmdir "${PROBE_DIR}" 2>/dev/null || true
+  fi
+}
+
+require_command git
+
+SIGNING_KEY="$(git config --get user.signingkey || true)"
+[ -n "${SIGNING_KEY}" ] || die "Git user.signingkey is not configured"
+[ "${#SIGNING_KEY}" -eq 40 ] || die "Git user.signingkey must be a full 40-character fingerprint"
+case "${SIGNING_KEY}" in
+  *[!0-9A-Fa-f]*)
+    die "Git user.signingkey must contain only hexadecimal characters"
+    ;;
+esac
+
+GPG_PROGRAM="$(git config --get gpg.program || true)"
+[ -n "${GPG_PROGRAM}" ] || die "Git gpg.program is not configured; install GPG and run chezmoi apply"
+[ -x "${GPG_PROGRAM}" ] || die "Configured GPG program is not executable: ${GPG_PROGRAM}"
+
+if ! "${GPG_PROGRAM}" --batch --list-secret-keys "${SIGNING_KEY}" >/dev/null 2>&1; then
+  die "Secret signing key not found: ${SIGNING_KEY}"
+fi
+
+if ! "${GPG_PROGRAM}" --batch --with-colons --list-keys "${SIGNING_KEY}" |
+  awk -F: '$1 == "pub" && $2 == "u" { trusted = 1 } END { exit trusted ? 0 : 1 }'; then
+  die "The signing key does not have ultimate owner trust"
+fi
+
+PROBE_DIR="$(mktemp -d)"
+PROBE_FILE="${PROBE_DIR}/message"
+SIGNATURE_FILE="${PROBE_DIR}/message.asc"
+trap cleanup EXIT
+
+printf 'Git signing preflight\n' > "${PROBE_FILE}"
+if ! "${GPG_PROGRAM}" \
+  --local-user "${SIGNING_KEY}" \
+  --armor \
+  --detach-sign \
+  --output "${SIGNATURE_FILE}" \
+  "${PROBE_FILE}"; then
+  die "Signing probe failed; check the GPG agent and pinentry"
+fi
+
+if ! "${GPG_PROGRAM}" --verify "${SIGNATURE_FILE}" "${PROBE_FILE}" >/dev/null 2>&1; then
+  die "GPG could not verify the signing probe"
+fi
+
+LOCAL_CONFIG="${HOME}/.config/git/config.local"
+printf '[%s] Signing preflight passed for %s\n' "${SCRIPT_NAME}" "${SIGNING_KEY}"
+printf '[%s] Enable commit signing with:\n' "${SCRIPT_NAME}"
+printf 'git config --file %q commit.gpgsign true\n' "${LOCAL_CONFIG}"
