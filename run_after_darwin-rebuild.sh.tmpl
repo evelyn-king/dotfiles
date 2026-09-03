@@ -13,6 +13,18 @@ flake="{{ .chezmoi.sourceDir }}/nix"
 
 command -v darwin-rebuild >/dev/null 2>&1 || exit 0
 
+if [ ! -r /run/current-system/activate ]; then
+  cat >&2 <<EOF
+
+  nix-darwin: no active generation exists yet.
+  Create the first generation with:
+
+    sudo darwin-rebuild switch --flake $flake#macbook
+
+EOF
+  exit 0
+fi
+
 # Compare the independently linked build outputs plus the activation script.
 # Deliberately do not compare `system.outPath`: it embeds
 # system.configurationRevision, the git revision of this whole repo, so every
@@ -25,10 +37,9 @@ if ! declared=$(nix eval --raw "$flake#darwinConfigurations.macbook" \
     cfg.system.build.fonts.outPath + " " +
     cfg.system.build.launchd.outPath + " " +
     cfg.system.build.patches.outPath + " " +
-    builtins.hashString "sha256" cfg.system.activationScripts.script.text' \
-  2>/dev/null); then
-  echo "nix-darwin: cannot evaluate $flake; skipping the drift check." >&2
-  exit 0
+    builtins.hashString "sha256" cfg.system.activationScripts.script.text'); then
+  echo "nix-darwin: failed to evaluate $flake; drift is unknown." >&2
+  exit 1
 fi
 
 read -r want_sw want_etc want_apps want_fonts want_launchd want_patches want_activate <<<"$declared"
