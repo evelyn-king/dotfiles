@@ -1,6 +1,15 @@
 # vim mode
 set editing-mode vi
 
+# Esc is ambiguous with the arrow key sequences bound below, so readline waits
+# this long to tell the two apart. The 500ms default is a visible lag on every
+# Esc out of insert mode.
+set keyseq-timeout 25
+
+# vi mode is invisible otherwise. starship prints the mode for zsh, which never
+# reads this file; bash has no equivalent, so let readline print (ins)/(cmd).
+set show-mode-in-prompt on
+
 set meta-flag on
 set input-meta on
 set output-meta on
