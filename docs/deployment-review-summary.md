@@ -26,22 +26,22 @@ boundaries.
 `P0` means the issue must be resolved before another live apply or system
 activation. It does not replace the severity recorded in the source reports.
 
-| Priority | Consolidated finding | Required resolution | Review IDs |
-| --- | --- | --- | --- |
-| P0 | `.chezmoiremove` can recursively delete unrelated or newly recreated user data. | Remove expired entries. Replace necessary migrations with exact content or provenance checks. | A1-001, A7-001, A3-012 |
-| P0 | The macOS flake hardcodes user `evelyn`, which does not match the owner's account. | Make the username host-specific or an explicit flake input. | A2-001, A4M-003 |
-| P0 | `terraform` is unfree, but the flake has no license exception, so the configuration cannot evaluate. | Remove Terraform or add a narrow `allowUnfreePredicate`. | A2-002, A4M-001 |
-| P0 | Homebrew activation uses `--force-cleanup`, which can remove every undeclared formula, cask, and tap. | Default to `cleanup = "check"` or `"none"` until full Homebrew ownership is an explicit policy. | A2-004, A4M-004 |
-| P1 | Neither platform has a complete cold-start procedure. | Document installation of chezmoi, Nix, Homebrew, and Omarchy prerequisites, activation order, login or reboot, repeated applies, and final verification. | A1-002, A1-005, A2-006, A3-011, A4M-002 |
-| P1 | The nix-darwin drift hook hides evaluation errors and fails before the first generation exists. | Handle the no-generation state, preserve evaluation errors, and distinguish failure from convergence. | A1-003, A2-003 |
-| P1 | Existing macOS applications collide with Homebrew casks instead of being adopted. | Add a documented or scripted cask-adoption preflight before activation. | A2-005 |
-| P1 | The Omarchy package hook cannot complete reliably. Stock `tldr` conflicts with `tealdeer`; optional AUR failures stop mise; legacy or partial hosts may lack the `omarchy` dispatcher. | Resolve `tldr` ownership, isolate optional packages, and guard the required CLI. | A1-004, A3-006, A4-001 |
-| P1 | The documented Jupyter workflow fails on first use and can report success for a dead server. Custom tokens appear in process arguments and permissive state files. | Create state directories first, provision environments, verify startup and port readiness, use modes 0700 and 0600, and keep tokens out of process arguments. | A6-001, A6-002, A6-003, A7-005 |
-| P1 | Mandatory Git signing makes fresh-host commits fail, while the advertised agent Git protections have simple bypasses. | Add signing preflight and restoration instructions. Strengthen and test the command policy or document it as advisory. | A7-002, A7-003 |
-| P1 | Interrupted Doom installation cannot recover. | Clone into a temporary sibling, validate it, then rename it atomically. Diagnose invalid checkouts separately from dirty ones. | A6-004 |
-| P1 | Omarchy installs Tailscale, Dropbox, and Ollama packages without making the services usable. It installs `ollama-cuda` on non-NVIDIA machines. | Add a post-apply readiness checklist and hardware-aware Ollama ownership. | A3-004, A7-004 |
-| P1 | Linux remote commands miss most of the managed environment while bash remains the login shell. | Document and verify switching the login shell to zsh, or provide another SSH environment mechanism and narrow the startup claims. | A5-001 |
-| P1 | Managed terminal key behavior is inconsistent. macOS zsh switches to Emacs mode, and Omarchy Ghostty loses Shift+Enter encodings. | Set zsh vi mode explicitly and restore the two CSI-u bindings. | A3-001, A5M-002, A5-009, A5-010 |
+| Priority | Status | Consolidated finding | Required resolution | Review IDs |
+| --- | --- | --- | --- | --- |
+| P0 | Open | `.chezmoiremove` can recursively delete unrelated or newly recreated user data. | Remove expired entries. Replace necessary migrations with exact content or provenance checks. | A1-001, A7-001, A3-012 |
+| P0 | Resolved | The macOS flake hardcoded user `evelyn`, which did not match the owner's account. | `system.primaryUser` is now set for the `macbook` host as `evelynking`. | A2-001, A4M-003 |
+| P0 | Open | `terraform` is unfree, but the flake has no license exception, so the configuration cannot evaluate. | Remove Terraform or add a narrow `allowUnfreePredicate`. | A2-002, A4M-001 |
+| P0 | Open | Homebrew activation uses `--force-cleanup`, which can remove every undeclared formula, cask, and tap. | Default to `cleanup = "check"` or `"none"` until full Homebrew ownership is an explicit policy. | A2-004, A4M-004 |
+| P1 | Open | Neither platform has a complete cold-start procedure. | Document installation of chezmoi, Nix, Homebrew, and Omarchy prerequisites, activation order, login or reboot, repeated applies, and final verification. | A1-002, A1-005, A2-006, A3-011, A4M-002 |
+| P1 | Open | The nix-darwin drift hook hides evaluation errors and fails before the first generation exists. | Handle the no-generation state, preserve evaluation errors, and distinguish failure from convergence. | A1-003, A2-003 |
+| P1 | Open | Existing macOS applications collide with Homebrew casks instead of being adopted. | Add a documented or scripted cask-adoption preflight before activation. | A2-005 |
+| P1 | Open | The Omarchy package hook cannot complete reliably. Stock `tldr` conflicts with `tealdeer`; optional AUR failures stop mise; legacy or partial hosts may lack the `omarchy` dispatcher. | Resolve `tldr` ownership, isolate optional packages, and guard the required CLI. | A1-004, A3-006, A4-001 |
+| P1 | Open | The documented Jupyter workflow fails on first use and can report success for a dead server. Custom tokens appear in process arguments and permissive state files. | Create state directories first, provision environments, verify startup and port readiness, use modes 0700 and 0600, and keep tokens out of process arguments. | A6-001, A6-002, A6-003, A7-005 |
+| P1 | Open | Mandatory Git signing makes fresh-host commits fail, while the advertised agent Git protections have simple bypasses. | Add signing preflight and restoration instructions. Strengthen and test the command policy or document it as advisory. | A7-002, A7-003 |
+| P1 | Open | Interrupted Doom installation cannot recover. | Clone into a temporary sibling, validate it, then rename it atomically. Diagnose invalid checkouts separately from dirty ones. | A6-004 |
+| P1 | Open | Omarchy installs Tailscale, Dropbox, and Ollama packages without making the services usable. It installs `ollama-cuda` on non-NVIDIA machines. | Add a post-apply readiness checklist and hardware-aware Ollama ownership. | A3-004, A7-004 |
+| P1 | Open | Linux remote commands miss most of the managed environment while bash remains the login shell. | Document and verify switching the login shell to zsh, or provide another SSH environment mechanism and narrow the startup claims. | A5-001 |
+| P1 | Open | Managed terminal key behavior is inconsistent. macOS zsh switches to Emacs mode, and Omarchy Ghostty loses Shift+Enter encodings. | Set zsh vi mode explicitly and restore the two CSI-u bindings. | A3-001, A5M-002, A5-009, A5-010 |
 
 ## P2 stabilization work
 

@@ -12,18 +12,11 @@
 
   outputs = inputs@{ self, nix-darwin, ... }:
   let
-    # The macOS short account name that owns user-scoped nix-darwin options.
-    # It must match `id -un` on the machine or activation fails. This file is
-    # repo content rather than a chezmoi target, so it is not templated.
-    username = "evelyn";
-
     configuration = { pkgs, ... }: {
       # Determinate Nix manages the daemon and /etc/nix/nix.conf itself.
       determinateNix.enable = true;
 
       nixpkgs.hostPlatform = "aarch64-darwin";
-
-      system.primaryUser = username;
 
       environment.systemPackages = with pkgs; [
         # --- shell and terminal ---
@@ -166,6 +159,8 @@
         inputs.determinate.darwinModules.default
         configuration
         inputs.mac-app-util.darwinModules.default
+        # Host-specific account for user-scoped nix-darwin options.
+        { system.primaryUser = "evelynking"; }
       ];
     };
   };
