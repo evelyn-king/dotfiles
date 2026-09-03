@@ -10,6 +10,13 @@ Dotfiles managed directly with `chezmoi`.
 - `.chezmoitemplates/` keeps bodies shared between several rendered files
 - `docs/` and the top-level Markdown describe usage and repository conventions
 
+## Cold start
+
+Use [docs/cold-start.md](docs/cold-start.md) for a new Apple Silicon Mac or
+Omarchy host. It starts with platform prerequisites and source initialization,
+then covers activation, repeated applies, login or reboot, manual service setup,
+and final verification.
+
 ## Apply
 
 ```bash
