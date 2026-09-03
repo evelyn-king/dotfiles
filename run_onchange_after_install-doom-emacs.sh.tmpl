@@ -26,20 +26,69 @@ fi
 repo={{ .doom.repo | quote }}
 rev={{ .doom.rev | quote }}
 dest="$HOME/.config/emacs"
+stage="$HOME/.config/emacs.chezmoi-install"
+stage_marker="$stage/.owner"
+stage_owner="chezmoi Doom checkout staging directory for $dest"
+
+remove_stage() {
+  if [ -f "$stage_marker" ] && [ "$(<"$stage_marker")" = "$stage_owner" ]; then
+    rm -rf -- "$stage"
+  fi
+}
+
+if [ -e "$stage" ]; then
+  if [ ! -f "$stage_marker" ] || [ "$(<"$stage_marker")" != "$stage_owner" ]; then
+    echo "doom: $stage exists but is not owned by this installer." >&2
+    exit 1
+  fi
+  echo "doom: removing an interrupted staged checkout"
+  remove_stage
+fi
 
 if [ ! -d "$dest/.git" ]; then
   if [ -e "$dest" ]; then
     echo "doom: $dest exists but is not a git checkout." >&2
     exit 1
   fi
+
+  mkdir -m 700 "$stage"
+  printf '%s\n' "$stage_owner" >"$stage_marker"
+  trap remove_stage EXIT
+  trap 'exit 1' HUP INT TERM
+
   echo "doom: cloning $repo"
-  git clone --filter=blob:none "$repo" "$dest"
+  git clone --filter=blob:none "$repo" "$stage/checkout"
+  git -C "$stage/checkout" fetch --quiet origin "$rev" 2>/dev/null ||
+    git -C "$stage/checkout" fetch --quiet origin
+  git -C "$stage/checkout" checkout --quiet --detach "$rev"
+
+  if ! git -C "$stage/checkout" rev-parse --verify HEAD >/dev/null 2>&1 ||
+    [ "$(git -C "$stage/checkout" remote get-url origin 2>/dev/null || true)" != "$repo" ] ||
+    [ ! -x "$stage/checkout/bin/doom" ]; then
+    echo "doom: staged checkout failed validation; not installing it." >&2
+    exit 1
+  fi
+
+  mv "$stage/checkout" "$dest"
+  rm "$stage_marker"
+  rmdir "$stage"
+  trap - EXIT HUP INT TERM
 fi
 
-if [ "$(git -C "$dest" rev-parse HEAD)" != "$rev" ]; then
+if ! current_rev=$(git -C "$dest" rev-parse --verify HEAD 2>/dev/null); then
+  echo "doom: $dest has an invalid Git checkout; move it aside after checking for user data, then apply again." >&2
+  exit 1
+fi
+
+if [ "$(git -C "$dest" remote get-url origin 2>/dev/null || true)" != "$repo" ]; then
+  echo "doom: $dest has an unexpected origin; not modifying it." >&2
+  exit 1
+fi
+
+if [ "$current_rev" != "$rev" ]; then
   # Moving the checkout must not discard local work. Returning failure keeps
   # this hook pending so a later apply retries after the checkout is clean.
-  if ! git -C "$dest" diff --quiet HEAD 2>/dev/null; then
+  if [ -n "$(git -C "$dest" status --porcelain 2>/dev/null)" ]; then
     echo "doom: $dest has uncommitted changes; not moving it to $rev." >&2
     exit 1
   fi
