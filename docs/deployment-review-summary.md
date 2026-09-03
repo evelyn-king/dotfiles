@@ -126,9 +126,13 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## P3 maintenance work
 
-Fix the narrow correctness and documentation issues after deployment is safe:
+### Resolved
 
-- quote source and environment names containing spaces;
+- `nix-switch` now quotes a source path containing spaces, and
+  `create_direnv_micromamba` quotes the generated environment name.
+
+### Open
+
 - make `MANPATH` idempotent and handle trailing slashes in `TMPDIR`;
 - remove or reposition the ineffective bash-completion setting;
 - remove the deprecated AeroSpace option;

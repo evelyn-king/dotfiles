@@ -104,7 +104,7 @@ command -v mise >/dev/null 2>&1 && alias mup='mise lock --global --bump && mise 
 # command it tells you to run. The flake path is fixed at apply time from the
 # source tree the alias was rendered from, so it keeps pointing at this repo
 # from any directory.
-command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebuild switch --flake {{ .chezmoi.sourceDir }}/nix#macbook'
+command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebuild switch --flake {{ printf "%s/nix#macbook" .chezmoi.sourceDir | quote }}'
 {{- else if eq .chezmoi.os "linux" }}
 # Linux commits its global lock, and the source tree holds the only copy: it is
 # repo content, never applied to $HOME. Refresh it for the target platform, then
@@ -171,8 +171,9 @@ fi
 
 create_direnv_micromamba() {
   env_name=${1:-${PWD##*/}}
-  echo "layout micromamba $env_name" >.envrc
-  unset env_name
+  env_name_quoted=$(printf '%s' "$env_name" | sed "s/'/'\\\\''/g")
+  printf "layout micromamba '%s'\n" "$env_name_quoted" >.envrc
+  unset env_name env_name_quoted
   direnv allow .
 }
 
