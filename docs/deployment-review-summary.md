@@ -38,7 +38,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Open | Interrupted Doom installation cannot recover. | Clone into a temporary sibling, validate it, then rename it atomically. Diagnose invalid checkouts separately from dirty ones. | A6-004 |
 | P1 | Open | Omarchy installs Tailscale, Dropbox, and Ollama packages without making the services usable. It installs `ollama-cuda` on non-NVIDIA machines. | Add a post-apply readiness checklist and hardware-aware Ollama ownership. | A3-004, A7-004 |
 | P1 | Open | Linux remote commands miss most of the managed environment while bash remains the login shell. | Document and verify switching the login shell to zsh, or provide another SSH environment mechanism and narrow the startup claims. | A5-001 |
-| P1 | Open | Managed terminal key behavior is inconsistent. macOS zsh switches to Emacs mode, and Omarchy Ghostty loses Shift+Enter encodings. | Set zsh vi mode explicitly and restore the two CSI-u bindings. | A3-001, A5M-002, A5-009, A5-010 |
+| P1 | Resolved | Managed terminal key behavior was inconsistent. macOS zsh switched to Emacs mode, and Omarchy Ghostty lost Shift+Enter encodings. | zsh now selects vi mode with a short escape timeout. Ghostty carries both CSI-u Shift+Enter bindings. | A3-001, A5M-002, A5-009, A5-010 |
 
 ## `.chezmoiremove` necessity audit
 

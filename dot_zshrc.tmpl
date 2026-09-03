@@ -8,6 +8,10 @@ typeset -U path fpath
 
 {{ template "shell-path.sh" . }}
 
+# Match the vi editing mode and short escape timeout in ~/.inputrc.
+bindkey -v
+KEYTIMEOUT=2
+
 # --- completions ------------------------------------------------------------
 
 # Completions installed by a package manager into a system prefix arrive on
