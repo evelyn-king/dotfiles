@@ -22,6 +22,11 @@
 .local/bin/opencode
 .local/bin/pi
 
+# atuin ships bash-preexec inside `atuin init bash` and loads it when no backend
+# is present, so this repo stopped vendoring a copy. ~/.bashrc no longer sources
+# ~/.bash-preexec.sh; delete the file so nothing else picks up a stale 0.6.0.
+.bash-preexec.sh
+
 # --- migration cleanup ------------------------------------------------------
 
 # AeroSpace and git config both moved to their XDG paths.

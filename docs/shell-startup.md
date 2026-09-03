@@ -3,9 +3,8 @@
 Startup files are flat. The shared bodies live in `.chezmoitemplates/` and
 chezmoi inlines them at apply time, so nothing under `.chezmoitemplates/` is
 sourced at runtime. The rendered files still read a handful of things at
-runtime, each covered below: `~/.bashrc` from `~/.bash_profile`, the vendored
-`~/.bash-preexec.sh`, Omarchy's own files, and the per-machine hook in
-`~/.config/shell`.
+runtime, each covered below: `~/.bashrc` from `~/.bash_profile`, Omarchy's own
+files, and the per-machine hook in `~/.config/shell`.
 
 | Template | Contents |
 | --- | --- |
@@ -17,7 +16,7 @@ runtime, each covered below: `~/.bashrc` from `~/.bash_profile`, the vendored
 | --- | --- |
 | `~/.zshenv` | `shell-env.sh` |
 | `~/.zshrc` | `shell-path.sh`, zsh completions, `shell-interactive.sh` |
-| `~/.bashrc` | `shell-env.sh`, `shell-path.sh`, bash history/completions/preexec, Omarchy completions, `shell-interactive.sh` |
+| `~/.bashrc` | `shell-env.sh`, `shell-path.sh`, bash history/completions, Omarchy completions, `shell-interactive.sh` |
 | `~/.bash_profile` | sources `~/.bashrc` |
 | `~/.profile` | `shell-env.sh` |
 | `~/.zprofile` | nothing; a comment explaining why |
@@ -55,6 +54,11 @@ reaches both copies still ends up with the same order.
   `shell-interactive.sh`. The tool hooks in there register completions, so
   `compinit` and `bashcompinit` have to have run already.
 - The prompt block (starship, zoxide, atuin) stays last.
+- bash gets its preexec/precmd hooks from atuin. `atuin init bash` carries its
+  own bash-preexec and loads it only when no backend is present, so a copy
+  sourced earlier in `~/.bashrc` takes its place and pins that older release.
+  On bash 5.3 the current bash-preexec hooks preexec through `PS0` rather than
+  the DEBUG trap; the 0.6.0 this repo used to vendor cannot.
 
 ## Omarchy
 

@@ -76,9 +76,10 @@ set +h
 
 # --- preexec ----------------------------------------------------------------
 
-# bash has no preexec/precmd. atuin's bash integration needs them, so this must
-# be sourced before shell-interactive.sh runs `atuin init bash`. zsh needs no
-# equivalent. The vendored copy is ~/.bash-preexec.sh, tracked in this repo.
-[ -f "$HOME/.bash-preexec.sh" ] && . "$HOME/.bash-preexec.sh"
+# bash has no preexec/precmd, and atuin's bash integration needs them. Nothing
+# is sourced here on purpose. `atuin init bash` carries its own bash-preexec and
+# loads it when no backend is already present. Source a vendored copy ahead of
+# it and that copy sets bash_preexec_imported, atuin skips its own, and bash
+# stays on whatever release this repo checked in. zsh needs no equivalent.
 
 {{ template "shell-interactive.sh" . }}
