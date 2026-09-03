@@ -39,11 +39,13 @@ export LANG
 # processes disagree about the server socket. Preserve deliberate custom paths,
 # but replace generic or missing values with the native per-user directory.
 {{ if eq .chezmoi.os "darwin" }}
-if [ -z "${TMPDIR:-}" ] || [ "${TMPDIR:-}" = /tmp ] || [ "${TMPDIR:-}" = /private/tmp ]; then
+case "${TMPDIR:-}" in
+"" | /tmp | /tmp/ | /private/tmp | /private/tmp/)
   __darwin_tmpdir=$(getconf DARWIN_USER_TEMP_DIR 2>/dev/null)
   TMPDIR=${__darwin_tmpdir:-/tmp}
   unset __darwin_tmpdir
-fi
+  ;;
+esac
 export TMPDIR
 {{- else }}
 export TMPDIR="${TMPDIR:-/tmp}"

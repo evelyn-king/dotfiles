@@ -130,10 +130,11 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 - `nix-switch` now quotes a source path containing spaces, and
   `create_direnv_micromamba` quotes the generated environment name.
+- The shared path setup adds its man directory once, and the macOS temp-directory
+  guard handles `/tmp` and `/private/tmp` with or without a trailing slash.
 
 ### Open
 
-- make `MANPATH` idempotent and handle trailing slashes in `TMPDIR`;
 - remove or reposition the ineffective bash-completion setting;
 - remove the deprecated AeroSpace option;
 - exclude the macOS drift hook on Linux;

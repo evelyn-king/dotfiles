@@ -89,4 +89,8 @@ export PATH
 unset __dir __path_new __path_rest
 
 # path_helper manages MANPATH too, so it belongs here for the same reason.
-export MANPATH="$HOME/.local/share/man:${MANPATH:-}"
+case ":${MANPATH:-}:" in
+*":$HOME/.local/share/man:"*) ;;
+*) MANPATH="$HOME/.local/share/man:${MANPATH:-}" ;;
+esac
+export MANPATH
