@@ -132,10 +132,11 @@ installer, so the new policy preserves it; mise already takes precedence on
   `create_direnv_micromamba` quotes the generated environment name.
 - The shared path setup adds its man directory once, and the macOS temp-directory
   guard handles `/tmp` and `/private/tmp` with or without a trailing slash.
+- Bash completion now uses its default XDG data directory instead of exporting
+  the same path after initialization.
 
 ### Open
 
-- remove or reposition the ineffective bash-completion setting;
 - remove the deprecated AeroSpace option;
 - exclude the macOS drift hook on Linux;
 - document cold-cache external downloads and add archive checksums if they are

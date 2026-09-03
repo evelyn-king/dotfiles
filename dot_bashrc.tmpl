@@ -55,8 +55,6 @@ if ! shopt -oq posix; then
   unset __bc
 fi
 
-export BASH_COMPLETION_USER_DIR="$XDG_DATA_HOME/bash-completion"
-
 # The `omarchy` dispatcher ships its own completion. Omarchy loads it from
 # $OMARCHY_PATH/default/bash/rc, which this file replaces. Sourcing that whole
 # chain instead would re-run `mise activate`, `starship init` and `zoxide init`
