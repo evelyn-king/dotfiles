@@ -159,7 +159,7 @@ Implementation depends on owner decisions in these areas:
 - whether chezmoi or Omarchy owns runtime monitor scaling;
 - whether display-specific Hyprland settings apply globally;
 - whether Neovim and micromamba deployments must be reproducible from committed
-  locks.
+  locks;
 - whether commit-pinned Vim plugin archives also require committed content
   checksums.
 
