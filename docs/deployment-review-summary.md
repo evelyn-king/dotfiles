@@ -136,10 +136,11 @@ installer, so the new policy preserves it; mise already takes precedence on
   the same path after initialization.
 - The AeroSpace config no longer carries the deprecated `after-login-command`
   option.
+- Non-macOS hosts now exclude the nix-darwin drift hook from the managed script
+  set.
 
 ### Open
 
-- exclude the macOS drift hook on Linux;
 - document cold-cache external downloads and add archive checksums if they are
   part of the trust policy;
 - correct the claims about cron, launchd, Git hooks, `path_helper`, and Omarchy
