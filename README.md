@@ -158,6 +158,17 @@ environment. Override any of them per machine in `~/.config/shell/extras.sh`.
 `conda run -n jupyter` by default, so the notebook server starts inside that
 environment without depending on an interactive shell activation step.
 
+Create the managed environments before first use. This remains an explicit
+step until the environment installer can replace an existing environment
+without deleting the working copy first:
+
+```bash
+install-micromamba-env \
+  ~/local-codex/environments/jupyter_environment.yml \
+  ~/local-codex/environments/analysis_environment.yml
+jupyter kernelspec list
+```
+
 Use `jupyter-remote-lab` on the remote host to start a headless lab instance:
 
 ```bash
@@ -175,3 +186,9 @@ The launcher writes its last runtime metadata to
 `${JUPYTER_REMOTE_ENV_FILE:-~/.local/state/jupyter-remote/current.env}`. Run
 `jupyter_remote_load_env` in a shell if you want that runtime state loaded back
 into your current environment after launching with overrides like `--port`.
+
+For a custom token, put the token in a mode-0600 file and pass its path with
+`--token-file`. The launcher copies it into its mode-0700 state directory and
+passes only the file path to Jupyter. After stopping the server, remove the
+token file named by `JUPYTER_REMOTE_TOKEN_FILE` and any old logs that contain
+tokenized startup URLs.

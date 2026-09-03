@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+umask 077
 
 SCRIPT_NAME="jupyter-remote-lab"
 PORT="${JUPYTER_PORT:-8888}"
@@ -10,7 +11,8 @@ NOTEBOOK_DIR="${JUPYTER_NOTEBOOK_DIR:-$PWD}"
 STATE_DIR="${JUPYTER_STATE_DIR:-${XDG_STATE_HOME:-${HOME}/.local/state}/jupyter-remote}"
 DETACH=0
 TOKEN_MODE="default"
-TOKEN_VALUE=""
+TOKEN_SOURCE_FILE=""
+STARTUP_TIMEOUT="${JUPYTER_STARTUP_TIMEOUT:-30}"
 EXTRA_ARGS=()
 
 usage() {
@@ -26,7 +28,7 @@ Options:
   --bind-host HOST   Bind address. Defaults to \$JUPYTER_BIND_HOST or 127.0.0.1.
   --dir PATH         Notebook root directory. Defaults to \$JUPYTER_NOTEBOOK_DIR or the current directory.
   --detach           Start JupyterLab in the background with a log and pid file.
-  --token TOKEN      Set an explicit Jupyter token.
+  --token-file PATH  Read an explicit Jupyter token from a file.
   --no-token         Disable token auth. Only do this if localhost binding is sufficient for your threat model.
   -h, --help         Show this help message.
 
@@ -36,6 +38,7 @@ Environment:
   JUPYTER_NOTEBOOK_DIR    Default notebook directory.
   JUPYTER_PORT            Default remote port.
   JUPYTER_REMOTE_ENV_FILE Runtime env file written for later sourcing.
+  JUPYTER_STARTUP_TIMEOUT Seconds to wait for a detached server. Defaults to 30.
   JUPYTER_STATE_DIR       State directory for runtime metadata.
 
 Examples:
@@ -107,40 +110,121 @@ resolve_env_runner() {
   die "Missing required command: micromamba or conda"
 }
 
+prepare_state() {
+  local runtime_parent
+
+  LOG_FILE="${STATE_DIR}/jupyter-${PORT}.log"
+  PID_FILE="${STATE_DIR}/jupyter-${PORT}.pid"
+  TOKEN_FILE="${STATE_DIR}/jupyter-${PORT}.token"
+  RUNTIME_ENV_FILE="${JUPYTER_REMOTE_ENV_FILE:-${STATE_DIR}/current.env}"
+  runtime_parent="$(dirname "${RUNTIME_ENV_FILE}")"
+
+  mkdir -p "${STATE_DIR}" "${runtime_parent}"
+  chmod 700 "${STATE_DIR}"
+}
+
+configure_token() {
+  case "${TOKEN_MODE}" in
+    custom)
+      [ -f "${TOKEN_SOURCE_FILE}" ] || die "Token file not found: ${TOKEN_SOURCE_FILE}"
+      [ -r "${TOKEN_SOURCE_FILE}" ] || die "Token file is not readable: ${TOKEN_SOURCE_FILE}"
+      if [ "${TOKEN_SOURCE_FILE}" != "${TOKEN_FILE}" ]; then
+        install -m 600 "${TOKEN_SOURCE_FILE}" "${TOKEN_FILE}"
+      else
+        chmod 600 "${TOKEN_FILE}"
+      fi
+      unset JUPYTER_TOKEN
+      export JUPYTER_TOKEN_FILE="${TOKEN_FILE}"
+      ;;
+    none)
+      rm -f "${TOKEN_FILE}"
+      unset JUPYTER_TOKEN_FILE
+      export JUPYTER_TOKEN=""
+      ;;
+    default)
+      ;;
+  esac
+}
+
+port_is_ready() {
+  local probe_host="${BIND_HOST}"
+
+  case "${probe_host}" in
+    0.0.0.0)
+      probe_host="127.0.0.1"
+      ;;
+    ::)
+      probe_host="::1"
+      ;;
+  esac
+
+  (exec 3<>"/dev/tcp/${probe_host}/${PORT}") >/dev/null 2>&1
+}
+
+show_startup_log() {
+  if [ -s "${LOG_FILE}" ]; then
+    echo "${SCRIPT_NAME}: last startup log lines:" >&2
+    tail -n 20 "${LOG_FILE}" >&2
+  fi
+}
+
+wait_for_detached_start() {
+  local child_pid="$1" deadline=$((SECONDS + STARTUP_TIMEOUT)) child_status
+
+  while [ "${SECONDS}" -lt "${deadline}" ]; do
+    if ! kill -0 "${child_pid}" 2>/dev/null; then
+      child_status=0
+      wait "${child_pid}" || child_status=$?
+      echo "${SCRIPT_NAME}: JupyterLab exited during startup with status ${child_status}." >&2
+      show_startup_log
+      return 1
+    fi
+    if port_is_ready; then
+      return 0
+    fi
+    sleep 0.25
+  done
+
+  echo "${SCRIPT_NAME}: JupyterLab did not open ${BIND_HOST}:${PORT} within ${STARTUP_TIMEOUT} seconds." >&2
+  kill "${child_pid}" 2>/dev/null || true
+  wait "${child_pid}" 2>/dev/null || true
+  show_startup_log
+  return 1
+}
+
 write_runtime_env() {
-  local remote_host runtime_env_file log_file pid_file remote_url remote_pid="" tmp_env_file
+  local remote_host remote_url remote_pid="" tmp_env_file
 
-  mkdir -p "${STATE_DIR}"
-  runtime_env_file="${JUPYTER_REMOTE_ENV_FILE:-${STATE_DIR}/current.env}"
-  mkdir -p "$(dirname "${runtime_env_file}")"
-  tmp_env_file="${runtime_env_file}.tmp"
-
-  log_file="${STATE_DIR}/jupyter-${PORT}.log"
-  pid_file="${STATE_DIR}/jupyter-${PORT}.pid"
+  tmp_env_file="${RUNTIME_ENV_FILE}.tmp"
   remote_host="$(hostname -f 2>/dev/null || hostname)"
   remote_url="http://${BIND_HOST}:${PORT}/lab"
 
-  if [ "${DETACH}" = "1" ] && [ -f "${pid_file}" ]; then
-    remote_pid="$(tr -d '[:space:]' < "${pid_file}")"
+  if [ "${DETACH}" = "1" ] && [ -f "${PID_FILE}" ]; then
+    remote_pid="$(tr -d '[:space:]' < "${PID_FILE}")"
   fi
+
+  install -m 600 /dev/null "${tmp_env_file}"
 
   {
     printf 'export JUPYTER_BIND_HOST=%s\n' "$(shell_quote "${BIND_HOST}")"
     printf 'export JUPYTER_ENV_NAME=%s\n' "$(shell_quote "${ENV_NAME}")"
     printf 'export JUPYTER_NOTEBOOK_DIR=%s\n' "$(shell_quote "${NOTEBOOK_DIR}")"
     printf 'export JUPYTER_PORT=%s\n' "$(shell_quote "${PORT}")"
-    printf 'export JUPYTER_REMOTE_ENV_FILE=%s\n' "$(shell_quote "${runtime_env_file}")"
+    printf 'export JUPYTER_REMOTE_ENV_FILE=%s\n' "$(shell_quote "${RUNTIME_ENV_FILE}")"
     printf 'export JUPYTER_REMOTE_HOST=%s\n' "$(shell_quote "${remote_host}")"
-    printf 'export JUPYTER_REMOTE_LOG_FILE=%s\n' "$(shell_quote "${log_file}")"
-    printf 'export JUPYTER_REMOTE_PID_FILE=%s\n' "$(shell_quote "${pid_file}")"
+    printf 'export JUPYTER_REMOTE_LOG_FILE=%s\n' "$(shell_quote "${LOG_FILE}")"
+    printf 'export JUPYTER_REMOTE_PID_FILE=%s\n' "$(shell_quote "${PID_FILE}")"
     printf 'export JUPYTER_REMOTE_URL=%s\n' "$(shell_quote "${remote_url}")"
     printf 'export JUPYTER_STATE_DIR=%s\n' "$(shell_quote "${STATE_DIR}")"
+    if [ "${TOKEN_MODE}" = "custom" ]; then
+      printf 'export JUPYTER_REMOTE_TOKEN_FILE=%s\n' "$(shell_quote "${TOKEN_FILE}")"
+    fi
     if [ -n "${remote_pid}" ]; then
       printf 'export JUPYTER_REMOTE_PID=%s\n' "$(shell_quote "${remote_pid}")"
     fi
   } > "${tmp_env_file}"
 
-  mv "${tmp_env_file}" "${runtime_env_file}"
+  mv "${tmp_env_file}" "${RUNTIME_ENV_FILE}"
 }
 
 while [ "$#" -gt 0 ]; do
@@ -185,16 +269,19 @@ while [ "$#" -gt 0 ]; do
       DETACH=1
       shift
       ;;
-    --token)
+    --token-file)
       require_value "$@"
       TOKEN_MODE="custom"
-      TOKEN_VALUE="$2"
+      TOKEN_SOURCE_FILE="$2"
       shift 2
       ;;
-    --token=*)
+    --token-file=*)
       TOKEN_MODE="custom"
-      TOKEN_VALUE="${1#*=}"
+      TOKEN_SOURCE_FILE="${1#*=}"
       shift
+      ;;
+    --token|--token=*)
+      die "--token exposes the token in process arguments; use --token-file instead"
       ;;
     --no-token)
       TOKEN_MODE="none"
@@ -216,6 +303,7 @@ while [ "$#" -gt 0 ]; do
 done
 
 validate_port "${PORT}" || die "Invalid port: ${PORT}"
+validate_port "${STARTUP_TIMEOUT}" || die "Invalid startup timeout: ${STARTUP_TIMEOUT}"
 [ -d "${NOTEBOOK_DIR}" ] || die "Notebook directory not found: ${NOTEBOOK_DIR}"
 NOTEBOOK_DIR="$(cd "${NOTEBOOK_DIR}" && pwd)"
 
@@ -226,6 +314,15 @@ export JUPYTER_PORT="${PORT}"
 export JUPYTER_STATE_DIR="${STATE_DIR}"
 
 resolve_env_runner
+if ! "${ENV_RUNNER[@]}" jupyter --version >/dev/null; then
+  die "Environment ${ENV_NAME} is missing or does not contain Jupyter"
+fi
+
+prepare_state
+if port_is_ready; then
+  die "Port ${PORT} is already accepting connections on ${BIND_HOST}"
+fi
+configure_token
 
 JUPYTER_CMD=(
   jupyter lab
@@ -236,29 +333,31 @@ JUPYTER_CMD=(
   --ServerApp.root_dir="${NOTEBOOK_DIR}"
 )
 
-case "${TOKEN_MODE}" in
-  none)
-    JUPYTER_CMD+=(--IdentityProvider.token=)
-    ;;
-  custom)
-    JUPYTER_CMD+=(--IdentityProvider.token="${TOKEN_VALUE}")
-    ;;
-esac
-
 if [ "${#EXTRA_ARGS[@]}" -gt 0 ]; then
   JUPYTER_CMD+=("${EXTRA_ARGS[@]}")
 fi
 
 if [ "${DETACH}" = "1" ]; then
-  nohup "${ENV_RUNNER[@]}" "${JUPYTER_CMD[@]}" > "${STATE_DIR}/jupyter-${PORT}.log" 2>&1 < /dev/null &
-  printf '%s\n' "$!" > "${STATE_DIR}/jupyter-${PORT}.pid"
+  install -m 600 /dev/null "${LOG_FILE}"
+  rm -f "${PID_FILE}"
+  nohup "${ENV_RUNNER[@]}" "${JUPYTER_CMD[@]}" >"${LOG_FILE}" 2>&1 </dev/null &
+  child_pid=$!
+  if ! wait_for_detached_start "${child_pid}"; then
+    rm -f "${PID_FILE}"
+    if [ "${TOKEN_MODE}" = "custom" ]; then
+      rm -f "${TOKEN_FILE}"
+    fi
+    exit 1
+  fi
+  printf '%s\n' "${child_pid}" >"${PID_FILE}"
+  chmod 600 "${PID_FILE}"
   write_runtime_env
 
   log "Started JupyterLab on ${BIND_HOST}:${PORT}"
   log "Environment: ${ENV_NAME}"
-  log "Runtime env file: ${JUPYTER_REMOTE_ENV_FILE:-${STATE_DIR}/current.env}"
-  log "Log file: ${STATE_DIR}/jupyter-${PORT}.log"
-  log "PID file: ${STATE_DIR}/jupyter-${PORT}.pid"
+  log "Runtime env file: ${RUNTIME_ENV_FILE}"
+  log "Log file: ${LOG_FILE}"
+  log "PID file: ${PID_FILE}"
   log "Tunnel from your laptop with: ssh -N -L ${PORT}:127.0.0.1:${PORT} <ssh-host>"
   if [ "${TOKEN_MODE}" = "default" ]; then
     log "Use the startup URL from the log file once Jupyter finishes booting."
@@ -270,7 +369,7 @@ write_runtime_env
 
 log "Starting JupyterLab on ${BIND_HOST}:${PORT}"
 log "Environment: ${ENV_NAME}"
-log "Runtime env file: ${JUPYTER_REMOTE_ENV_FILE:-${STATE_DIR}/current.env}"
+log "Runtime env file: ${RUNTIME_ENV_FILE}"
 log "Tunnel from your laptop with: ssh -N -L ${PORT}:127.0.0.1:${PORT} <ssh-host>"
 if [ "${TOKEN_MODE}" = "default" ]; then
   log "Jupyter will print its tokenized URL after startup."
