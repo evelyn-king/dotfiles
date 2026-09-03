@@ -36,6 +36,27 @@ formula, cask, and tap that is not declared in `nix/flake.nix`. Add a package
 to the flake before installing it with Homebrew if it must survive the next
 `darwin-rebuild switch`.
 
+## Adopt existing applications
+
+Before the first activation on an existing Mac, let Homebrew adopt applications
+that were installed by another method. Otherwise the cask installation stops
+when it finds the existing application in `/Applications`.
+
+The deployment review found these collisions on the `macbook` host:
+
+```bash
+brew install --cask --adopt \
+  bitwarden firefox ghostty iterm2 obsidian rancher raycast spotify \
+  visual-studio-code
+brew list --cask bitwarden firefox ghostty iterm2 obsidian rancher raycast \
+  spotify visual-studio-code
+```
+
+Run this after installing Homebrew and before the first activation. The command
+also installs any listed application that is not already present, which is
+consistent with the flake's declared cask ownership. Remove an unwanted cask
+from `nix/flake.nix` before activation rather than skipping its collision.
+
 `system.primaryUser` in the flake must match the macOS short account name
 (`id -un`) or activation fails.
 
