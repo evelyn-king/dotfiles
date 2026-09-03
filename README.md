@@ -108,8 +108,7 @@ Neovim pulls `gruvbox.nvim`, while Vim uses a pinned chezmoi external from
 `.chezmoidata/versions.yaml`.
 
 btop and atuin use the repo-managed theme files under each tool's `themes/`
-directory. `run_onchange_after_build-bat-cache.sh.tmpl` rebuilds bat's binary
-cache whenever its config changes.
+directory.
 
 tmux and starship deliberately stay on ANSI color names rather than hex, so
 they inherit whatever Ghostty is set to and never drift from it. Claude Code
