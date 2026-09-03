@@ -4,7 +4,7 @@ Startup files are flat. The shared bodies live in `.chezmoitemplates/` and
 chezmoi inlines them at apply time, so nothing under `.chezmoitemplates/` is
 sourced at runtime. The rendered files still read a handful of things at
 runtime, each covered below: `~/.bashrc` from `~/.bash_profile`, the vendored
-`~/.bash-preexec.sh`, Omarchy's own files, and the two per-machine hooks in
+`~/.bash-preexec.sh`, Omarchy's own files, and the per-machine hook in
 `~/.config/shell`.
 
 | Template | Contents |
