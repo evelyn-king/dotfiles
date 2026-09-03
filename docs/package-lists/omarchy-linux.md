@@ -77,16 +77,21 @@ adds the bar plugin. Finish the account login in the browser, then verify it:
 dropbox-cli status
 ```
 
-Ollama setup remains pending a hardware ownership decision. After selecting
-the CPU, NVIDIA, AMD, or Vulkan package and a model, enable the service and
-verify both parts:
+The shared manifest does not manage Ollama. Its CPU, NVIDIA, AMD, and Vulkan
+packages are per-machine choices, and most hosts do not need one. On a host
+that does, choose the package and model locally, then verify the service:
 
 ```bash
+ollama_package=ollama # or ollama-cuda, ollama-rocm, or ollama-vulkan
+omarchy pkg add "$ollama_package"
 sudo systemctl enable --now ollama
 ollama pull <chosen-model>
 systemctl is-active ollama
 ollama list
 ```
+
+The package hook is additive, so removing Ollama from the manifest does not
+uninstall it from a machine that already has it.
 
 ## Notes
 

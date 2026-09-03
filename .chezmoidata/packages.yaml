@@ -31,7 +31,6 @@ omarchyPackages:
     - lazygit
     - lua-language-server
     - neovim
-    - ollama-cuda
     - pinentry
     - pixi
     - ripgrep

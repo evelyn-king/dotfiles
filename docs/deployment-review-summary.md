@@ -9,8 +9,7 @@ The reports reviewed source commits `30923db` and `abb2e56`. The latter added
 only review documents. The remediation table below records changes made after
 the review.
 
-All four P0 findings and nine of the ten P1 findings are resolved. Ollama
-hardware ownership still needs an owner decision.
+All four P0 findings and all ten P1 findings are resolved.
 
 The files-only chezmoi target set did converge in disposable homes. The main
 failures sit at removal, package installation, system activation, and first-use
@@ -34,7 +33,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Resolved | The documented Jupyter workflow failed on first use and could report success for a dead server. Custom tokens appeared in process arguments and permissive state files. | The setup now documents environment provisioning. The launcher checks the environment and port, waits for detached startup, secures state, and supplies custom tokens through a mode-0600 token file. | A6-001, A6-002, A6-003, A7-005 |
 | P1 | Resolved | Mandatory Git signing made fresh-host commits fail, while the advertised agent Git protections had simple bypasses. | Fresh hosts now default to unsigned commits and have a signing restoration preflight. The agent hooks are documented as advisory, block the reviewed direct bypasses, and test their known limits. | A7-002, A7-003 |
 | P1 | Resolved | Interrupted Doom installation could not recover. | The hook now clones and validates in an owned staging directory before renaming the checkout into place. It removes interrupted staging data and reports invalid, dirty, and unexpected-origin checkouts separately. | A6-004 |
-| P1 | Partial | Omarchy installs `ollama-cuda` on every machine without a hardware or model policy. | The Omarchy guide now hands Tailscale and Dropbox to their interactive service installers and lists readiness checks. Choose the Ollama package for each hardware class and the model to pull. | A3-004, A7-004 |
+| P1 | Resolved | Omarchy installed `ollama-cuda` on every machine without a hardware or model policy. | The shared manifest no longer installs Ollama. Its hardware package, service, and model are documented as per-machine choices. The guide also hands Tailscale and Dropbox to their interactive service installers and lists readiness checks. | A3-004, A7-004 |
 | P1 | Resolved | Linux remote commands missed most of the managed environment while bash remained the login shell. | The Omarchy cold-start procedure now switches the login shell to zsh, requires a new login, and verifies the environment through a remote SSH command. | A5-001 |
 | P1 | Resolved | Managed terminal key behavior was inconsistent. macOS zsh switched to Emacs mode, and Omarchy Ghostty lost Shift+Enter encodings. | zsh now selects vi mode with a short escape timeout. Ghostty carries both CSI-u Shift+Enter bindings. | A3-001, A5M-002, A5-009, A5-010 |
 
