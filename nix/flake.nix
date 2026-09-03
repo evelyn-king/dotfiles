@@ -134,6 +134,8 @@
 
         onActivation = {
           autoUpdate = true;
+          # This flake owns the Homebrew prefix. Remove any formula, cask, or
+          # tap that is not declared above.
           cleanup = "uninstall";
           upgrade = true;
         };

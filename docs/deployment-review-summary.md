@@ -6,16 +6,19 @@ The nine agent reports contain 93 findings, with substantial overlap. This
 document combines them into one remediation queue.
 
 The reports reviewed source commits `30923db` and `abb2e56`. The latter added
-only review documents. Current commit `4e77a95` adds the macOS reports and no
-source configuration changes, so the findings still apply.
+only review documents. The remediation table below records changes made after
+the review.
 
-Both target platforms are blocked for a fresh deployment:
+Both target platforms remain blocked for a fresh deployment:
 
-- macOS cannot activate the checked-in nix-darwin configuration. The username
-  is wrong and the unfree Terraform package prevents evaluation.
+- `.chezmoiremove` still risks user data on both platforms.
 - Omarchy cannot complete an unattended first apply. Persistent removal rules
   risk user data, and the stock `tldr` package conflicts with the requested
   `tealdeer` package.
+
+The macOS username and Terraform blockers are resolved. Full-prefix Homebrew
+cleanup is now an explicit policy. Cold-start and cask-adoption work remain
+open at P1.
 
 The files-only chezmoi target set did converge in disposable homes. The main
 failures sit at removal, package installation, system activation, and first-use
@@ -31,7 +34,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P0 | Open | `.chezmoiremove` can recursively delete unrelated or newly recreated user data. | Remove expired entries. Replace necessary migrations with exact content or provenance checks. | A1-001, A7-001, A3-012 |
 | P0 | Resolved | The macOS flake hardcoded user `evelyn`, which did not match the owner's account. | `system.primaryUser` is now set for the `macbook` host as `evelynking`. | A2-001, A4M-003 |
 | P0 | Resolved | `terraform` was unfree, but the flake had no license exception, so the configuration could not evaluate. | Terraform has been removed from the macOS system package set. | A2-002, A4M-001 |
-| P0 | Open | Homebrew activation uses `--force-cleanup`, which can remove every undeclared formula, cask, and tap. | Default to `cleanup = "check"` or `"none"` until full Homebrew ownership is an explicit policy. | A2-004, A4M-004 |
+| P0 | Resolved | Homebrew activation uses `--force-cleanup`, which removes every undeclared formula, cask, and tap. | The flake now documents intentional ownership of the entire Homebrew prefix. | A2-004, A4M-004 |
 | P1 | Open | Neither platform has a complete cold-start procedure. | Document installation of chezmoi, Nix, Homebrew, and Omarchy prerequisites, activation order, login or reboot, repeated applies, and final verification. | A1-002, A1-005, A2-006, A3-011, A4M-002 |
 | P1 | Open | The nix-darwin drift hook hides evaluation errors and fails before the first generation exists. | Handle the no-generation state, preserve evaluation errors, and distinguish failure from convergence. | A1-003, A2-003 |
 | P1 | Open | Existing macOS applications collide with Homebrew casks instead of being adopted. | Add a documented or scripted cask-adoption preflight before activation. | A2-005 |
@@ -90,7 +93,6 @@ Fix the narrow correctness and documentation issues after deployment is safe:
 Implementation depends on owner decisions in these areas:
 
 - whether `.chezmoiremove` retains any long-lived migration rules;
-- whether Homebrew owns the entire prefix or only the declared applications;
 - whether mandatory Git signing and agent Git hooks are hard requirements or
   advisory controls;
 - whether Omarchy 3, Linux arm64, or Intel macOS are supported;

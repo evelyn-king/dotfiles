@@ -31,6 +31,11 @@ installs and upgrades them during `darwin-rebuild switch`, while keeping them
 outside the read-only Nix store so their own updaters still work. Homebrew
 itself must already be installed.
 
+The flake owns the entire Homebrew prefix. Each activation removes every
+formula, cask, and tap that is not declared in `nix/flake.nix`. Add a package
+to the flake before installing it with Homebrew if it must survive the next
+`darwin-rebuild switch`.
+
 `system.primaryUser` in the flake must match the macOS short account name
 (`id -un`) or activation fails.
 
