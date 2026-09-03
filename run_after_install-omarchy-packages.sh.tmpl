@@ -9,24 +9,19 @@
 set -euo pipefail
 
 {{ if $omarchy -}}
+if ! command -v omarchy >/dev/null 2>&1; then
+  echo "omarchy CLI not found; skipping required package restore." >&2
+  exit 0
+fi
+
 pacman_packages=(
 {{- range .omarchyPackages.pacman }}
   {{ . | quote }}
 {{- end }}
 )
 
-aur_packages=(
-{{- range .omarchyPackages.aur }}
-  {{ . | quote }}
-{{- end }}
-)
-
 if ((${#pacman_packages[@]})); then
   omarchy pkg add "${pacman_packages[@]}"
-fi
-
-if ((${#aur_packages[@]})); then
-  omarchy pkg aur add "${aur_packages[@]}"
 fi
 {{- else }}
 exit 0

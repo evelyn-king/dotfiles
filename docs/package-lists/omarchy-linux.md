@@ -31,9 +31,9 @@ whichever root the detection finds. `default/bash/env-bootstrap` is sourced by
 
 Required pacman and AUR packages are declared in
 [`../../.chezmoidata/packages.yaml`](../../.chezmoidata/packages.yaml). Every
-`chezmoi apply` runs `run_after_install-omarchy-packages.sh.tmpl`, which asks
-Omarchy to restore missing entries. The hook is additive. It never removes an
-unlisted package, so manually installed packages remain installed.
+`chezmoi apply` asks Omarchy to restore missing entries. The hooks are
+additive. They never remove unlisted packages, so manually installed packages
+remain installed.
 
 Removing an entry from the manifest does not uninstall it. Remove that package
 manually if it is no longer wanted. A no-op apply does not prompt for sudo;
@@ -43,8 +43,10 @@ manually if it is no longer wanted. A no-op apply does not prompt for sudo;
 
 Keep packages that Omarchy can install through pacman under `pacman`,
 including packages from Omarchy's own repository. Put packages that require
-`yay` under `aur`. The hook uses `omarchy pkg add` and `omarchy pkg aur add`,
-respectively.
+`yay` under `aur`. The required pacman hook runs before mise setup. The AUR
+hook runs last so a failed optional package does not prevent mise or local
+project trust from being configured. Both hooks skip package restoration with
+a warning when the Omarchy 4 dispatcher is unavailable.
 
 ## Notes
 
