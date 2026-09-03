@@ -1,8 +1,9 @@
 # Language runtimes and every global CLI tool.
 #
 # This is a conf.d file rather than ~/.config/mise/config.toml itself. That
-# keeps the declarative tool list separate from mise's generated global state;
-# chezmoi removes config.toml on apply.
+# keeps the declarative tool list separate from mise's generated global state.
+# config.toml has higher precedence, so the migration script removes audited
+# old versions and warns when it finds unrecognized content there.
 #
 # Update pinned versions in this file. Entries set to "latest" or a release
 # channel such as "stable" intentionally float.

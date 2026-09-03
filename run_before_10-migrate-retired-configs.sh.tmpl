@@ -1,0 +1,61 @@
+#!/bin/sh
+
+# Remove old config locations only when their contents match an audited legacy
+# version. Unknown files stay in place and produce a warning.
+
+set -u
+
+destination={{ .chezmoi.destDir | quote }}
+
+file_sha256() {
+  if command -v sha256sum >/dev/null 2>&1; then
+    sha256sum -- "$1" | awk '{ print $1 }'
+  elif command -v shasum >/dev/null 2>&1; then
+    shasum -a 256 -- "$1" | awk '{ print $1 }'
+  else
+    return 1
+  fi
+}
+
+is_known_version() {
+  case "$1:$2" in
+    .config/mise/config.toml:0892de21090153dfb41f0e7eeab9585eaa960c414fb1891190e2f586901e9d43 | \
+      .config/mise/config.toml:554c5bdd59d7c7dc1b021fb2cecda8de371154944c2e2d4a06befccdf88aff4c | \
+      .config/mise/config.toml:9ecaddce6bdbdf876c5f5fb0d6295c813eae71383bbf857c418d3a728cc20c28 | \
+      .aerospace.toml:97481a46d8c2756d28fb7c1cc28295aee20d8d4298ebf0f3a9f8f54837e54467 | \
+      .gitconfig:12e9b40a4fe5fa968e122ec98cfa4dbcf802880bcef6981ecf1d341a4f2541b5 | \
+      .gitconfig:18d5ae28fdfec06ad3b0277f63f434556d7aaf4a468488bad827b6acc0bdfbb7)
+      return 0
+      ;;
+  esac
+  return 1
+}
+
+for retired_config in \
+  .config/mise/config.toml \
+  .aerospace.toml \
+  .gitconfig; do
+  target="$destination/$retired_config"
+  if [ ! -e "$target" ] && [ ! -L "$target" ]; then
+    continue
+  fi
+
+  if [ ! -f "$target" ] || [ -L "$target" ]; then
+    printf 'migration: preserving non-file ~/%s; resolve it before using the managed replacement\n' \
+      "$retired_config" >&2
+    continue
+  fi
+
+  if ! actual_sha256=$(file_sha256 "$target"); then
+    printf 'migration: cannot hash ~/%s; preserving it\n' "$retired_config" >&2
+    continue
+  fi
+
+  if is_known_version "$retired_config" "$actual_sha256"; then
+    rm -f "$target"
+    printf 'migration: removed known retired ~/%s\n' "$retired_config"
+  else
+    printf 'migration: preserving unrecognized ~/%s; it overrides or conflicts with the managed replacement\n' \
+      "$retired_config" >&2
+  fi
+done

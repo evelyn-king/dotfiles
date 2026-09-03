@@ -18,6 +18,11 @@ The [`tools` table in the shared configuration](../../dot_config/mise/conf.d/10-
 is the complete list. Add, remove and update tools there. Do not copy the list
 into this document or another package manifest.
 
+`~/.config/mise/config.toml` has higher precedence than the managed `conf.d`
+file. The migration script removes audited legacy versions but preserves and
+warns about unrecognized content. If it warns, move any wanted declarations to
+`10-dotfiles.toml`, then remove the conflicting file.
+
 `unidep` installs with its `all` extra, and `pre-commit` installs with
 `pre-commit-uv`. Those additions are recorded as `uvx_args` in the shared
 configuration.

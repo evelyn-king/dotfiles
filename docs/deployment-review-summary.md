@@ -9,16 +9,10 @@ The reports reviewed source commits `30923db` and `abb2e56`. The latter added
 only review documents. The remediation table below records changes made after
 the review.
 
-Both target platforms remain blocked for a fresh deployment:
-
-- `.chezmoiremove` still risks user data on both platforms.
-- Omarchy cannot complete an unattended first apply. Persistent removal rules
-  risk user data, and the stock `tldr` package conflicts with the requested
-  `tealdeer` package.
-
-The macOS username and Terraform blockers are resolved. Full-prefix Homebrew
-cleanup is now an explicit policy. Cold-start and cask-adoption work remain
-open at P1.
+All four P0 findings are resolved. A live apply still needs the open P1
+cold-start work and final validation. Omarchy also cannot complete an
+unattended first apply because the stock `tldr` package conflicts with the
+requested `tealdeer` package.
 
 The files-only chezmoi target set did converge in disposable homes. The main
 failures sit at removal, package installation, system activation, and first-use
@@ -31,7 +25,7 @@ activation. It does not replace the severity recorded in the source reports.
 
 | Priority | Status | Consolidated finding | Required resolution | Review IDs |
 | --- | --- | --- | --- | --- |
-| P0 | Open | `.chezmoiremove` can recursively delete unrelated or newly recreated user data. | Remove expired entries. Replace necessary migrations with exact content or provenance checks. | A1-001, A7-001, A3-012 |
+| P0 | Resolved | `.chezmoiremove` could recursively delete unrelated or newly recreated user data. | The persistent rules have been removed. Three conflicting config locations now use exact SHA-256 checks and preserve unrecognized content. | A1-001, A7-001, A3-012 |
 | P0 | Resolved | The macOS flake hardcoded user `evelyn`, which did not match the owner's account. | `system.primaryUser` is now set for the `macbook` host as `evelynking`. | A2-001, A4M-003 |
 | P0 | Resolved | `terraform` was unfree, but the flake had no license exception, so the configuration could not evaluate. | Terraform has been removed from the macOS system package set. | A2-002, A4M-001 |
 | P0 | Resolved | Homebrew activation uses `--force-cleanup`, which removes every undeclared formula, cask, and tap. | The flake now documents intentional ownership of the entire Homebrew prefix. | A2-004, A4M-004 |
@@ -45,6 +39,66 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Open | Omarchy installs Tailscale, Dropbox, and Ollama packages without making the services usable. It installs `ollama-cuda` on non-NVIDIA machines. | Add a post-apply readiness checklist and hardware-aware Ollama ownership. | A3-004, A7-004 |
 | P1 | Open | Linux remote commands miss most of the managed environment while bash remains the login shell. | Document and verify switching the login shell to zsh, or provide another SSH environment mechanism and narrow the startup claims. | A5-001 |
 | P1 | Open | Managed terminal key behavior is inconsistent. macOS zsh switches to Emacs mode, and Omarchy Ghostty loses Shift+Enter encodings. | Set zsh vi mode explicitly and restore the two CSI-u bindings. | A3-001, A5M-002, A5-009, A5-010 |
+
+## `.chezmoiremove` necessity audit
+
+This audit covers all 45 former removal targets. A guarded migration deletes
+only a regular file whose SHA-256 matches an audited legacy version. It
+warns and preserves every other file. Dropped rules leave any existing targets
+untouched.
+
+The audit host still has three listed targets. Its old Git and mise files match
+audited versions and can be removed. Its Claude symlink belongs to Claude's
+installer, so the new policy preserves it; mise already takes precedence on
+`PATH`.
+
+| Target | Necessity finding | Disposition |
+| --- | --- | --- |
+| `.config/lazygit/config.yaml` | The managed file moved to `config.yml`; lazygit ignores the old name. | Drop rule. |
+| `.config/omarchy/extensions/menu.sh` | Omarchy 4 replaced this path, and the repo never managed its contents. | Drop rule. |
+| `.config/mise/config.toml` | This path has higher precedence than the managed `conf.d` file and can override tool versions. | Guarded migration. |
+| `.local/bin/claude` | Mise shims and activated installs precede `.local/bin`; this may be an official installer symlink. | Drop rule. |
+| `.local/bin/codex` | Mise shims and activated installs precede `.local/bin`. | Drop rule. |
+| `.local/bin/gemini` | Mise shims and activated installs precede `.local/bin`. | Drop rule. |
+| `.local/bin/gh` | Mise shims and activated installs precede `.local/bin`. | Drop rule. |
+| `.local/bin/opencode` | Mise shims and activated installs precede `.local/bin`. | Drop rule. |
+| `.local/bin/pi` | Mise shims and activated installs precede `.local/bin`. | Drop rule. |
+| `.bash-preexec.sh` | The managed startup files no longer source the vendored copy. | Drop rule. |
+| `.aerospace.toml` | AeroSpace reports an ambiguity when this file and the managed XDG file both exist. | Guarded migration. |
+| `.gitconfig` | Git reads this after the managed XDG file, so values here can override managed settings. | Guarded migration. |
+| `.hyprspace.toml` | HyprSpace is no longer installed or referenced. | Drop rule. |
+| `.icas.toml` | The personal configuration does not install or invoke icas. | Drop rule. |
+| `.Brewfile` | nix-darwin generates its own Brewfile and never reads this path. | Drop rule. |
+| `.local/bin/check-homebrew` | No managed command invokes the retired helper. | Drop rule. |
+| `.local/bin/dump-homebrew` | No managed command invokes the retired helper. | Drop rule. |
+| `.local/bin/sync-homebrew` | No managed command invokes the retired helper. | Drop rule. |
+| `.local/bin/sync-uv` | Mise replaced this helper and no managed command invokes it. | Drop rule. |
+| `.local/bin/sync-bun` | Mise replaced this helper and no managed command invokes it. | Drop rule. |
+| `.config/shell/00_init.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/05_prefer_zsh.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/05_zsh_completions.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/10_bash_init.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/15_host_env.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/25_nvim.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/30_env.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/30_interactive.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/35_keychain.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/40_python.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/45_omarchy.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/99_finish.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/base.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/interactive.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/lib.sh` | Flat rendered startup files replaced the shell fragment loader. | Drop rule. |
+| `.config/shell/personal` | The old directory is no longer sourced; recursive deletion would risk local files. | Drop rule. |
+| `.config/shell/work` | The old directory is no longer sourced; recursive deletion would risk local files. | Drop rule. |
+| `.config/themes` | Managed applications now name their themes directly; recursive deletion would risk local themes. | Drop rule. |
+| `.config/btop/themes/current.theme` | btop now names its managed Gruvbox theme directly. | Drop rule. |
+| `.config/omarchy/hooks/theme-set` | Omarchy 4 uses `theme-set.d`; this path can belong to a user or later release. | Drop rule. |
+| `.config/atuin/themes/rose-pine-moon.toml` | Atuin selects the managed Gruvbox theme. | Drop rule. |
+| `.config/bat/themes/rose-pine-moon.tmTheme` | Bat selects the managed Gruvbox theme. | Drop rule. |
+| `.config/btop/themes/rose-pine-moon.theme` | btop selects the managed Gruvbox theme. | Drop rule. |
+| `.config/zellij/themes/rose-pine-moon.kdl` | Zellij selects Gruvbox rather than this retired theme. | Drop rule. |
+| `.vim/pack/plugins/start/rose-pine` | Vim selects Gruvbox; recursively deleting a plugin directory would risk unrelated changes. | Drop rule. |
 
 ## P2 stabilization work
 
@@ -92,7 +146,6 @@ Fix the narrow correctness and documentation issues after deployment is safe:
 
 Implementation depends on owner decisions in these areas:
 
-- whether `.chezmoiremove` retains any long-lived migration rules;
 - whether mandatory Git signing and agent Git hooks are hard requirements or
   advisory controls;
 - whether Omarchy 3, Linux arm64, or Intel macOS are supported;
