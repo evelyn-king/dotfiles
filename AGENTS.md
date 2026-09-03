@@ -17,8 +17,6 @@
 - `chezmoi apply --dry-run --refresh-externals=never` previews changes without
   updating pinned externals.
 - `chezmoi execute-template --file <path>` renders a template for verification.
-- `python3 -m pytest .chezmoitemplates/test_git_rewrite_policy.py` covers the shared
-  agent git-safety policy.
 
 ## Style and naming
 - YAML uses 2-space indentation; keep list ordering stable in `.chezmoidata/*.yaml`.

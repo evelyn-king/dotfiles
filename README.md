@@ -136,12 +136,6 @@ protected-branch pushes and PR merges. The rules live once, in
 translates its tool's input and block protocol. Edit the shared policy, not the
 adapters.
 
-`.chezmoitemplates/test_git_rewrite_policy.py` covers the policy:
-
-```bash
-python3 -m pytest .chezmoitemplates/test_git_rewrite_policy.py
-```
-
 ## Branches
 
 - `main` contains the macOS/Linux chezmoi source tree at the repo root
