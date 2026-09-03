@@ -167,7 +167,7 @@ environment without depending on an interactive shell activation step.
 Use `jupyter-remote-lab` on the remote host to start a headless lab instance:
 
 ```bash
-jupyter-remote-lab --detach --dir ~/local-praxis/project
+jupyter-remote-lab --detach --dir ~/local-projects/project
 ```
 
 Then create the SSH tunnel from your local machine with the exact port the
