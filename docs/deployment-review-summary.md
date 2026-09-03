@@ -9,8 +9,8 @@ The reports reviewed source commits `30923db` and `abb2e56`. The latter added
 only review documents. The remediation table below records changes made after
 the review.
 
-All four P0 findings and eight of the ten P1 findings are resolved. Agent Git
-command policy and Ollama hardware ownership still need owner decisions.
+All four P0 findings and nine of the ten P1 findings are resolved. Ollama
+hardware ownership still needs an owner decision.
 
 The files-only chezmoi target set did converge in disposable homes. The main
 failures sit at removal, package installation, system activation, and first-use
@@ -32,7 +32,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Resolved | Existing macOS applications collided with Homebrew casks instead of being adopted. | The macOS package guide now lists the reviewed collisions and runs Homebrew's adoption flow before the first activation. | A2-005 |
 | P1 | Resolved | The Omarchy package hook could not complete reliably because stock `tldr` conflicted with `tealdeer`, optional AUR failures stopped mise, and legacy hosts could lack the dispatcher. | Both platforms now use the stock `tldr` client, so stock Omarchy owns its command without a package conflict. Optional AUR packages run after required runtime setup, and both package hooks guard the Omarchy 4 dispatcher. | A1-004, A3-006, A4-001 |
 | P1 | Resolved | The documented Jupyter workflow failed on first use and could report success for a dead server. Custom tokens appeared in process arguments and permissive state files. | The setup now documents environment provisioning. The launcher checks the environment and port, waits for detached startup, secures state, and supplies custom tokens through a mode-0600 token file. | A6-001, A6-002, A6-003, A7-005 |
-| P1 | Partial | Mandatory Git signing made fresh-host commits fail, while the advertised agent Git protections have simple bypasses. | Fresh hosts now default to unsigned commits. The managed config sets the full fingerprint, omits an invalid GPG path when GPG is absent, and includes a restoration preflight. Strengthen and test the agent command policy or document it as advisory. | A7-002, A7-003 |
+| P1 | Resolved | Mandatory Git signing made fresh-host commits fail, while the advertised agent Git protections had simple bypasses. | Fresh hosts now default to unsigned commits and have a signing restoration preflight. The agent hooks are documented as advisory, block the reviewed direct bypasses, and test their known limits. | A7-002, A7-003 |
 | P1 | Resolved | Interrupted Doom installation could not recover. | The hook now clones and validates in an owned staging directory before renaming the checkout into place. It removes interrupted staging data and reports invalid, dirty, and unexpected-origin checkouts separately. | A6-004 |
 | P1 | Partial | Omarchy installs `ollama-cuda` on every machine without a hardware or model policy. | The Omarchy guide now hands Tailscale and Dropbox to their interactive service installers and lists readiness checks. Choose the Ollama package for each hardware class and the model to pull. | A3-004, A7-004 |
 | P1 | Resolved | Linux remote commands missed most of the managed environment while bash remained the login shell. | The Omarchy cold-start procedure now switches the login shell to zsh, requires a new login, and verifies the environment through a remote SSH command. | A5-001 |
@@ -144,7 +144,6 @@ Fix the narrow correctness and documentation issues after deployment is safe:
 
 Implementation depends on owner decisions in these areas:
 
-- whether agent Git hooks are hard requirements or advisory controls;
 - whether Omarchy 3, Linux arm64, or Intel macOS are supported;
 - whether chezmoi or Omarchy owns runtime monitor scaling;
 - whether display-specific Hyprland settings apply globally;

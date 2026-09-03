@@ -144,11 +144,18 @@ The palette, for hand-editing a theme file:
 
 ## Agent git safety
 
-Claude Code, Gemini CLI and opencode all block history rewrites, broad staging,
-protected-branch pushes and PR merges. The rules live once, in
-`.chezmoitemplates/git-rewrite-policy.py`; each hook is a thin adapter that
-translates its tool's input and block protocol. Edit the shared policy, not the
-adapters.
+Claude Code, Gemini CLI and opencode use advisory hooks for common unsafe Git
+commands. The hooks block direct forms of commit amendment, hard reset, rebase,
+force push, broad `git add`, protected-branch pushes, and PR merges.
+
+These hooks are guardrails, not a security boundary. Shell wrappers, nested
+interpreters, Git aliases, and commands that change directory before running
+Git can bypass the matcher. Hook errors also fail open in some adapters. Keep
+remote branch protection enabled and review agent commands before execution.
+
+The rules live in `.chezmoitemplates/git-rewrite-policy.py`; each hook is a thin
+adapter for its tool's input and block protocol. Edit the shared policy, not the
+adapters. The tests record both blocked commands and known advisory limits.
 
 ## Branches
 

@@ -1,4 +1,4 @@
-# Shared policy for the Claude Code, Gemini CLI and OpenCode git safety hooks.
+# Shared advisory policy for the Claude Code, Gemini CLI and OpenCode git hooks.
 # Edit the rules here; the adapters only translate tool input and block results.
 #
 import re
@@ -15,6 +15,8 @@ _GIT_CMD = rf"\bgit\b{_GIT_OPTS}\s+"  # git followed by options then space
 # Patterns to block dangerous git commands
 BLOCKED_PATTERNS = [
     (rf"{_GIT_CMD}commit\b.*--amend\b", "git commit --amend is not allowed"),
+    (rf"{_GIT_CMD}reset\b.*--hard\b", "git reset --hard is not allowed"),
+    (rf"{_GIT_CMD}rebase\b", "git rebase is not allowed"),
     (
         rf"{_GIT_CMD}push\b.*--force-with-lease\b",
         "git push --force-with-lease is not allowed",
@@ -22,12 +24,20 @@ BLOCKED_PATTERNS = [
     (rf"{_GIT_CMD}push\b.*--force\b", "git push --force is not allowed"),
     (rf"{_GIT_CMD}push\b.*-f\b", "git push -f (force) is not allowed"),
     (
+        rf"{_GIT_CMD}push\b.*\s\+\S+",
+        "git push with a force refspec is not allowed",
+    ),
+    (
         rf"{_GIT_CMD}add\b.*-A\b",
         "git add -A is not allowed - add files explicitly to avoid adding unrelated untracked files",
     ),
     (
         rf"{_GIT_CMD}add\b.*--all\b",
         "git add --all is not allowed - add files explicitly to avoid adding unrelated untracked files",
+    ),
+    (
+        rf"{_GIT_CMD}add\b.*\s(?:--\s+)?\.(?:\s|$)",
+        "git add . is not allowed - add files explicitly to avoid adding unrelated untracked files",
     ),
     (
         r"\bgh\s+pr\s+merge\b",
@@ -41,8 +51,18 @@ PROTECTED_QUOTED_TOKENS = {
     "--amend",
     "--force",
     "--force-with-lease",
+    "--hard",
+    ".",
     "-A",
     "-f",
+    "HEAD",
+    "add",
+    "commit",
+    "merge",
+    "pr",
+    "push",
+    "rebase",
+    "reset",
 }
 
 
@@ -50,6 +70,8 @@ def preserve_policy_token(match: re.Match[str]) -> str:
     """Keep a quoted token when quoting does not change its shell meaning."""
     value = match.group(0)[1:-1]
     if value in PROTECTED_QUOTED_TOKENS:
+        return value
+    if value.startswith("+") and not re.search(r"\s", value):
         return value
     if not re.search(r"\s", value) and any(
         re.search(rf"\b{branch}\b", value) for branch in PROTECTED_BRANCHES
@@ -160,8 +182,8 @@ def check_push_to_protected_branch(
         # Remove flags like -u, --set-upstream, etc.
         args_without_flags = re.sub(r"\s*-[a-zA-Z]\b|\s*--[\w-]+", "", args).strip()
         parts = args_without_flags.split()
-        # If 0 or 1 parts (no args or just remote), check current branch
-        if len(parts) <= 1:
+        # An implicit push or `git push origin HEAD` uses the current branch.
+        if len(parts) <= 1 or "HEAD" in parts[1:]:
             # Extract -C directory from original command (preserves quoted paths)
             git_dir = extract_git_directory(original_command or command)
             current_branch = get_current_branch(git_dir)
