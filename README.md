@@ -96,6 +96,13 @@ PATH is built twice, on purpose, and the order is load-bearing. See
 One per-machine escape hatch is sourced near the end of interactive startup:
 `~/.config/shell/extras.sh`, untracked and hand-written.
 
+## Editors
+
+Neovim runs LazyVim; Vim runs a short `.vimrc` plus six pinned pack plugins.
+They share one keymap as far as plain Vim reaches: Neovim is the reference, and
+`dot_vim/plugin/keymaps.vim` mirrors LazyVim's defaults. Changing a binding
+means changing both files. See [docs/keybindings.md](docs/keybindings.md).
+
 ## Theming
 
 Everything is [Gruvbox](https://github.com/morhetz/gruvbox), dark by default. Each

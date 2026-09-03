@@ -15,7 +15,9 @@ set signcolumn=yes
 set ruler
 set cursorline
 
-set nohlsearch
+" Neovim leaves hlsearch on, and <Esc> / <leader>ur in
+" ~/.vim/plugin/keymaps.vim exist to clear it. Keep the two in step.
+set hlsearch
 set incsearch
 set ignorecase
 set splitbelow
@@ -29,8 +31,29 @@ set smartcase
 
 set scrolloff=4
 set sidescrolloff=8
+set wildmenu
 set wildmode=longest:full,full
 set updatetime=250
+
+" LazyVim's timeoutlen, so leader chords feel the same in both editors. The
+" short ttimeoutlen keeps <Esc> responsive despite the normal-mode <Esc>
+" mapping and the <M-j>/<M-k> terminal key codes in keymaps.vim.
+set timeoutlen=300
+set ttimeout
+set ttimeoutlen=10
+
+" Backing for the picker-key fallbacks in ~/.vim/plugin/keymaps.vim. Plain
+" wildmenu completion, not a fuzzy finder, but the keys land somewhere useful.
+set path+=**
+if executable('rg')
+  set grepprg=rg\ --vimgrep\ --smart-case
+  set grepformat=%f:%l:%c:%m
+endif
+
+augroup vimrc_grep
+  autocmd!
+  autocmd QuickFixCmdPost grep,grepadd,vimgrep cwindow
+augroup END
 
 if exists('+termguicolors')
   set termguicolors
@@ -46,7 +69,15 @@ endif
 
 set undodir=~/.vim/undo-dir
 
-inoremap jk <Esc>
+" Mappings live in ~/.vim/plugin/keymaps.vim, the counterpart to Neovim's
+" lua/config/keymaps.lua. The leader and the plugin mapping flags belong here
+" instead: both are read when the pack plugins load, after this file.
+let mapleader = ' '
+let maplocalleader = '\'
+
+" NERDCommenter's defaults claim <leader>c*, which is Neovim's code prefix.
+" keymaps.vim maps its <Plug> targets onto gc* instead.
+let g:NERDCreateDefaultMappings = 0
 
 set background=dark
 colorscheme gruvbox
