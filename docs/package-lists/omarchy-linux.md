@@ -48,6 +48,46 @@ hook runs last so a failed optional package does not prevent mise or local
 project trust from being configured. Both hooks skip package restoration with
 a warning when the Omarchy 4 dispatcher is unavailable.
 
+## Post-apply services
+
+The package hook installs the Tailscale and Dropbox packages, but it does not
+perform account setup. Run Omarchy's service installers from an interactive
+desktop session after the apply:
+
+```bash
+omarchy install service tailscale
+omarchy install service dropbox
+```
+
+The Tailscale installer uses elevated privileges to enable `tailscaled`, opens
+the browser login, grants the local user operator access, enables Taildrop
+receive, and adds the bar plugin. Review the tailnet's DNS and advertised
+routes before accepting them. Verify the result with:
+
+```bash
+systemctl is-enabled tailscaled
+tailscale status
+tailscale debug prefs
+```
+
+The Dropbox installer adds its service dependencies, starts the daemon, and
+adds the bar plugin. Finish the account login in the browser, then verify it:
+
+```bash
+dropbox-cli status
+```
+
+Ollama setup remains pending a hardware ownership decision. After selecting
+the CPU, NVIDIA, AMD, or Vulkan package and a model, enable the service and
+verify both parts:
+
+```bash
+sudo systemctl enable --now ollama
+ollama pull <chosen-model>
+systemctl is-active ollama
+ollama list
+```
+
 ## Notes
 
 - mise owns Rust and installs rustup with the stable toolchain. Do not install a
