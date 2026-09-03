@@ -61,6 +61,17 @@ unset __micromamba
 # resolved through `mise which` above.
 command -v mise >/dev/null 2>&1 && eval "$(mise activate "$__shell")"
 
+# Omarchy initializes try under ~/Work/tries. Keep its lazy shell wrapper, but
+# use this repo's project root instead. try treats the parent of this directory
+# as the default destination when a temporary project graduates.
+if command -v try >/dev/null 2>&1; then
+  try() {
+    unset -f try
+    eval "$(SHELL=/bin/bash command try init "$HOME/local-projects/tries")"
+    try "$@"
+  }
+fi
+
 if command -v fzf >/dev/null 2>&1; then
   # atuin binds Ctrl-R in the prompt block below, so fzf's history widget would
   # be bound here only to be overwritten a few lines later. An empty (but set)
