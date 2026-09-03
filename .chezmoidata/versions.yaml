@@ -28,6 +28,12 @@ plugins:
         - "*/nerdtree_plugin/**"
         - "*/plugin/**"
         - "*/syntax/**"
+    vim_airline:
+      url: https://github.com/vim-airline/vim-airline/archive/192c2c7e8e58fcc771b1959e633b963984319a7c.tar.gz
+      include:
+        - "*/autoload/**"
+        - "*/doc/**"
+        - "*/plugin/**"
     vim_fugitive:
       url: https://github.com/tpope/vim-fugitive/archive/3b753cf8c6a4dcde6edee8827d464ba9b8c4a6f0.tar.gz
       include:
