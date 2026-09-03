@@ -141,11 +141,14 @@ installer, so the new policy preserves it; mise already takes precedence on
 - Shell documentation and comments now distinguish remote shell startup from
   cron, launchd, systemd and directly executed Git hooks. They also record the
   nix-darwin `path_helper` behavior and the Bash-only Omarchy helper set.
+- The README and cold-start guide now state that `--refresh-externals=never`
+  still downloads missing externals and that the Vim archives have no committed
+  content checksums.
 
 ### Open
 
-- document cold-cache external downloads and add archive checksums if they are
-  part of the trust policy;
+- decide whether the Vim external trust policy requires committed archive
+  checksums;
 - test the remaining hypothesis about unbinding disabled Omarchy defaults.
 
 ## Required policy decisions
@@ -157,6 +160,8 @@ Implementation depends on owner decisions in these areas:
 - whether display-specific Hyprland settings apply globally;
 - whether Neovim and micromamba deployments must be reproducible from committed
   locks.
+- whether commit-pinned Vim plugin archives also require committed content
+  checksums.
 
 ## Remaining review gaps
 
