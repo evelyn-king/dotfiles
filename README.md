@@ -31,7 +31,8 @@ cache. It does not make a cold-cache run offline. The first dry run or apply
 still downloads the six commit-pinned Vim plugin archives before writing any
 destination files. Run that first command with network access, or copy a
 populated cache from a trusted machine. The archive URLs are commit-pinned, but
-the repo does not currently carry checksums for their response bodies.
+the repo intentionally relies on HTTPS and GitHub's commit archive endpoint
+instead of carrying checksums for their response bodies.
 
 `~/.config/chezmoi/chezmoi.toml` is rendered from `.chezmoi.toml.tmpl` at init
 time, not on every apply. After pulling a change to that template, run
