@@ -90,6 +90,9 @@ ollama list
 
 ## Notes
 
+- Stock Omarchy owns the `tldr` command through its `tldr` package. Do not add
+  `tealdeer` to the Omarchy manifest because the packages conflict. macOS also
+  uses the stock `tldr` client through Nix.
 - mise owns Rust and installs rustup with the stable toolchain. Do not install a
   separate system `rust` or `rustup` package.
 - Ghostty's font chain names `JetBrainsMono Nerd Font` explicitly. Omarchy

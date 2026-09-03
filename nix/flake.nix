@@ -38,7 +38,7 @@
         fzf
         jq
         ripgrep
-        tealdeer
+        tldr
 
         # --- git ---
         delta

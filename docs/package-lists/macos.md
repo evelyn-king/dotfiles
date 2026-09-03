@@ -25,6 +25,7 @@ already resolved. `darwinConfigurations` defines only `macbook`, for
 | `dot_config/mise/conf.d/10-dotfiles.toml` | language runtimes and global CLI tools |
 
 Anything managed by mise is deliberately absent from the Nix package list.
+Both macOS and Omarchy use the stock `tldr` client; Nix owns it on macOS.
 
 GUI applications come from Homebrew casks declared in the flake. nix-darwin
 installs and upgrades them during `darwin-rebuild switch`, while keeping them

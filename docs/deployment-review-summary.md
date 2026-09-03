@@ -9,10 +9,9 @@ The reports reviewed source commits `30923db` and `abb2e56`. The latter added
 only review documents. The remediation table below records changes made after
 the review.
 
-All four P0 findings and seven of the ten P1 findings are resolved. Omarchy
-still cannot complete an unattended first apply because the stock `tldr`
-package conflicts with the requested `tealdeer` package. Git signing and agent
-command policy, plus Ollama hardware ownership, still need owner decisions.
+All four P0 findings and eight of the ten P1 findings are resolved. Git signing
+and agent command policy, plus Ollama hardware ownership, still need owner
+decisions.
 
 The files-only chezmoi target set did converge in disposable homes. The main
 failures sit at removal, package installation, system activation, and first-use
@@ -32,7 +31,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Resolved | Neither platform had a complete cold-start procedure. | The cold-start guide now covers prerequisites, source initialization, activation order, login or reboot, three applies, manual handoffs, and final checks for macOS and Omarchy. | A1-002, A1-005, A2-006, A3-011, A4M-002 |
 | P1 | Resolved | The nix-darwin drift hook hid evaluation errors and failed before the first generation existed. | The hook now gives the first-activation command when no generation exists. Evaluation errors remain visible and make the drift check fail. | A1-003, A2-003 |
 | P1 | Resolved | Existing macOS applications collided with Homebrew casks instead of being adopted. | The macOS package guide now lists the reviewed collisions and runs Homebrew's adoption flow before the first activation. | A2-005 |
-| P1 | Partial | The Omarchy package hook cannot complete reliably because stock `tldr` conflicts with `tealdeer`. | Optional AUR packages now run after required runtime setup, and both package hooks guard the Omarchy 4 dispatcher. Choose whether stock `tldr` or `tealdeer` owns the command. | A1-004, A3-006, A4-001 |
+| P1 | Resolved | The Omarchy package hook could not complete reliably because stock `tldr` conflicted with `tealdeer`, optional AUR failures stopped mise, and legacy hosts could lack the dispatcher. | Both platforms now use the stock `tldr` client, so stock Omarchy owns its command without a package conflict. Optional AUR packages run after required runtime setup, and both package hooks guard the Omarchy 4 dispatcher. | A1-004, A3-006, A4-001 |
 | P1 | Resolved | The documented Jupyter workflow failed on first use and could report success for a dead server. Custom tokens appeared in process arguments and permissive state files. | The setup now documents environment provisioning. The launcher checks the environment and port, waits for detached startup, secures state, and supplies custom tokens through a mode-0600 token file. | A6-001, A6-002, A6-003, A7-005 |
 | P1 | Open | Mandatory Git signing makes fresh-host commits fail, while the advertised agent Git protections have simple bypasses. | Add signing preflight and restoration instructions. Strengthen and test the command policy or document it as advisory. | A7-002, A7-003 |
 | P1 | Resolved | Interrupted Doom installation could not recover. | The hook now clones and validates in an owned staging directory before renaming the checkout into place. It removes interrupted staging data and reports invalid, dirty, and unexpected-origin checkouts separately. | A6-004 |

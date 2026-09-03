@@ -105,10 +105,8 @@ command -v mise || omarchy pkg add mise
 omarchy pkg add chezmoi
 ```
 
-The open `tldr` ownership item in
-[deployment-review-summary.md](deployment-review-summary.md) must be resolved
-before the package restore can finish. Stock Omarchy owns `tldr`, while the
-current manifest requests the conflicting `tealdeer` package.
+Stock Omarchy owns the `tldr` command. The package manifest deliberately leaves
+out `tealdeer` because the two packages conflict.
 
 Initialize the source, inspect it, and run the first apply:
 

@@ -40,7 +40,6 @@ omarchyPackages:
     - starship
     - superfile
     - tailscale
-    - tealdeer
     - uv
     - vim
     - visual-studio-code-bin
