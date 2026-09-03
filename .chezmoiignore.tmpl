@@ -2,7 +2,6 @@
        machine needs no change here. Shared with dot_config/ghostty/config.tmpl;
        edit .chezmoitemplates/omarchy-detect.tmpl, not this. */ -}}
 {{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
-{{- $ageIdentity := env "CHEZMOI_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/personal-key.txt") -}}
 
 # Repo content, not dotfiles: read from the source tree, never applied to $HOME.
 AGENTS.md
@@ -31,10 +30,4 @@ linux-package-drift.sh
 {{- if not $omarchy }}
 install-omarchy-packages.sh
 .config/hypr/**
-{{- end }}
-
-{{- /* Optional. A machine without the age identity skips the encrypted extras
-       instead of failing the whole apply. */ -}}
-{{- if eq (stat $ageIdentity) nil }}
-.config/shell/secrets.sh
 {{- end }}

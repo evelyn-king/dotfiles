@@ -60,10 +60,8 @@
 - Link related issues. Add screenshots only for UI-facing config changes.
 
 ## Configuration and security
-- Do not commit secrets. They belong in the age-encrypted file described in
-  `docs/encryption.md`, or in the untracked `~/.config/shell/extras.sh`.
-- Public age recipients are not secret and are committed; private identities live
-  only in `~/.config/chezmoi/`.
+- Do not commit secrets. They belong in the untracked
+  `~/.config/shell/extras.sh`.
 - This is a personal repo. Do not add employer hostnames, addresses, signing keys
   or internal paths to it.
 - Put native Windows changes on the `windows` branch.

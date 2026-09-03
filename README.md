@@ -93,9 +93,8 @@ self-contained, with no shared body sourced at runtime.
 PATH is built twice, on purpose, and the order is load-bearing. See
 [docs/shell-startup.md](docs/shell-startup.md).
 
-Two per-machine escape hatches are sourced near the end of interactive startup:
-`~/.config/shell/secrets.sh` (tracked, age-encrypted) and
-`~/.config/shell/extras.sh` (untracked, hand-written).
+One per-machine escape hatch is sourced near the end of interactive startup:
+`~/.config/shell/extras.sh`, untracked and hand-written.
 
 ## Theming
 
@@ -142,11 +141,6 @@ adapters.
 ```bash
 python3 -m pytest .chezmoitemplates/test_git_rewrite_policy.py
 ```
-
-## Encryption
-
-One age key covers the encrypted files in this repo. See
-[docs/encryption.md](docs/encryption.md).
 
 ## Branches
 

@@ -92,10 +92,8 @@ Two pieces need no action: `~/.inputrc` is already Omarchy's
 
 ## Per-machine overrides
 
-Two hooks, both sourced near the end of `shell-interactive.sh`:
+One hook, sourced near the end of `shell-interactive.sh`:
 
-- `~/.config/shell/secrets.sh`, tracked but age-encrypted. See
-  [encryption.md](encryption.md).
 - `~/.config/shell/extras.sh`, untracked. Nothing in this repo creates or
   manages it. This is where a per-machine `JUPYTER_PORT` or
   `MAMBA_ROOT_PREFIX` override belongs.

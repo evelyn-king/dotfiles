@@ -241,11 +241,6 @@ fi
 
 # --- local overrides --------------------------------------------------------
 
-# Tracked but encrypted. Rendered from
-# dot_config/shell/encrypted_private_secrets.sh.age, and skipped entirely when
-# the age identity is absent (see .chezmoiignore.tmpl).
-[ -f "$XDG_CONFIG_HOME/shell/secrets.sh" ] && . "$XDG_CONFIG_HOME/shell/secrets.sh"
-
 # Machine-local escape hatch. Nothing in this repo creates or manages this
 # file: write it by hand on a host that needs something the tracked config
 # should not carry, and keep it out of version control. This is where a

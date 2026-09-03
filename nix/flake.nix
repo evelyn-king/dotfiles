@@ -95,7 +95,6 @@
         tesseract
 
         # --- network and misc ---
-        age
         chezmoi
         cloudflared
         gnupg
@@ -103,7 +102,6 @@
         lima
         pinentry_mac
         prettyping
-        sops
         sshpass
         terraform
         w3m

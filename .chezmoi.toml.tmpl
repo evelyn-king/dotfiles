@@ -2,21 +2,9 @@
 Rendered once at `chezmoi init`, not on every apply. After pulling a change to
 this template, run `chezmoi init` again so the generated
 ~/.config/chezmoi/chezmoi.toml picks it up.
-
-Public age recipients are not secret; the private identity never leaves the
-machine. Both are overridable so a new key can be rolled without editing this
-file first.
 */ -}}
-{{- $ageIdentity := env "CHEZMOI_AGE_IDENTITY" | default "~/.config/chezmoi/personal-key.txt" -}}
-{{- $ageRecipient := env "CHEZMOI_AGE_RECIPIENT" | default "age197jc7wzxms3whemclkuq7z8mefw7r3238avljr3m6tmg76yal5ls3qtv6h" -}}
 workingTree = {{ .chezmoi.sourceDir | quote }}
 sourceDir = {{ .chezmoi.sourceDir | quote }}
-
-encryption = "age"
-
-[age]
-  identity = {{ $ageIdentity | quote }}
-  recipient = {{ $ageRecipient | quote }}
 
 [cd]
   command = "bash"

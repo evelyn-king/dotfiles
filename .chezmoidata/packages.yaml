@@ -2,7 +2,6 @@
 # additive: it restores missing entries but never removes unlisted packages.
 omarchyPackages:
   pacman:
-    - age
     - aspell
     - aspell-en
     - ast-grep
