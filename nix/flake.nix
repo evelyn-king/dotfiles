@@ -96,7 +96,6 @@
         pinentry_mac
         prettyping
         sshpass
-        terraform
         w3m
         wget
 

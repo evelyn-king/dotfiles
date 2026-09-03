@@ -30,7 +30,7 @@ activation. It does not replace the severity recorded in the source reports.
 | --- | --- | --- | --- | --- |
 | P0 | Open | `.chezmoiremove` can recursively delete unrelated or newly recreated user data. | Remove expired entries. Replace necessary migrations with exact content or provenance checks. | A1-001, A7-001, A3-012 |
 | P0 | Resolved | The macOS flake hardcoded user `evelyn`, which did not match the owner's account. | `system.primaryUser` is now set for the `macbook` host as `evelynking`. | A2-001, A4M-003 |
-| P0 | Open | `terraform` is unfree, but the flake has no license exception, so the configuration cannot evaluate. | Remove Terraform or add a narrow `allowUnfreePredicate`. | A2-002, A4M-001 |
+| P0 | Resolved | `terraform` was unfree, but the flake had no license exception, so the configuration could not evaluate. | Terraform has been removed from the macOS system package set. | A2-002, A4M-001 |
 | P0 | Open | Homebrew activation uses `--force-cleanup`, which can remove every undeclared formula, cask, and tap. | Default to `cleanup = "check"` or `"none"` until full Homebrew ownership is an explicit policy. | A2-004, A4M-004 |
 | P1 | Open | Neither platform has a complete cold-start procedure. | Document installation of chezmoi, Nix, Homebrew, and Omarchy prerequisites, activation order, login or reboot, repeated applies, and final verification. | A1-002, A1-005, A2-006, A3-011, A4M-002 |
 | P1 | Open | The nix-darwin drift hook hides evaluation errors and fails before the first generation exists. | Handle the no-generation state, preserve evaluation errors, and distinguish failure from convergence. | A1-003, A2-003 |
@@ -91,7 +91,6 @@ Implementation depends on owner decisions in these areas:
 
 - whether `.chezmoiremove` retains any long-lived migration rules;
 - whether Homebrew owns the entire prefix or only the declared applications;
-- whether Terraform belongs in the macOS system package set;
 - whether mandatory Git signing and agent Git hooks are hard requirements or
   advisory controls;
 - whether Omarchy 3, Linux arm64, or Intel macOS are supported;
