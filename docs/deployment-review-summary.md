@@ -134,10 +134,11 @@ installer, so the new policy preserves it; mise already takes precedence on
   guard handles `/tmp` and `/private/tmp` with or without a trailing slash.
 - Bash completion now uses its default XDG data directory instead of exporting
   the same path after initialization.
+- The AeroSpace config no longer carries the deprecated `after-login-command`
+  option.
 
 ### Open
 
-- remove the deprecated AeroSpace option;
 - exclude the macOS drift hook on Linux;
 - document cold-cache external downloads and add archive checksums if they are
   part of the trust policy;
