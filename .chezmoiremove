@@ -28,6 +28,10 @@
 .aerospace.toml
 .gitconfig
 
+# HyprSpace is retired; nothing installs it and AeroSpace is the macOS window
+# manager. Its config shipped to macOS machines before, so clean it up.
+.hyprspace.toml
+
 # icas is a work tool and is not configured on personal machines.
 .icas.toml
 
