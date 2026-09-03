@@ -8,7 +8,7 @@ files, and the per-machine hook in `~/.config/shell`.
 
 | Template | Contents |
 | --- | --- |
-| `shell-env.sh` | environment for every shell, the Omarchy bootstrap, plus PATH for non-interactive ones |
+| `shell-env.sh` | shared startup environment, the Omarchy bootstrap, plus PATH for non-interactive shells that read it |
 | `shell-path.sh` | the PATH build itself |
 | `shell-interactive.sh` | ssh agent, tool hooks, aliases, Omarchy extras, local overrides, prompt |
 
@@ -26,16 +26,24 @@ Edit the templates, never the rendered files.
 ## Why PATH is built twice
 
 Interactive shells build PATH in the rc file. macOS runs `path_helper` from
-`/etc/zprofile` and `/etc/profile`, and it reorders anything an earlier stage
-prepended, so the rc file is the first point where an ordering sticks.
+`/etc/profile` for login sh and bash. Stock `/etc/zprofile` also runs it for
+login zsh, but nix-darwin replaces that file. Because `path_helper` reorders
+anything an earlier stage prepended, the interactive rc file is the first point
+where the managed order sticks.
 
-`path_helper` only runs for login shells, though. A non-interactive shell never
-reaches it, and under zsh never reads `~/.zshrc` at all. Without a second build
-such a shell inherits a bare PATH: no `~/.local/bin`, no nix profiles, no mise
-shims. That is what makes `ssh host some-command`, cron and launchd jobs, and
-git hooks fail with "command not found" while the same command works
-interactively. `shell-env.sh` therefore runs the same body behind a
+Non-interactive zsh reads `~/.zshenv`, and sshd makes a remote bash command read
+`~/.bashrc`. Without a second build those commands inherit a bare PATH with no
+`~/.local/bin`, nix profiles or mise shims. That is what made
+`ssh host some-command` fail with "command not found" while the same command
+worked interactively. `shell-env.sh` therefore runs the same body behind a
 non-interactive guard.
+
+Before the first nix-darwin activation, `zsh -lc` is one narrow exception.
+Stock `/etc/zprofile` runs `path_helper` after `~/.zshenv` and can reorder the
+managed PATH. Cron jobs, launchd jobs, systemd units and directly executed Git
+hooks do not read these startup files at all. They need their own PATH setting,
+such as `PATH=` in a crontab, `EnvironmentVariables` in a launchd plist,
+`Environment=` in a systemd unit, or an absolute command path in a Git hook.
 
 The body is idempotent and first-occurrence-wins, so a shell that somehow
 reaches both copies still ends up with the same order.
@@ -69,10 +77,9 @@ lost.
 `shell-env.sh` re-sources `env-bootstrap` in place of `~/.bashrc`. It exports
 `OMARCHY_PATH` and appends the mise shims and `~/.local/bin` to PATH.
 Omarchy's own comment calls it "needed even for non-interactive shells", and
-that is right. Without it an SSH command, systemd user unit, cron job or git
-hook gets neither. Putting it in the shared body also hands `OMARCHY_PATH` to
-zsh, which Omarchy's bash-only chain never did. `shell-path.sh` reorders
-whatever it appends, so the mise shims still lead.
+that is right for remote shell commands. Putting it in the shared body also
+hands `OMARCHY_PATH` to zsh, which Omarchy's bash-only chain never did.
+`shell-path.sh` reorders whatever it appends, so the mise shims still lead.
 
 `default/bash/rc` is deliberately *not* sourced. It re-runs `mise activate`,
 `starship init` and `zoxide init` on top of the copies in
@@ -86,9 +93,12 @@ tool being present.
 Omarchy's `default/bash/fns` directory is sourced only by Bash. Those files are
 not a cross-shell API: several rely on Bash-specific `read` behavior or on
 array indexing whose meaning differs in zsh. zsh instead loads
-`shell-omarchy-zsh.zsh`, which holds native ports of the few functions used
-there. At present that is `tdl`, needed by the `ic`, `ix` and `icx` aliases. An
-upstream addition to the Bash directory therefore cannot break zsh startup.
+`shell-omarchy-zsh.zsh`, which currently ports only `tdl` for the `ic`, `ix`
+and `icx` aliases. It does not get Bash's `compress`, `dip`, `dsw`, `fip`,
+`format-drive`, `ga`, `gd`, `hdl`, `hdlm`, `hds`, `hsl`, `iso2sd`, `lip`,
+`lsw`, `rsw`, `ssh`, `tdlm`, `tds` or `tsl` functions. In particular, `ssh`
+in Bash is Omarchy's reconnect wrapper while zsh runs the underlying command.
+An upstream addition to the Bash directory cannot break zsh startup.
 
 Two pieces need no action: `~/.inputrc` is already Omarchy's
 `default/bash/inputrc` plus vi mode, and `default/bash/functions` is only the

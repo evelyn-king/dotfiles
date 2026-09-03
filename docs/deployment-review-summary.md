@@ -138,13 +138,14 @@ installer, so the new policy preserves it; mise already takes precedence on
   option.
 - Non-macOS hosts now exclude the nix-darwin drift hook from the managed script
   set.
+- Shell documentation and comments now distinguish remote shell startup from
+  cron, launchd, systemd and directly executed Git hooks. They also record the
+  nix-darwin `path_helper` behavior and the Bash-only Omarchy helper set.
 
 ### Open
 
 - document cold-cache external downloads and add archive checksums if they are
   part of the trust policy;
-- correct the claims about cron, launchd, Git hooks, `path_helper`, and Omarchy
-  shell helpers;
 - test the remaining hypothesis about unbinding disabled Omarchy defaults.
 
 ## Required policy decisions

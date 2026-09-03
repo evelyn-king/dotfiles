@@ -11,8 +11,8 @@
 # Nix supplies uv and bun on macOS; Omarchy supplies them on Linux. mise uses
 # those system tools as the fast installers for its npm and pipx backends.
 #
-# Interactive shells use `mise activate`; static shims cover noninteractive
-# SSH commands, cron jobs, and hooks.
+# Interactive shells use `mise activate`; static shims cover remote SSH commands
+# whose shell reads the managed environment.
 
 [settings]
 # Project configs can opt into lockfiles; global locks are refreshed explicitly.

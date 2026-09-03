@@ -24,8 +24,9 @@ provisions them on a fresh account.
 Omarchy's shell layer is not applied either; it is loaded at runtime from
 whichever root the detection finds. `default/bash/env-bootstrap` is sourced by
 `shell-env.sh`, the `default/bash/fns` helper functions by
-`shell-interactive.sh`, and the `omarchy` dispatcher's completions by
-`~/.bashrc`. See [../shell-startup.md](../shell-startup.md).
+`shell-interactive.sh` for Bash only, and the `omarchy` dispatcher's
+completions by `~/.bashrc`. zsh receives a native port of `tdl`, not the full
+Bash helper set. See [../shell-startup.md](../shell-startup.md).
 
 ## System packages
 

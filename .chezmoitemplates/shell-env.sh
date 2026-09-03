@@ -1,10 +1,11 @@
-# Environment shared by every shell. Included verbatim into ~/.zshenv and the
-# top of ~/.bashrc, so it must stay POSIX: no arrays, no zsh glob qualifiers.
+# Environment shared by the managed shell startup files. Included verbatim into
+# ~/.zshenv and the top of ~/.bashrc, so it must stay POSIX: no arrays, no zsh
+# glob qualifiers.
 #
-# Interactive shells do NOT build PATH here; they build it in the rc file, after
-# macOS path_helper has run. See shell-path.sh for why, and the block at the
-# bottom of this file for the non-interactive case that path_helper never
-# touches.
+# Interactive shells do NOT build PATH here; they build it in the rc file after
+# any macOS login path setup. See shell-path.sh for why, and the block at the
+# bottom of this file for non-interactive shells that read a managed startup
+# file.
 
 export EDITOR=nvim
 export VISUAL=$EDITOR
@@ -71,9 +72,9 @@ export DOCKER_DEFAULT_PLATFORM=linux/amd64
 
 # Omarchy's env-bootstrap exports OMARCHY_PATH and appends the mise shims and
 # ~/.local/bin to PATH. Omarchy sources it from ~/.bashrc, which this repo
-# replaces wholesale, so without this it is lost for every shell that never
-# reaches /etc/profile.d: SSH commands, systemd user units, cron jobs and git
-# hooks. Its own comment calls it "needed even for non-interactive shells".
+# replaces wholesale, so without this it is lost for zsh and for remote bash
+# commands that sshd starts through .bashrc. Its own comment calls it "needed
+# even for non-interactive shells".
 #
 # Sourcing it here rather than from ~/.bashrc also hands zsh the variable,
 # which Omarchy's bash-only rc chain never did. Roots and their order match
@@ -93,16 +94,16 @@ unset __dir
 
 # --- PATH for non-interactive shells ---------------------------------------
 
-# Interactive shells skip this. They build PATH in ~/.zshrc / ~/.bashrc so that
-# it lands after macOS path_helper, which runs from /etc/zprofile and
-# /etc/profile and reorders whatever an earlier stage prepended.
+# Interactive shells skip this. They build PATH in ~/.zshrc or ~/.bashrc after
+# any macOS login path setup has finished.
 #
-# path_helper only runs for LOGIN shells, though. A non-interactive shell never
-# reaches it, and under zsh never reads ~/.zshrc at all. Without this block such
-# a shell inherits whatever bare PATH its parent handed over: no ~/.local/bin,
-# no nix profiles, no ~/.cargo/bin. That is what made
+# zsh reads ~/.zshenv for every invocation, and sshd makes remote bash commands
+# read ~/.bashrc. Without this block those commands inherit whatever bare PATH
+# their parent handed over: no ~/.local/bin, no nix profiles, no ~/.cargo/bin.
+# That is what made
 # `ssh host jupyter-remote-lab` fail with "command not found" while the same
-# command worked interactively. Cron and launchd jobs and git hooks hit it too.
+# command worked interactively. Cron, launchd, systemd units and directly
+# executed Git hooks do not read these files and must set their own PATH.
 #
 # Nothing reorders PATH after this point in a non-interactive shell, so building
 # it here is safe. The body is idempotent, first occurrence wins, so an

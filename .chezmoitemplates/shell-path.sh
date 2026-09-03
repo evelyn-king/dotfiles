@@ -1,13 +1,14 @@
 # PATH, built in the interactive rc rather than in the env file.
 #
-# macOS runs path_helper from /etc/zprofile and /etc/profile, which reorders
-# anything an earlier stage prepended. Building PATH here, after that has run,
-# is the only way to keep this order on macOS, and costs nothing on Linux.
+# macOS runs path_helper from /etc/profile for login sh and bash. Stock
+# /etc/zprofile does the same for login zsh, but nix-darwin replaces that file.
+# Building PATH in the interactive rc preserves this order after either login
+# path setup and costs nothing on Linux.
 #
 # Two callers include this body, and only one is the interactive rc.
-# shell-env.sh also runs it for non-interactive shells, which never reach
-# path_helper and would otherwise get no PATH at all. Keep it idempotent. The
-# first-occurrence-wins rule below is what makes running it twice harmless.
+# shell-env.sh also runs it when a non-interactive shell reads .zshenv, .profile
+# or sshd's special .bashrc path. Keep it idempotent. The first-occurrence-wins
+# rule below is what makes running it twice harmless.
 #
 # POSIX on purpose: the same text is included into ~/.zshrc, ~/.bashrc and
 # (via shell-env.sh) ~/.zshenv and ~/.profile, so no zsh arrays and no (N-/)
@@ -34,8 +35,8 @@ __path_new="$GOPATH/bin"
 # depend on that order, since `mise activate` prepends the real install
 # dirs later. Non-interactive shells have only the shims, and those are
 # exactly the shells this order protects: a hand-installed binary dropped
-# into ~/.local/bin must not outrank the version mise pins for SSH
-# commands, cron jobs and hooks. ~/.local/bin keeps its own scripts.
+# into ~/.local/bin must not outrank the version mise pins for remote SSH
+# commands. ~/.local/bin keeps its own scripts.
 for __dir in \
   "$XDG_DATA_HOME/mise/shims" \
   "$HOME/.local/bin" \
