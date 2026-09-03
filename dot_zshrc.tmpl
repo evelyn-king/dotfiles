@@ -23,6 +23,11 @@ else
 fi
 autoload -U +X bashcompinit && bashcompinit
 
+# ~/.inputrc turns on `completion-ignore-case`, but that is a readline setting
+# and zsh has its own completion system, so without this the daily shell is the
+# case-sensitive one. Lower case matches upper and the reverse.
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+
 {{ template "shell-omarchy-zsh.zsh" . }}
 
 {{ template "shell-interactive.sh" . }}
