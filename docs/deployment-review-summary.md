@@ -39,6 +39,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | The privacy rule conflicted with employer addresses retained in commit history, and local credential files lacked protection guidance. | The rule now applies to the current tree and new commits while acknowledging retained history. The local-secret procedure covers credential stores, private modes, atomic writes, backups, and commit checks. | A7-006, A7-007 |
 | P2 | Resolved | Supported architectures and Omarchy versions were not defined. | The supported targets are now Apple Silicon macOS and Omarchy 4 on x86_64 Linux. Omarchy 3, Linux arm64 and Intel macOS are explicitly unsupported. | A3-006, A4-003, A4M-010 |
 | P2 | Resolved | Greedy Homebrew cask upgrades conflicted with application self-updaters. | Homebrew is intentionally authoritative for all declared casks during activation, including self-updating applications. The package guide documents the resulting downloads and bundle replacement. | A2-010, A4M-011 |
+| P2 | Resolved | macOS mise installs resolved live versions without checksums or a reviewable record. | The shared lock now covers `linux-x64` and `macos-arm64`. Both install hooks and `mup` use the committed lock. | A4M-005 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -102,10 +103,9 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## P2 stabilization work
 
-- Make runtime ownership deterministic. Add `macos-arm64` mise lock entries,
-  stop mise from shadowing Omarchy-owned `herdr`, `usage`, and `tree-sitter`,
-  remove global macOS GCC unless required, report PATH drift, and correct the
-  `mise self-update` instructions.
+- Make runtime ownership deterministic. Stop mise from shadowing Omarchy-owned
+  `herdr`, `usage`, and `tree-sitter`, remove global macOS GCC unless required,
+  report PATH drift, and correct the `mise self-update` instructions.
 - Normalize shell behavior. Own zsh history explicitly, fix locale validation,
   honor inherited Jupyter variables, make `extras.sh` available where
   documented, preserve an existing SSH agent, and disable nix-darwin's second

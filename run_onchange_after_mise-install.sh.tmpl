@@ -6,9 +6,7 @@
 # `chezmoi apply` rather than a remembered command.
 
 # shared tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
-{{- if eq .chezmoi.os "linux" }}
-# Linux lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
-{{- end }}
+# lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
 # mise executable: {{ lookPath "mise" | quote }}
 {{- $omarchy := includeTemplate "omarchy-detect.tmpl" . }}
 
@@ -37,11 +35,7 @@ if ((${#missing_backends[@]})); then
 {{- end }}
 fi
 
-{{- if eq .chezmoi.os "linux" }}
 # The lockfile is repo content and is never applied to $HOME, so the locked
 # install reads it from the source tree, which is also what `mup` does.
 MISE_CONFIG_DIR={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }} \
   mise install --locked
-{{- else }}
-mise install
-{{- end }}

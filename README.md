@@ -84,12 +84,11 @@ that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
 mup
 ```
 
-On macOS `mup` refreshes the untracked global lock under `~/.config/mise` and
-installs the resolved versions. On Linux it refreshes the committed
-`dot_config/mise/mise.lock` for `linux-x64` and installs with locked
-resolution; review and commit the lockfile change afterwards. Rust is the one
-channel-based exception: its lock entry remains `stable`, and rustup resolves
-that channel when mise installs or updates it.
+On macOS `mup` refreshes the committed `dot_config/mise/mise.lock` for
+`macos-arm64`; on Linux it refreshes the same lock for `linux-x64`. Both install
+with locked resolution. Review and commit the lockfile change afterwards. Rust
+is the one channel-based exception: its lock entry remains `stable`, and rustup
+resolves that channel when mise installs or updates it.
 
 Like `nix/flake.lock`, that lock is repo content rather than a home file. mise
 rewrites a lock in place whenever it installs, so an applied second copy under

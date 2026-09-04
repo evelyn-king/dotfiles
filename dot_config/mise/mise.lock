@@ -9,6 +9,9 @@ checksum = "sha256:4dcbd239217dd01a5cf73002eea8f85e945170830d66891948426a09c99f3
 url = "https://github.com/anthropics/claude-code/releases/download/v2.1.258/claude-linux-x64.tar.gz"
 url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/540224577"
 
+[tools.claude."platforms.macos-arm64"]
+url = "https://storage.googleapis.com/claude-code-dist-86c565f3-f756-42ad-8dfa-d59b1c096819/claude-code-releases/2.1.258/darwin-arm64/claude"
+
 [[tools.codex]]
 version = "0.152.1"
 backend = "aqua:openai/codex"
@@ -17,6 +20,11 @@ backend = "aqua:openai/codex"
 checksum = "sha256:2aeea68239b4d96081b3e7fe91d0d64e4875b224668c381985d22bb31d7566b9"
 url = "https://github.com/openai/codex/releases/download/rust-v0.152.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/openai/codex/releases/assets/540234347"
+
+[tools.codex."platforms.macos-arm64"]
+checksum = "sha256:0a5dffe5a4ab6769e70d962708d2a195b2adcf8cb96e7b9d969a2c95d2238575"
+url = "https://github.com/openai/codex/releases/download/rust-v0.152.1/codex-package-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/540234419"
 
 [[tools.gh]]
 version = "2.99.0"
@@ -28,6 +36,12 @@ url = "https://github.com/cli/cli/releases/download/v2.99.0/gh_2.99.0_linux_amd6
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/540091442"
 provenance = "github-attestations"
 
+[tools.gh."platforms.macos-arm64"]
+checksum = "sha256:94d4bd7e88563a9cb414e651e88acc4f1728a87476752460906d824230748d37"
+url = "https://github.com/cli/cli/releases/download/v2.99.0/gh_2.99.0_macOS_arm64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/540091462"
+provenance = "github-attestations"
+
 [[tools.go]]
 version = "1.27.0"
 backend = "core:go"
@@ -35,6 +49,10 @@ backend = "core:go"
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:675c26c449cbb18fc24b74650de1eabbae6e16f64326fd85a283fb3b58280685"
 url = "https://dl.google.com/go/go1.27.0.linux-amd64.tar.gz"
+
+[tools.go."platforms.macos-arm64"]
+checksum = "sha256:90493b3bbd5e10f91d12153198bf1994fd756399b4fec93b49b0c6e2acdeeb3e"
+url = "https://dl.google.com/go/go1.27.0.darwin-arm64.tar.gz"
 
 [[tools.herdr]]
 version = "0.8.2"
@@ -45,6 +63,11 @@ checksum = "sha256:976150a14d490c94b243ea2e1a7eb2dfb67f12e36b182db90936f6728e6ae
 url = "https://github.com/herdrdev/herdr/releases/download/v0.8.2/herdr-linux-x86_64"
 url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/521169107"
 
+[tools.herdr."platforms.macos-arm64"]
+checksum = "sha256:a5d4f4d504d8b309c91f811050559300faba31258425f53c50852fc96f6ae574"
+url = "https://github.com/herdrdev/herdr/releases/download/v0.8.2/herdr-macos-aarch64"
+url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/521169108"
+
 [[tools.micromamba]]
 version = "2.9.0-0"
 backend = "github:mamba-org/micromamba-releases"
@@ -54,6 +77,11 @@ checksum = "sha256:8761c382127e6363bd9e0a2451aa3ef90d071a79133f736e2f759a3bf1304
 url = "https://github.com/mamba-org/micromamba-releases/releases/download/2.9.0-0/micromamba-linux-64.tar.bz2"
 url_api = "https://api.github.com/repos/mamba-org/micromamba-releases/releases/assets/505526153"
 
+[tools.micromamba."platforms.macos-arm64"]
+checksum = "sha256:500f5074feb8d02c4296ef9921c3650ed2874171805a9fbb8fbb53896433646b"
+url = "https://github.com/mamba-org/micromamba-releases/releases/download/2.9.0-0/micromamba-osx-arm64.tar.bz2"
+url_api = "https://api.github.com/repos/mamba-org/micromamba-releases/releases/assets/505526141"
+
 [[tools.node]]
 version = "26.8.0"
 backend = "core:node"
@@ -61,6 +89,10 @@ backend = "core:node"
 [tools.node."platforms.linux-x64"]
 checksum = "sha256:32fcdc8e2e2cc54fbcd6c8cc96ca5bd2e70019ac23000cbd6ccc5663de111b33"
 url = "https://nodejs.org/dist/v26.8.0/node-v26.8.0-linux-x64.tar.gz"
+
+[tools.node."platforms.macos-arm64"]
+checksum = "sha256:d6516f067a433cd979b27dfdb0bad88ce97f47be33b713d04c8361b1502f19c6"
+url = "https://nodejs.org/dist/v26.8.0/node-v26.8.0-darwin-arm64.tar.gz"
 
 [[tools."npm:@doist/todoist-cli"]]
 version = "4.0.0"
@@ -91,6 +123,11 @@ checksum = "sha256:7c20c1ffa91bcca0ac903752260bcc36307dff656833baead2f5ef3b224b1
 url = "https://github.com/anomalyco/opencode/releases/download/v1.18.26/opencode-linux-x64.tar.gz"
 url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/540146333"
 
+[tools.opencode."platforms.macos-arm64"]
+checksum = "sha256:b05d383149a5a417140e8edebd83064142fa36e74fdfcd5f791919dcb12fd33a"
+url = "https://github.com/anomalyco/opencode/releases/download/v1.18.26/opencode-darwin-arm64.zip"
+url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/540146149"
+
 [[tools.pi]]
 version = "0.84.4"
 backend = "aqua:earendil-works/pi"
@@ -99,6 +136,11 @@ backend = "aqua:earendil-works/pi"
 checksum = "sha256:c2f3c3e6a1850bd87654cc3ca8811013272397c3d042a4e2a64c43ee1b423972"
 url = "https://github.com/earendil-works/pi/releases/download/v0.84.4/pi-linux-x64.tar.gz"
 url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/534389946"
+
+[tools.pi."platforms.macos-arm64"]
+checksum = "sha256:c68e3ac4d05b4e282aaab2e6c76f161d3e9e68f19a22e38913cbfaadb6c800f0"
+url = "https://github.com/earendil-works/pi/releases/download/v0.84.4/pi-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/534389952"
 
 [[tools."pipx:black"]]
 version = "26.5.1"
@@ -159,6 +201,11 @@ checksum = "sha256:3959f92825141e04adf44982d3a83ee57af0877e893b0796e04c1468749d9
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.14.7+20260901-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
+[tools.python."platforms.macos-arm64"]
+checksum = "sha256:4632cb1a6edad9e73d3c81b6d2e69131637d995173e3e85005df14102b0592ba"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260901/cpython-3.14.7+20260901-aarch64-apple-darwin-install_only_stripped.tar.gz"
+provenance = "github-attestations"
+
 [[tools.rust]]
 version = "stable"
 backend = "core:rust"
@@ -174,3 +221,8 @@ backend = "aqua:jdx/usage"
 checksum = "sha256:f159816540a3b813d51458ff25344a888e772d9e03d13006140ec5b42023a06e"
 url = "https://github.com/jdx/usage/releases/download/v6.6.1/usage-x86_64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/jdx/usage/releases/assets/539822350"
+
+[tools.usage."platforms.macos-arm64"]
+checksum = "sha256:2cd11077e8b62c65687c84eab29dae429985acfdea3847b3775a99677f5d6408"
+url = "https://github.com/jdx/usage/releases/download/v6.6.1/usage-universal-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/jdx/usage/releases/assets/539847849"

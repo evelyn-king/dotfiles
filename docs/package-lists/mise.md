@@ -6,11 +6,11 @@ Linux. Their declarations live in
 
 The TOML file is the source of truth for requested versions. Most tools have
 exact pins. Coding agents, `gh`, and `usage` track `latest` by design, while
-Rust tracks the stable release channel. On Linux,
+Rust tracks the stable release channel. On both platforms,
 [`dot_config/mise/mise.lock`](../../dot_config/mise/mise.lock) resolves them to
-reviewable versions and checksums for `linux-x64` where the backend exposes a
-fixed artifact. The Rust entry remains `stable`; rustup resolves that channel
-when mise installs or updates it.
+reviewable versions and checksums for `linux-x64` and `macos-arm64` where the
+backend exposes a fixed artifact. The Rust entry remains `stable`; rustup
+resolves that channel when mise installs or updates it.
 
 ## Shared tools
 
@@ -39,9 +39,9 @@ provide them before applying. Apply a declaration change with:
 chezmoi apply
 ```
 
-Run `mup` to update floating tools and their lock resolution. On Linux, review
-and commit the resulting `dot_config/mise/mise.lock` change. Update mise itself
-separately with `mise self-update`.
+Run `mup` to update floating tools and their platform-specific lock resolution.
+Review and commit the resulting `dot_config/mise/mise.lock` change. Update mise
+itself separately with `mise self-update`.
 
 mise hides releases younger than a day so a compromised publish has time to be
 pulled before it lands here. The coding agents ship several times a day, which
