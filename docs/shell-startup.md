@@ -15,13 +15,18 @@ files, and the per-machine hook in `~/.config/shell`.
 | Rendered file | Includes |
 | --- | --- |
 | `~/.zshenv` | `shell-env.sh` |
-| `~/.zshrc` | `shell-path.sh`, zsh completions, `shell-interactive.sh` |
+| `~/.zshrc` | `shell-path.sh`, zsh history/completions, `shell-interactive.sh` |
 | `~/.bashrc` | `shell-env.sh`, `shell-path.sh`, bash history/completions, Omarchy completions, `shell-interactive.sh` |
 | `~/.bash_profile` | sources `~/.bashrc` |
 | `~/.profile` | `shell-env.sh` |
 | `~/.zprofile` | nothing; a comment explaining why |
 
 Edit the templates, never the rendered files.
+
+Both interactive shells retain 100,000 history entries. zsh writes its history
+to `$XDG_STATE_HOME/zsh/history` and appends when a shell exits without
+interleaving commands live across open shells. Atuin keeps its own searchable
+database in addition to the shell-native history.
 
 ## Why PATH is built twice
 

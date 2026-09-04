@@ -12,6 +12,15 @@ typeset -U path fpath
 bindkey -v
 KEYTIMEOUT=2
 
+# --- history ----------------------------------------------------------------
+
+mkdir -p "$XDG_STATE_HOME/zsh"
+HISTFILE="$XDG_STATE_HOME/zsh/history"
+HISTSIZE=100000
+SAVEHIST=100000
+setopt APPEND_HISTORY HIST_IGNORE_ALL_DUPS
+unsetopt SHARE_HISTORY
+
 # --- completions ------------------------------------------------------------
 
 # Completions installed by a package manager into a system prefix arrive on

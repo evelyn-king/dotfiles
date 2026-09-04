@@ -32,8 +32,8 @@ fi
 
 # --- history ----------------------------------------------------------------
 
-# zsh needs no equivalent block: atuin owns history in both shells, but bash's
-# defaults truncate and overwrite badly enough to matter before atuin loads.
+# Atuin keeps a separate searchable database. Bash still owns normal recall and
+# its history file, just as zsh does in its rc file.
 HISTSIZE=100000
 HISTFILESIZE=100000
 HISTCONTROL=ignoreboth
