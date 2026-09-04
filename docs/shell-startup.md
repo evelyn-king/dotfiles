@@ -106,8 +106,52 @@ Two pieces need no action: `~/.inputrc` is already Omarchy's
 
 ## Per-machine overrides
 
-One hook, sourced near the end of `shell-interactive.sh`:
+One hook is sourced near the end of `shell-interactive.sh`:
 
-- `~/.config/shell/extras.sh`, untracked. Nothing in this repo creates or
-  manages it. This is where a per-machine `JUPYTER_PORT` or
-  `MAMBA_ROOT_PREFIX` override belongs.
+- `~/.config/shell/extras.sh`, untracked and hand-written. Nothing in this repo
+  creates or manages it. Use it for per-machine settings such as
+  `JUPYTER_PORT` or `MAMBA_ROOT_PREFIX`.
+
+Prefer the system credential manager or a tool's own protected authentication
+file for secrets. Do not export long-lived tokens from `extras.sh`. Every
+interactive shell and its child processes would inherit them.
+
+Create `extras.sh` with a private directory and file mode, even when the current
+umask is permissive:
+
+```sh
+install -d -m 700 "$HOME/.config/shell"
+if [ ! -e "$HOME/.config/shell/extras.sh" ]; then
+  install -m 600 /dev/null "$HOME/.config/shell/extras.sh"
+else
+  chmod 600 "$HOME/.config/shell/extras.sh"
+fi
+```
+
+Keep generated credential files outside the chezmoi source directory. Protect
+their parent directory with mode 0700 and the files with mode 0600. Generate a
+complete temporary file in the destination directory, then rename it into
+place so a shell or application cannot read a partial credential:
+
+```sh
+(
+  set -eu
+  credential_dir="$HOME/.config/example"
+  credential_file="$credential_dir/credentials.json"
+  install -d -m 700 "$credential_dir"
+  credential_tmp=$(mktemp "$credential_dir/.credentials.json.XXXXXX")
+  trap 'rm -f "$credential_tmp"' EXIT HUP INT TERM
+  chmod 600 "$credential_tmp"
+  command-that-writes-credential >"$credential_tmp"
+  mv "$credential_tmp" "$credential_file"
+  trap - EXIT HUP INT TERM
+)
+```
+
+Replace the example directory, file and generator with the paths and command
+for the tool. Store any required backup in an encrypted secret store, not in
+the dotfiles repository or an unencrypted sync folder.
+
+Before committing, inspect `git status --short`, stage explicit paths, and
+inspect `git diff --cached`. Do not rely on `.gitignore` to protect secrets. If
+a secret reaches a commit, revoke it before arranging any history rewrite.

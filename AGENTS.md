@@ -58,9 +58,12 @@
 - Link related issues. Add screenshots only for UI-facing config changes.
 
 ## Configuration and security
-- Do not commit secrets. They belong in the untracked
-  `~/.config/shell/extras.sh`.
-- This is a personal repo. Do not add employer hostnames, addresses, signing keys
-  or internal paths to it.
+- Do not commit secrets. Prefer the system credential manager or tool-specific
+  authentication files outside the source tree. Use the untracked
+  `~/.config/shell/extras.sh` only when no safer option exists, and keep it mode
+  0600.
+- This personal repo retains employer addresses in older commit metadata. Do not
+  add employer hostnames, addresses, private signing keys or internal paths to
+  the current tree or new commits.
 - Put native Windows changes on the `windows` branch.
 - Keep `dot_config/nvim/lazy-lock.json` untracked; it is per-machine.
