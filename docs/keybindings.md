@@ -119,3 +119,22 @@ have, and a key that behaves differently is worse than a key that does nothing.
   mapping stays responsive alongside them. Neovim needs none of this.
 - **`<C-s>`.** Terminal flow control eats it unless the shell has run
   `stty -ixon`.
+
+## AeroSpace on macOS
+
+AeroSpace reserves `Ctrl-Alt` as its global prefix. Keeping both modifiers on
+the main-mode bindings leaves the editors' `<C-h/j/k/l>` and `<M-j/k>` mappings
+available inside terminals.
+
+| Key | Action |
+| --- | --- |
+| `Ctrl-Alt-H/J/K/L` | Focus left/down/up/right |
+| `Ctrl-Alt-Shift-H/J/K/L` | Move the window left/down/up/right |
+| `Ctrl-Alt-1` through `9` | Switch workspace |
+| `Ctrl-Alt-Shift-1` through `9` | Move the window to a workspace |
+| `Ctrl-Alt-Enter` | Open Ghostty |
+| `Ctrl-Alt-Slash`, `Ctrl-Alt-Comma` | Use tiles or accordion layout |
+| `Ctrl-Alt-Minus`, `Ctrl-Alt-Equal` | Resize the window |
+| `Ctrl-Alt-Tab` | Switch to the previous workspace |
+| `Ctrl-Alt-Shift-Tab` | Move the workspace to the next monitor |
+| `Ctrl-Alt-Shift-Semicolon` | Enter service mode |

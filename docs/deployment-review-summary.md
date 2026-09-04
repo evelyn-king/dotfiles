@@ -51,6 +51,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | Keychain replaced valid local SSH agents, including macOS's launchd agent, because only OpenSSH forwarding sockets were recognized. | Interactive startup keeps any inherited agent that responds to `ssh-add -l` and starts keychain only as a fallback. | A5-014, A5M-005 |
 | P2 | Resolved | nix-darwin and the managed zsh configuration both ran `compinit` with different `fpath` values. | nix-darwin's global completion initialization is disabled, leaving the managed `~/.zshrc` as the single owner. | A5M-001 |
 | P2 | Resolved | AeroSpace was installed but did not start automatically, and its required Accessibility approval was easy to miss. | AeroSpace now starts at login after initial launch. The macOS cold-start guide names the approval path, restart, and verification command. | A2-008 |
+| P2 | Resolved | AeroSpace captured bare Control shortcuts before terminal shells, Vim, or Neovim could receive them. | Main-mode shortcuts now use a dedicated `Ctrl-Alt` prefix, and the keybinding guide records the full map. | A2-007 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -115,8 +116,7 @@ installer, so the new policy preserves it; mise already takes precedence on
 ## P2 stabilization work
 
 - Resolve desktop ownership. Decide whether chezmoi or Omarchy owns monitor
-  scaling, gate display-specific settings by host, and move AeroSpace's global
-  shortcuts away from terminal and editor keys.
+  scaling and whether display-specific settings should be gated by host.
 - Make application installs reproducible. Build micromamba environments without
   deleting the working copy first, add environment locks, decide whether to
   track Neovim's lock, avoid the headless Lazy bootstrap hang, and move
