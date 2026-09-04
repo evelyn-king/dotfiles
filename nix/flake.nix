@@ -114,7 +114,6 @@
 
         casks = [
           "1password-cli"
-          "adobe-acrobat-reader"
           "nikitabobko/tap/aerospace"
           "basictex"
           "bitwarden"
@@ -122,12 +121,8 @@
           "claude"
           "firefox"
           "ghostty"
-          "gimp"
           "iterm2"
-          "klayout"
-          "ltspice"
           "obsidian"
-          "paraview"
           "rancher"
           "raycast"
           "spotify"
