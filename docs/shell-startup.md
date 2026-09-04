@@ -77,6 +77,11 @@ reaches both copies still ends up with the same order.
   On bash 5.3 the current bash-preexec hooks preexec through `PS0` rather than
   the DEBUG trap; the 0.6.0 this repo used to vendor cannot.
 
+Interactive startup probes an inherited `SSH_AUTH_SOCK` with `ssh-add -l` and
+keeps any agent that answers, even when it holds no keys. This preserves
+forwarded, launchd, systemd, desktop, and password-manager agents. Keychain
+starts a local agent only when no inherited agent is reachable.
+
 ## Omarchy
 
 Omarchy's own `~/.bashrc` is two things: `default/bash/env-bootstrap`, and then

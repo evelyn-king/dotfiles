@@ -18,21 +18,22 @@ GPG_TTY=$(tty 2>/dev/null) && export GPG_TTY
 
 # --- ssh agent --------------------------------------------------------------
 
-# Keep a forwarded agent when SSH'd in; otherwise let keychain manage a local one.
-__use_forwarded_agent=0
-if [ -n "${SSH_CONNECTION:-}" ]; then
-  case "${SSH_AUTH_SOCK:-}" in
-  /tmp/ssh-*/agent.*)
+# Keep any reachable inherited agent, including OpenSSH forwarding, Apple's
+# launchd agent, systemd sockets, desktop keyrings, and password managers.
+__use_existing_agent=0
+if [ -n "${SSH_AUTH_SOCK:-}" ] && command -v ssh-add >/dev/null 2>&1; then
+  __ssh_add_status=0
+  ssh-add -l >/dev/null 2>&1 || __ssh_add_status=$?
+  case $__ssh_add_status in
     # 0 = keys listed, 1 = agent reachable but holding none. Both are usable.
-    ssh-add -l >/dev/null 2>&1
-    [ $? -le 1 ] && __use_forwarded_agent=1
-    ;;
+    0 | 1) __use_existing_agent=1 ;;
   esac
+  unset __ssh_add_status
 fi
-if [ "$__use_forwarded_agent" -eq 0 ] && command -v keychain >/dev/null 2>&1; then
+if [ "$__use_existing_agent" -eq 0 ] && command -v keychain >/dev/null 2>&1; then
   eval "$(keychain --eval --quiet --ignore-missing id_ed25519)" || true
 fi
-unset __use_forwarded_agent
+unset __use_existing_agent
 
 # --- tool integrations ------------------------------------------------------
 

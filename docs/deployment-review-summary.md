@@ -48,6 +48,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | Linux ignored the system locale in clean sessions, while macOS accepted unsupported inherited locale names. | Shell startup validates inherited locales against the host, then reads `/etc/locale.conf` on Linux or `AppleLocale` on macOS before portable fallbacks. | A5-003, A5M-004 |
 | P2 | Resolved | Shell startup overwrote inherited Jupyter bind, environment, and port variables. | Jupyter variables now use defaults only when the parent did not provide a value. | A5-005 |
 | P2 | Resolved | `extras.sh` overrides were documented for remote Jupyter use but loaded only by interactive shells. | The local override file now runs after shared defaults in every shell that reads a managed startup file. | A5-004 |
+| P2 | Resolved | Keychain replaced valid local SSH agents, including macOS's launchd agent, because only OpenSSH forwarding sockets were recognized. | Interactive startup keeps any inherited agent that responds to `ssh-add -l` and starts keychain only as a fallback. | A5-014, A5M-005 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -111,8 +112,7 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## P2 stabilization work
 
-- Normalize shell behavior. Preserve an existing SSH agent and disable
-  nix-darwin's second global `compinit`.
+- Normalize shell behavior. Disable nix-darwin's second global `compinit`.
 - Resolve desktop ownership. Decide whether chezmoi or Omarchy owns monitor
   scaling, gate display-specific settings by host, configure AeroSpace startup
   and Accessibility onboarding, and move its global shortcuts away from
