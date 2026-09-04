@@ -24,6 +24,11 @@ hostname-specific template seeds a new machine, then Omarchy owns the file so
 changes made with its monitor-scaling control survive later applies. Delete the
 file before an apply to seed it again.
 
+The single-window aspect limit is global. `looknfeel.lua` enables the golden
+ratio limit when any enabled display is wider than that ratio and disables it
+otherwise. It reevaluates the limit after config reloads and monitor changes,
+so docking and undocking do not depend on the hostname.
+
 The rest of `~/.config/hypr` belongs to the package. A file identical to the
 shipped default only pins a stale copy, and Omarchy's update migrations rewrite
 those files in place, which a later apply would revert. `/etc/skel/.config/hypr`
