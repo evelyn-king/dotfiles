@@ -108,16 +108,20 @@
       homebrew = {
         enable = true;
         taps = [ "nikitabobko/tap" ];
-        # 43 of the 47 casks below set `auto_updates`, so forcing Homebrew to
+        # 37 of the 40 casks below set `auto_updates`, so forcing Homebrew to
         # own every version means fighting each vendor's own updater on a
         # roughly fortnightly cycle, and re-running a pkg installer under sudo
         # for the Microsoft suite, google-drive, onedrive, cloudflare-warp,
         # tailscale-app, zoom and the Logitech pair. Let the apps update
         # themselves instead, and opt individual casks back in below.
         #
-        # This does not stop `upgrade = true` from upgrading the four casks
-        # that do not self-update (1password-cli, aerospace, basictex, dot);
-        # non-greedy `brew upgrade` already covers those.
+        # This does not stop `upgrade = true` from upgrading the three casks
+        # that do not self-update (aerospace, basictex, dot); non-greedy
+        # `brew upgrade` already covers those.
+        #
+        # Recount both numbers after adding or removing a cask:
+        #   brew info --json=v2 --cask <tokens...> \
+        #     | jq '[.casks[].auto_updates] | {total: length, self: map(select(.)) | length}'
         greedyCasks = false;
 
         casks = [
@@ -125,10 +129,10 @@
           "bitwarden"
 
           # --- window management and launchers ---
-          # bartender, notion-calendar and raindropio each sat between seven
-          # months and two years out of date while installed by hand, despite
-          # all three advertising `auto_updates`. Non-greedy would recreate the
-          # conditions they rotted under, so Homebrew forces these three.
+          # bartender and raindropio each sat between seven months and two
+          # years out of date while installed by hand, despite both advertising
+          # `auto_updates`. Non-greedy would recreate the conditions they
+          # rotted under, so Homebrew forces these two.
           "nikitabobko/tap/aerospace"
           { name = "bartender"; greedy = true; }
           "raycast"
