@@ -108,12 +108,17 @@
       homebrew = {
         enable = true;
         taps = [ "nikitabobko/tap" ];
-        # Homebrew owns cask versions at activation, including apps with their
-        # own updaters. Casks that ship a pkg or installer artifact (the
-        # Microsoft suite, google-drive, onedrive, cloudflare-warp,
-        # tailscale-app, zoom and the Logitech pair) re-run their installer on
-        # upgrade and prompt for sudo, so activation is not unattended.
-        greedyCasks = true;
+        # 43 of the 47 casks below set `auto_updates`, so forcing Homebrew to
+        # own every version means fighting each vendor's own updater on a
+        # roughly fortnightly cycle, and re-running a pkg installer under sudo
+        # for the Microsoft suite, google-drive, onedrive, cloudflare-warp,
+        # tailscale-app, zoom and the Logitech pair. Let the apps update
+        # themselves instead, and opt individual casks back in below.
+        #
+        # This does not stop `upgrade = true` from upgrading the four casks
+        # that do not self-update (1password-cli, aerospace, basictex, dot);
+        # non-greedy `brew upgrade` already covers those.
+        greedyCasks = false;
 
         casks = [
           # --- security and credentials ---
@@ -121,8 +126,12 @@
           "bitwarden"
 
           # --- window management and launchers ---
+          # bartender, notion-calendar and raindropio each sat between seven
+          # months and two years out of date while installed by hand, despite
+          # all three advertising `auto_updates`. Non-greedy would recreate the
+          # conditions they rotted under, so Homebrew forces these three.
           "nikitabobko/tap/aerospace"
-          "bartender"
+          { name = "bartender"; greedy = true; }
           "raycast"
 
           # --- browsers ---
@@ -146,9 +155,9 @@
           # --- notes, tasks and reference ---
           "dot"
           "notion"
-          "notion-calendar"
+          { name = "notion-calendar"; greedy = true; }
           "obsidian"
-          "raindropio"
+          { name = "raindropio"; greedy = true; }
           "todoist-app"
           "zotero"
 
