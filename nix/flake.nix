@@ -109,27 +109,107 @@
         enable = true;
         taps = [ "nikitabobko/tap" ];
         # Homebrew owns cask versions at activation, including apps with their
-        # own updaters.
+        # own updaters. Casks that ship a pkg or installer artifact (the
+        # Microsoft suite, google-drive, onedrive, cloudflare-warp,
+        # tailscale-app, zoom and the Logitech pair) re-run their installer on
+        # upgrade and prompt for sudo, so activation is not unattended.
         greedyCasks = true;
 
         casks = [
+          # --- security and credentials ---
           "1password-cli"
-          "nikitabobko/tap/aerospace"
-          "basictex"
           "bitwarden"
-          "chatgpt"
-          "claude"
+
+          # --- window management and launchers ---
+          "nikitabobko/tap/aerospace"
+          "bartender"
+          "raycast"
+
+          # --- browsers ---
+          "brave-origin"
           "firefox"
+          "google-chrome"
+          "helium-browser"
+          "microsoft-edge"
+          "zen"
+
+          # --- terminals and editors ---
           "ghostty"
           "iterm2"
-          "obsidian"
-          "rancher"
-          "raycast"
-          "spotify"
           "visual-studio-code"
           "zed"
+
+          # --- AI assistants ---
+          "chatgpt"
+          "claude"
+
+          # --- notes, tasks and reference ---
+          "dot"
+          "notion"
+          "notion-calendar"
+          "obsidian"
+          "raindropio"
+          "todoist-app"
           "zotero"
+
+          # --- communication ---
+          "discord"
+          "microsoft-teams"
+          "proton-mail"
+          "readdle-spark"
+          "signal"
+          "zoom"
+
+          # --- office and documents ---
+          "basictex"
+          "microsoft-excel"
+          "microsoft-onenote"
+          "microsoft-outlook"
+          "microsoft-powerpoint"
+          "microsoft-word"
+
+          # --- cloud storage and sync ---
+          "dropbox"
+          "google-drive"
+          "onedrive"
+          "proton-drive"
+
+          # --- networking ---
+          "cloudflare-warp"
+          "tailscale-app"
+
+          # --- hardware ---
+          "logi-options+"
+          "logitune"
+
+          # --- containers ---
+          "rancher"
+
+          # --- media and games ---
+          "spotify"
+          "steam"
         ];
+
+        # Mac App Store apps, installed with `mas`. nix-darwin puts `pkgs.mas`
+        # on the activation PATH, so it is not declared as a formula.
+        #
+        # Two caveats from the Homebrew Bundle implementation:
+        #   * the App Store account that owns these must be signed in, or
+        #     activation cannot install or upgrade them;
+        #   * removing an entry here does NOT uninstall the app, even with
+        #     `cleanup = "uninstall"`. Delete those by hand.
+        #
+        # Ids come from `kMDItemAppStoreAdamID` on the installed bundle.
+        masApps = {
+          "Amazon Kindle" = 302584613;
+          DaisyDisk = 411643860;
+          Keynote = 409183694;
+          Magnet = 441258766;
+          "Microsoft To Do" = 1274495053;
+          Slack = 803453959;
+          WireGuard = 1451685025;
+          Xcode = 497799835;
+        };
 
         onActivation = {
           autoUpdate = true;
