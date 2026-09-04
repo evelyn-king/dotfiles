@@ -1,5 +1,9 @@
 # Agent 3 deployment review: Omarchy integration
 
+> Subsequent ownership change: Pixi is now managed exclusively by mise on both
+> platforms. The system-package inventories below describe the reviewed commit;
+> see [the current mise tool list](package-lists/mise.md).
+
 Reviewed commit: `30923db41d1c2c3f0458b1b322d7b1509e538c6b`
 
 Reviewed branch: `feat/port-of-work-profile`

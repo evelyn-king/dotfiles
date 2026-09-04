@@ -1,5 +1,9 @@
 # Agent 4 deployment review: macOS package and runtime ownership
 
+> Subsequent ownership change: Pixi is now managed exclusively by mise on both
+> platforms. The system-package inventories below describe the reviewed commit;
+> see [the current mise tool list](package-lists/mise.md).
+
 Reviewed commit: `abb2e562c5f61d4904a636fe1645863a4feb7722`
 
 Reviewed branch: `feat/port-of-work-profile`

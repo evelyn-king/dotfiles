@@ -55,7 +55,6 @@
         luarocks
         lua-language-server
         mise
-        pixi
         uv
 
         # --- editors ---

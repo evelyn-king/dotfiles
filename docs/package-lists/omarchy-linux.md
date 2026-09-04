@@ -53,6 +53,10 @@ Removing an entry from the manifest does not uninstall it. Remove that package
 manually if it is no longer wanted. A no-op apply does not prompt for sudo;
 `omarchy pkg add` asks only when it finds a missing pacman package.
 
+Pixi is supplied by [mise](mise.md) on both platforms. Existing pacman
+installations must be removed manually after verifying `mise which pixi`;
+the additive package hook does not uninstall them.
+
 ## AUR packages
 
 Keep packages that Omarchy can install through pacman under `pacman`,

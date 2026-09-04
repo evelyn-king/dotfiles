@@ -30,6 +30,10 @@ warns about unrecognized content. If it warns, move any wanted declarations to
 `pre-commit-uv`. Those additions are recorded as `uvx_args` in the shared
 configuration.
 
+Pixi is managed exclusively by mise on both Linux and macOS, with its version
+pinned in `10-dotfiles.toml`. Do not add it to pacman or Nix package lists.
+`~/.pixi/bin` remains on PATH for tools installed through Pixi itself.
+
 ## Installation and updates
 
 `run_onchange_after_mise-install.sh.tmpl` runs the install after the

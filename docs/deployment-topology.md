@@ -81,8 +81,8 @@ AUR package cannot stop required runtime setup.
 1. Confirm the Omarchy 4 dispatcher and add chezmoi. Stock Omarchy supplies
    neither this repo nor, reliably, mise.
 2. **First apply.** Writes normal targets and fetches externals. Doom skips
-   because Emacs is absent. The package hook then restores 44 pacman packages,
-   including Emacs, bun and uv. mise installs the locked tool set, trust runs,
+   because Emacs is absent. The package hook then restores the declared pacman
+   packages, including Emacs, bun and uv. mise installs the locked tool set, trust runs,
    and the 2 optional AUR packages run last.
 3. `chsh` to zsh and log out fully, so non-interactive SSH commands get the
    managed environment.

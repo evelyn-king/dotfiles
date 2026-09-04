@@ -65,6 +65,9 @@ formula, cask, and tap that is not declared in `nix/flake.nix`. Add a package
 to the flake before installing it with Homebrew if it must survive the next
 `darwin-rebuild switch`.
 
+Pixi is supplied by [mise](mise.md) on both platforms. The next
+`nix-switch` removes it from the Nix system package set.
+
 ## Adopt existing applications
 
 Before the first activation on an existing Mac, let Homebrew adopt applications

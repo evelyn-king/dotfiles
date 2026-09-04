@@ -32,7 +32,6 @@ omarchyPackages:
     - lua-language-server
     - neovim
     - pinentry
-    - pixi
     - ripgrep
     - sccache
     - shellcheck
