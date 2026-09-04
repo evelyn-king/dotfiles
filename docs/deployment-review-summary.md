@@ -54,6 +54,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | AeroSpace captured bare Control shortcuts before terminal shells, Vim, or Neovim could receive them. | Main-mode shortcuts now use a dedicated `Ctrl-Alt` prefix, and the keybinding guide records the full map. | A2-007 |
 | P2 | Resolved | Refreshing a micromamba environment deleted the working environment and kernel before solving or installing its replacement. | The installer now builds and smoke-tests a staging environment first. It retains rollback copies until the final environment and staged kernel are ready. | A6-005 |
 | P2 | Resolved | A failed lazy.nvim clone waited forever for a key during headless Neovim startup. | The bootstrap waits for acknowledgement only when a UI is attached and exits immediately with failure in headless mode. | A6-008 |
+| P2 | Resolved | OpenCode migrated the managed theme out of `opencode.json`, leaving permanent chezmoi drift. | The runtime config no longer contains TUI settings. A managed `tui.json` owns the system theme through the current TUI schema. | A6-009 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -119,8 +120,8 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 - Resolve desktop ownership. Decide whether chezmoi or Omarchy owns monitor
   scaling and whether display-specific settings should be gated by host.
-- Make application installs reproducible. Add environment locks, decide whether
-  to track Neovim's lock, and move OpenCode's theme to `tui.json`.
+- Make application installs reproducible. Add environment locks and decide
+  whether to track Neovim's lock.
 
 ## P3 maintenance work
 

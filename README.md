@@ -150,7 +150,8 @@ directory.
 
 tmux and starship deliberately stay on ANSI color names rather than hex, so
 they inherit whatever Ghostty is set to and never drift from it. Claude Code
-and opencode stay on `auto`/`system`.
+stays on `auto`, and OpenCode's TUI stays on `system` in its separate
+`tui.json`.
 
 Omarchy's own theme switching still themes the desktop chrome it owns, but no
 longer drives anything in this repo.
