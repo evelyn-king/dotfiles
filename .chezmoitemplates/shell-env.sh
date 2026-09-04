@@ -99,9 +99,9 @@ export BUN_INSTALL="$HOME/.bun"
 
 export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/opt/micromamba}"
 
-export JUPYTER_BIND_HOST=127.0.0.1
-export JUPYTER_ENV_NAME=jupyter
-export JUPYTER_PORT=8888
+export JUPYTER_BIND_HOST="${JUPYTER_BIND_HOST:-127.0.0.1}"
+export JUPYTER_ENV_NAME="${JUPYTER_ENV_NAME:-jupyter}"
+export JUPYTER_PORT="${JUPYTER_PORT:-8888}"
 export JUPYTER_REMOTE_ENV_FILE="${JUPYTER_REMOTE_ENV_FILE:-$XDG_STATE_HOME/jupyter-remote/current.env}"
 {{ if eq .chezmoi.os "darwin" }}
 # Apple silicon runs amd64 images under emulation rather than failing to find a
