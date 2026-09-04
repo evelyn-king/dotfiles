@@ -7,8 +7,11 @@ set editing-mode vi
 set keyseq-timeout 25
 
 # vi mode is invisible otherwise. starship prints the mode for zsh, which never
-# reads this file; bash has no equivalent, so let readline print (ins)/(cmd).
+# reads this file; in bash, let readline display Vim-style mode labels.
 set show-mode-in-prompt on
+# Mark color escapes as non-printing so readline measures the prompt correctly.
+set vi-ins-mode-string "\1\e[1;32m\2-- INSERT --\1\e[0m\2 "
+set vi-cmd-mode-string "\1\e[1;34m\2-- NORMAL --\1\e[0m\2 "
 
 set meta-flag on
 set input-meta on
