@@ -28,9 +28,12 @@ Anything managed by mise is deliberately absent from the Nix package list.
 Both macOS and Omarchy use the stock `tldr` client; Nix owns it on macOS.
 
 GUI applications come from Homebrew casks declared in the flake. nix-darwin
-installs and upgrades them during `darwin-rebuild switch`, while keeping them
-outside the read-only Nix store so their own updaters still work. Homebrew
-itself must already be installed.
+installs and upgrades them during `darwin-rebuild switch`. Homebrew is
+authoritative for every declared cask during activation, including applications
+with built-in updaters. An application may update itself between activations,
+but the next activation can download and replace its bundle according to the
+current cask. This is intentional. Close managed applications before a switch.
+Homebrew itself must already be installed.
 
 The flake owns the entire Homebrew prefix. Each activation removes every
 formula, cask, and tap that is not declared in `nix/flake.nix`. Add a package

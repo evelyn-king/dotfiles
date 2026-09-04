@@ -38,6 +38,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Resolved | Managed terminal key behavior was inconsistent. macOS zsh switched to Emacs mode, and Omarchy Ghostty lost Shift+Enter encodings. | zsh now selects vi mode with a short escape timeout. Ghostty carries both CSI-u Shift+Enter bindings. | A3-001, A5M-002, A5-009, A5-010 |
 | P2 | Resolved | The privacy rule conflicted with employer addresses retained in commit history, and local credential files lacked protection guidance. | The rule now applies to the current tree and new commits while acknowledging retained history. The local-secret procedure covers credential stores, private modes, atomic writes, backups, and commit checks. | A7-006, A7-007 |
 | P2 | Resolved | Supported architectures and Omarchy versions were not defined. | The supported targets are now Apple Silicon macOS and Omarchy 4 on x86_64 Linux. Omarchy 3, Linux arm64 and Intel macOS are explicitly unsupported. | A3-006, A4-003, A4M-010 |
+| P2 | Resolved | Greedy Homebrew cask upgrades conflicted with application self-updaters. | Homebrew is intentionally authoritative for all declared casks during activation, including self-updating applications. The package guide documents the resulting downloads and bundle replacement. | A2-010, A4M-011 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -117,8 +118,7 @@ installer, so the new policy preserves it; mise already takes precedence on
   deleting the working copy first, add environment locks, decide whether to
   track Neovim's lock, avoid the headless Lazy bootstrap hang, and move
   OpenCode's theme to `tui.json`.
-- Disable greedy Homebrew cask upgrades unless the flake is intentionally the
-  sole application updater.
+
 ## P3 maintenance work
 
 ### Resolved

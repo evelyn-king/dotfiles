@@ -106,6 +106,8 @@
       homebrew = {
         enable = true;
         taps = [ "nikitabobko/tap" ];
+        # Homebrew owns cask versions at activation, including apps with their
+        # own updaters.
         greedyCasks = true;
 
         casks = [
