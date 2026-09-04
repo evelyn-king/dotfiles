@@ -97,6 +97,13 @@ export TMPDIR="${TMPDIR:-/tmp}"
 export NLTK_DATA="$XDG_DATA_HOME/nltk_data"
 export BUN_INSTALL="$HOME/.bun"
 
+# mise owns the claude version, so its built-in updater must not install a
+# second copy behind mise's back. `claude doctor` already reports the updater
+# as package-manager managed, but that detection is Claude's to change; this
+# variable is checked before any of it, including the protection that keeps a
+# native install auto-updating even with autoUpdates set to false in config.
+export DISABLE_AUTOUPDATER=1
+
 export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/opt/micromamba}"
 
 export JUPYTER_BIND_HOST="${JUPYTER_BIND_HOST:-127.0.0.1}"
