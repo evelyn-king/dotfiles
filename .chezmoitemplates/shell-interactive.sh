@@ -120,10 +120,12 @@ command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebui
 if command -v mise >/dev/null 2>&1; then
   mup() {
     local mise_config_dir={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
+    local mise_macos_config="$mise_config_dir/conf.d/20-macos.toml"
 
-    MISE_CONFIG_DIR="$mise_config_dir" \
+    MISE_CONFIG_DIR="$mise_config_dir" MISE_IGNORED_CONFIG_PATHS="$mise_macos_config" \
       mise lock --global --platform linux-x64 --bump &&
-      MISE_CONFIG_DIR="$mise_config_dir" mise install --locked
+      MISE_CONFIG_DIR="$mise_config_dir" MISE_IGNORED_CONFIG_PATHS="$mise_macos_config" \
+        mise install --locked
   }
 fi
 {{- end }}

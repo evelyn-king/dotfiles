@@ -1,10 +1,10 @@
 # mise tool list
 
-mise installs the same language runtimes and user-level CLI tools on macOS and
-Linux. Their declarations live in
-[`dot_config/mise/conf.d/10-dotfiles.toml`](../../dot_config/mise/conf.d/10-dotfiles.toml).
+mise installs the shared language runtimes and user-level CLI tools on macOS
+and Linux, plus three macOS-only tools. Their declarations live in
+[`dot_config/mise/conf.d/`](../../dot_config/mise/conf.d/).
 
-The TOML file is the source of truth for requested versions. Most tools have
+The TOML files are the source of truth for requested versions. Most tools have
 exact pins. Coding agents, `gh`, and `usage` track `latest` by design, while
 Rust tracks the stable release channel. On both platforms,
 [`dot_config/mise/mise.lock`](../../dot_config/mise/mise.lock) resolves them to
@@ -12,11 +12,14 @@ reviewable versions and checksums for `linux-x64` and `macos-arm64` where the
 backend exposes a fixed artifact. The Rust entry remains `stable`; rustup
 resolves that channel when mise installs or updates it.
 
-## Shared tools
+## Tool ownership
 
-The [`tools` table in the shared configuration](../../dot_config/mise/conf.d/10-dotfiles.toml)
-is the complete list. Add, remove and update tools there. Do not copy the list
-into this document or another package manifest.
+The shared tools live in
+[`10-dotfiles.toml`](../../dot_config/mise/conf.d/10-dotfiles.toml). macOS adds
+`herdr`, `usage`, and `tree-sitter-cli` from
+[`20-macos.toml`](../../dot_config/mise/conf.d/20-macos.toml). Omarchy supplies
+those three as system packages, so installing them with mise on Linux would
+split update ownership and put stale versions ahead of `/usr/bin`.
 
 `~/.config/mise/config.toml` has higher precedence than the managed `conf.d`
 file. The migration script removes audited legacy versions but preserves and

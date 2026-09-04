@@ -64,12 +64,12 @@ for the runtimes and CLI tools managed by mise.
 ### mise
 
 Language runtimes and global CLI tools are declared in
-[`dot_config/mise/conf.d/10-dotfiles.toml`](dot_config/mise/conf.d/10-dotfiles.toml).
-The file lives under `conf.d` rather than at `~/.config/mise/config.toml` so
-repo-managed tools stay separate from mise's interactive global state. This
-repo removes `~/.config/mise/config.toml`; declare every global tool in
-`10-dotfiles.toml`. Omarchy owns Linux system CLI packages; Nix owns their
-macOS counterparts.
+[`dot_config/mise/conf.d/`](dot_config/mise/conf.d/). The files live under
+`conf.d` rather than at `~/.config/mise/config.toml` so repo-managed tools stay
+separate from mise's interactive global state. This repo removes
+`~/.config/mise/config.toml`; declare every global tool in `conf.d`. Omarchy
+owns `herdr`, `usage`, and `tree-sitter` on Linux, so their mise declarations
+apply only on macOS.
 
 `run_onchange_after_mise-install.sh.tmpl` installs them, and re-runs whenever
 the file changes, so adding a tool is a one-line edit plus `chezmoi apply`.

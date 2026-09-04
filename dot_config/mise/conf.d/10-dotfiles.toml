@@ -66,10 +66,7 @@ pi = "latest"
 # --- javascript tooling -----------------------------------------------------
 "npm:@doist/todoist-cli" = "4.0.0"
 "npm:@googleworkspace/cli" = "0.22.5"
-"npm:tree-sitter-cli" = "0.26.13"
 
 # --- other ------------------------------------------------------------------
 gh = "latest"
-herdr = "0.8.2"
-usage = "latest"
 micromamba = "2.9.0-0"
