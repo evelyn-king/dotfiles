@@ -171,6 +171,38 @@ machine, verify that an SSH command receives the managed environment:
 ssh <host> 'printf "%s %s\n" "$MAMBA_ROOT_PREFIX" "$LANG"; printf "%s\n" "$PATH"'
 ```
 
+## SSH keys
+
+Each host gets its own key. Nothing is copied between machines, so a lost or
+retired host is revoked by removing one public key rather than rotating a
+shared identity.
+
+```bash
+ssh-keygen -t ed25519 -C "$(id -un)@$(hostname -s)"
+ssh-add ~/.ssh/id_ed25519
+cat ~/.ssh/id_ed25519.pub
+```
+
+Register the public key with GitHub and any servers this host reaches, then
+verify:
+
+```bash
+ssh -T git@github.com
+```
+
+Keep the filename `id_ed25519`. Interactive shell startup first keeps any
+inherited agent that answers `ssh-add -l`, which covers OpenSSH forwarding,
+Apple's launchd agent, systemd sockets and password managers. Only when no
+agent answers does it fall back to `keychain --ignore-missing id_ed25519`, and
+that fallback loads exactly that name. A key called anything else is not picked
+up.
+
+keychain is installed on both platforms. On macOS launchd normally answers
+first, so keychain rarely runs; store the passphrase there with
+`ssh-add --apple-use-keychain ~/.ssh/id_ed25519`.
+
+`~/.ssh/config` and key material are not managed by this repository.
+
 ## Git commit signing
 
 Fresh hosts create unsigned commits until the signing key and pinentry work.

@@ -21,6 +21,22 @@ The files-only chezmoi target set did converge in disposable homes. The main
 failures sit at removal, package installation, system activation, and first-use
 boundaries.
 
+## Platform verdicts
+
+| Platform | Verdict | Basis |
+| --- | --- | --- |
+| Apple Silicon macOS | `blocked` | No known unresolved defect. Blocked only because the plan's dynamic stage never ran: no stock cold start, no real `darwin-rebuild switch`, no cask adoption or cleanup on a disposable host. |
+| Omarchy 4 x86_64 | `blocked` | Same dynamic gap, and no Omarchy host was exercised at all. Agent 3 cleared the integration workstream, but the package and application reports found independent first-use blockers. |
+
+Both verdicts are about missing evidence rather than known breakage. Every P0
+and P1 finding is resolved and the static workstreams converged. The plan makes
+the cold-start tests part of its completion criteria, so neither platform can
+reach `ready with documented manual steps` until they run.
+
+Converting either verdict requires the work in
+[Remaining review gaps](#remaining-review-gaps), and the tests must run against
+the commit that lands on `main`.
+
 ## Remediation priorities
 
 `P0` means the issue must be resolved before another live apply or system
@@ -200,28 +216,31 @@ disposition for each:
 | A5-006 | low | Addressed. `shell-env.sh` sources Omarchy's `env-bootstrap`. |
 | A5-013 | low | Addressed. `dot_direnvrc` checks `DIRENV_SHELL` then the shell version variables. |
 | A5-016 | low | Moot once A5-001 fixed the login shell. |
-| A5-017 | low | Open decision. `local-projects/dot_mise.toml` is byte-identical to what Omarchy's installer writes. Keep or drop. |
+| A5-017 | low | Kept, deliberately. The file states the setting explicitly instead of inheriting it, and it applies on macOS and generic Linux where Omarchy's installer never runs. Redundant only on Omarchy. |
 | A5M-008 | low | Addressed. `DOCKER_DEFAULT_PLATFORM` is inside a Darwin guard with its rationale. |
 | A5M-009 | low | Addressed. The cold-start guide tells the user not to append `brew shellenv` to `~/.zprofile`. |
 
-## Missing synthesis deliverables
+## Synthesis deliverables
 
-The plan's final synthesis asks for nine artifacts. These three exist only
-inside individual agent reports, which the plan treats as raw input rather than
-synthesis output:
+The plan's final synthesis asks for nine artifacts. Eight now exist:
 
-- **Readiness verdicts.** The plan requires separate macOS and Omarchy verdicts
-  drawn from `ready`, `ready with documented manual steps` and `blocked`. This
-  document gives an Omarchy verdict in prose and no macOS verdict.
-- **Target-selection matrix.** Only in the agent 1 report.
-- **First-apply hook timeline.** Only in the agent 1 report.
+- **Readiness verdicts** are above.
+- **Target-selection matrix**, **first-apply hook timeline** and the
+  **manual-state inventory** are in
+  [deployment-topology.md](deployment-topology.md), rebuilt against the current
+  tree rather than copied from the agent 1 report. The hook order there came
+  from `chezmoi managed --include=scripts`; the report's order predates the
+  merge of the two drift hooks and is wrong.
+- **Cold-start runbooks**, the **package ownership matrix** and the **patch
+  queue** were already covered by `docs/cold-start.md`, `docs/package-lists/`
+  and the remediation table above.
 
-The **manual-state inventory** is also incomplete. The plan lists ten
-categories to classify as automated, documented manual, or undocumented manual
-work. `docs/cold-start.md` covers GPG and App Store sign-in well, but never
-mentions SSH key creation or restoration, container runtime initialization, or
-host-specific monitor and input configuration, and reduces service
-authentication to a single sentence about launching applications.
+The ninth, **first, second and third apply transcripts**, requires the dynamic
+stage below.
+
+Three rows of the manual-state inventory are classified as undocumented manual
+work rather than written up: container runtime initialization, per-service
+sign-in, and host-specific monitor and input configuration.
 
 ## Remaining review gaps
 
@@ -237,7 +256,9 @@ not complete:
   findings marked `likely` or `hypothesis` still need dynamic verification.
 - The full cold-start tests must run after remediation and again against the
   commit that will land on `main`.
+- A3-010 remains a hypothesis: whether `hl.unbind` on a binding that only
+  exists when Omarchy's preinstalled bindings are enabled raises a config
+  error. It needs an Omarchy session and `hyprctl configerrors`.
 
-Agent 3's Omarchy verdict covered only the integration workstream. The package
-and application reports found independent first-use blockers, so the combined
-Omarchy verdict remains blocked.
+These are the only items standing between the current tree and a
+`ready with documented manual steps` verdict on either platform.
