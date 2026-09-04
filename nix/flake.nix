@@ -122,7 +122,6 @@
 
         casks = [
           # --- security and credentials ---
-          "1password-cli"
           "bitwarden"
 
           # --- window management and launchers ---
@@ -138,8 +137,6 @@
           "brave-origin"
           "firefox"
           "google-chrome"
-          "helium-browser"
-          "microsoft-edge"
           "zen"
 
           # --- terminals and editors ---
@@ -155,7 +152,6 @@
           # --- notes, tasks and reference ---
           "dot"
           "notion"
-          { name = "notion-calendar"; greedy = true; }
           "obsidian"
           { name = "raindropio"; greedy = true; }
           "todoist-app"
@@ -163,7 +159,6 @@
 
           # --- communication ---
           "discord"
-          "microsoft-teams"
           "proton-mail"
           "readdle-spark"
           "signal"
@@ -172,8 +167,6 @@
           # --- office and documents ---
           "basictex"
           "microsoft-excel"
-          "microsoft-onenote"
-          "microsoft-outlook"
           "microsoft-powerpoint"
           "microsoft-word"
 
@@ -214,7 +207,6 @@
           DaisyDisk = 411643860;
           Keynote = 409183694;
           Magnet = 441258766;
-          "Microsoft To Do" = 1274495053;
           Slack = 803453959;
           WireGuard = 1451685025;
           Xcode = 497799835;
