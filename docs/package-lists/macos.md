@@ -1,8 +1,8 @@
 # macOS package list
 
-Apple Silicon macOS machines use nix-darwin. The declaration is
-[`nix/flake.nix`](../../nix/flake.nix), which is repository content rather than
-a home file and is listed in `.chezmoiignore`.
+Apple Silicon macOS machines use nix-darwin. Intel macOS is not supported. The
+declaration is [`nix/flake.nix`](../../nix/flake.nix), which is repository
+content rather than a home file and is listed in `.chezmoiignore`.
 
 The flake lives in the source tree and `.chezmoi.toml.tmpl` pins `sourceDir` to
 wherever the repo was cloned, so derive the path rather than hardcoding it:

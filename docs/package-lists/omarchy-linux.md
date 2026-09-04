@@ -1,12 +1,16 @@
 # Omarchy Linux package list
 
-This repo assumes an Omarchy-flavored Arch Linux base on any Linux host that
-`.chezmoitemplates/omarchy-detect.tmpl` recognizes; no hostname list is
-involved. That partial checks `OMARCHY_PATH`, which `omarchy dev link`
-repoints, then `ID=omarchy` in `/etc/os-release`, then `/usr/share/omarchy`
-(where Omarchy 4 packages the desktop) and `~/.local/share/omarchy` (the
-Omarchy 3 clone). Only `OMARCHY_PATH` depends on the environment; the other
-three do not, so an apply from a systemd unit, a cron job or
+This repo supports Omarchy 4 on x86_64 Linux. Omarchy 3 and Linux arm64 are not
+supported.
+
+Detection is broader than the support policy. The
+`.chezmoitemplates/omarchy-detect.tmpl` partial also recognizes the legacy
+Omarchy 3 clone so an older installation does not silently take the
+non-Omarchy branch. Package hooks still require the Omarchy 4 dispatcher. The
+partial checks `OMARCHY_PATH`, which `omarchy dev link` repoints, then
+`ID=omarchy` in `/etc/os-release`, `/usr/share/omarchy`, and the legacy
+`~/.local/share/omarchy` clone. Only `OMARCHY_PATH` depends on the environment;
+the other signals do not, so an apply from a systemd unit, a cron job or
 `ssh host chezmoi apply` resolves just as well as an interactive one.
 
 ## Omarchy-specific layer

@@ -10,12 +10,18 @@ Dotfiles managed directly with `chezmoi`.
 - `.chezmoitemplates/` keeps bodies shared between several rendered files
 - `docs/` and the top-level Markdown describe usage and repository conventions
 
+## Supported platforms
+
+This branch supports only Apple Silicon macOS and Omarchy 4 on x86_64 Linux.
+Omarchy 3, Linux arm64 and Intel macOS are not supported. Native Windows uses
+the separate `windows` branch.
+
 ## Cold start
 
-Use [docs/cold-start.md](docs/cold-start.md) for a new Apple Silicon Mac or
-Omarchy host. It starts with platform prerequisites and source initialization,
-then covers activation, repeated applies, login or reboot, manual service setup,
-and final verification.
+Use [docs/cold-start.md](docs/cold-start.md) for a supported Apple Silicon Mac
+or Omarchy 4 x86_64 host. It starts with platform prerequisites and source
+initialization, then covers activation, repeated applies, login or reboot,
+manual service setup, and final verification.
 
 ## Apply
 
@@ -44,8 +50,8 @@ Package ownership depends on the host.
 
 | Host | System packages | GUI apps | Runtimes and CLI tools |
 | --- | --- | --- | --- |
-| macOS | nix-darwin | Homebrew casks, declared in the flake | mise |
-| Omarchy Linux | pacman and the AUR, via Omarchy | Omarchy | mise |
+| Apple Silicon macOS | nix-darwin | Homebrew casks, declared in the flake | mise |
+| Omarchy 4 x86_64 | pacman and the AUR, via Omarchy | Omarchy | mise |
 
 mise is the only package manager this repo drives on both platforms. On
 Omarchy, an additive apply hook also restores missing system packages without

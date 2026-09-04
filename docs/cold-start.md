@@ -4,8 +4,9 @@ These procedures require an internet connection and an account that can approve
 system changes. The first dry run downloads pinned externals when the chezmoi
 cache is empty, even with `--refresh-externals=never`.
 
-The current deployment paths are Apple Silicon macOS and Omarchy. Do not use
-these instructions for native Windows. Its history lives on the `windows`
+The supported deployment targets are Apple Silicon macOS and Omarchy 4 on
+x86_64 Linux. Omarchy 3, Linux arm64 and Intel macOS are not supported. Do not
+use these instructions for native Windows. Its history lives on the `windows`
 branch.
 
 ## Apple Silicon macOS
@@ -91,7 +92,7 @@ zsh -ic 'bindkey -lL main; printf "KEYTIMEOUT=%s\n" "$KEYTIMEOUT"'
 `chezmoi status` and the dry run should report no file changes. The drift hook
 should print nothing after the activated generation matches the flake.
 
-## Omarchy
+## Omarchy 4 x86_64
 
 Start from a working Omarchy desktop. The package and shell hooks require the
 Omarchy 4 dispatcher, and the committed mise lock currently targets x86-64.

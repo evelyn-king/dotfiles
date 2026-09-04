@@ -37,6 +37,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Resolved | Linux remote commands missed most of the managed environment while bash remained the login shell. | The Omarchy cold-start procedure now switches the login shell to zsh, requires a new login, and verifies the environment through a remote SSH command. | A5-001 |
 | P1 | Resolved | Managed terminal key behavior was inconsistent. macOS zsh switched to Emacs mode, and Omarchy Ghostty lost Shift+Enter encodings. | zsh now selects vi mode with a short escape timeout. Ghostty carries both CSI-u Shift+Enter bindings. | A3-001, A5M-002, A5-009, A5-010 |
 | P2 | Resolved | The privacy rule conflicted with employer addresses retained in commit history, and local credential files lacked protection guidance. | The rule now applies to the current tree and new commits while acknowledging retained history. The local-secret procedure covers credential stores, private modes, atomic writes, backups, and commit checks. | A7-006, A7-007 |
+| P2 | Resolved | Supported architectures and Omarchy versions were not defined. | The supported targets are now Apple Silicon macOS and Omarchy 4 on x86_64 Linux. Omarchy 3, Linux arm64 and Intel macOS are explicitly unsupported. | A3-006, A4-003, A4M-010 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -118,10 +119,6 @@ installer, so the new policy preserves it; mise already takes precedence on
   OpenCode's theme to `tui.json`.
 - Disable greedy Homebrew cask upgrades unless the flake is intentionally the
   sole application updater.
-- State the supported platform boundary. The current effective targets are
-  Apple Silicon macOS and Omarchy x86_64. Decide whether Omarchy 3 remains
-  supported.
-
 ## P3 maintenance work
 
 ### Resolved
@@ -151,7 +148,6 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 Implementation depends on owner decisions in these areas:
 
-- whether Omarchy 3, Linux arm64, or Intel macOS are supported;
 - whether chezmoi or Omarchy owns runtime monitor scaling;
 - whether display-specific Hyprland settings apply globally;
 - whether Neovim and micromamba deployments must be reproducible from committed
