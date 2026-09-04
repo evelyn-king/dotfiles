@@ -15,10 +15,14 @@ the other signals do not, so an apply from a systemd unit, a cron job or
 
 ## Omarchy-specific layer
 
-These desktop files apply only on hosts where Omarchy is detected:
+Chezmoi manages these desktop files only on hosts where Omarchy is detected:
 
-- `~/.config/hypr/bindings.lua`, `hyprland.lua`, `looknfeel.lua` and
-  `monitors.lua`
+- `~/.config/hypr/bindings.lua`, `hyprland.lua` and `looknfeel.lua`
+
+Chezmoi creates `~/.config/hypr/monitors.lua` only when it is missing. The
+hostname-specific template seeds a new machine, then Omarchy owns the file so
+changes made with its monitor-scaling control survive later applies. Delete the
+file before an apply to seed it again.
 
 The rest of `~/.config/hypr` belongs to the package. A file identical to the
 shipped default only pins a stale copy, and Omarchy's update migrations rewrite

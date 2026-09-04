@@ -53,6 +53,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | AeroSpace was installed but did not start automatically, and its required Accessibility approval was easy to miss. | AeroSpace now starts at login after initial launch. The macOS cold-start guide names the approval path, restart, and verification command. | A2-008 |
 | P2 | Resolved | AeroSpace captured bare Control shortcuts before terminal shells, Vim, or Neovim could receive them. | Main-mode shortcuts now use a dedicated `Ctrl-Alt` prefix, and the keybinding guide records the full map. | A2-007 |
 | P2 | Resolved | The `gimli` monitor profile gave GTK a fractional scale that GTK does not support. | The profile keeps Hyprland at `1.6667` and gives GTK its nearest integer scale, `2`. | A3-002 |
+| P2 | Resolved | Omarchy's monitor-scaling control edited a chezmoi-managed file, so the next apply discarded the selected scale. | Chezmoi now seeds `monitors.lua` only when it is missing. Omarchy owns later changes. | A3-003 |
 | P2 | Accepted | Neovim does not share a plugin lock across hosts. | Plugin revisions intentionally float. lazy.nvim owns a machine-local `lazy-lock.json`, which remains ignored. | A6-007 |
 | P2 | Accepted | Micromamba environment specifications do not pin versions or use lockfiles. | Environments intentionally resolve current packages from the managed YAML files during each rebuild. | A6-006 |
 | P2 | Resolved | Refreshing a micromamba environment deleted the working environment and kernel before solving or installing its replacement. | The installer now builds and smoke-tests a staging environment first. It retains rollback copies until the final environment and staged kernel are ready. | A6-005 |
@@ -121,8 +122,8 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## P2 stabilization work
 
-- Resolve desktop ownership. Decide whether chezmoi or Omarchy owns monitor
-  scaling and whether display-specific settings should be gated by host.
+- Apply the golden-ratio single-window limit only when an active display is
+  wider than that limit.
 
 ## P3 maintenance work
 
@@ -151,10 +152,7 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## Required policy decisions
 
-Implementation depends on owner decisions in these areas:
-
-- whether chezmoi or Omarchy owns runtime monitor scaling;
-- whether display-specific Hyprland settings apply globally.
+No policy decisions remain.
 
 ## Remaining review gaps
 

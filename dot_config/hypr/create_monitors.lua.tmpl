@@ -1,8 +1,8 @@
 -- See https://wiki.hypr.land/Configuring/Basics/Monitors/
 -- List current monitors and supported resolutions with: hyprctl monitors all
 
--- Keep these as plain locals: omarchy-hyprland-monitor-scaling (SUPER + SLASH)
--- rewrites both lines so a scale change survives a reboot.
+-- Chezmoi creates this file only when it is missing. Keep these as plain locals
+-- so omarchy-hyprland-monitor-scaling (SUPER + SLASH) can own later changes.
 {{- if eq .chezmoi.hostname "gimli" }}
 local omarchy_gdk_scale = 2
 local omarchy_monitor_scale = 1.6667
