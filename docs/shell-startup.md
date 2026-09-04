@@ -8,9 +8,9 @@ files, and the per-machine hook in `~/.config/shell`.
 
 | Template | Contents |
 | --- | --- |
-| `shell-env.sh` | shared startup environment, the Omarchy bootstrap, plus PATH for non-interactive shells that read it |
+| `shell-env.sh` | shared environment, the Omarchy bootstrap, non-interactive PATH, local overrides |
 | `shell-path.sh` | the PATH build itself |
-| `shell-interactive.sh` | ssh agent, tool hooks, aliases, Omarchy extras, local overrides, prompt |
+| `shell-interactive.sh` | ssh agent, tool hooks, aliases, Omarchy extras, prompt |
 
 | Rendered file | Includes |
 | --- | --- |
@@ -115,11 +115,16 @@ Two pieces need no action: `~/.inputrc` is already Omarchy's
 
 ## Per-machine overrides
 
-One hook is sourced near the end of `shell-interactive.sh`:
+One hook is sourced at the end of `shell-env.sh`, after the managed defaults and
+the non-interactive PATH build:
 
 - `~/.config/shell/extras.sh`, untracked and hand-written. Nothing in this repo
   creates or manages it. Use it for per-machine settings such as
   `JUPYTER_PORT` or `MAMBA_ROOT_PREFIX`.
+
+Interactive and non-interactive shells that read a managed startup file receive
+these overrides. Cron, launchd, systemd, and directly executed hooks do not read
+shell startup and still need their own environment.
 
 Prefer the system credential manager or a tool's own protected authentication
 file for secrets. Do not export long-lived tokens from `extras.sh`. Every

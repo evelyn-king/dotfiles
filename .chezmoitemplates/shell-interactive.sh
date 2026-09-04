@@ -250,14 +250,6 @@ if command -v tdl >/dev/null 2>&1; then
   alias icx='tdl c cx'
 fi
 
-# --- local overrides --------------------------------------------------------
-
-# Machine-local escape hatch. Nothing in this repo creates or manages this
-# file: write it by hand on a host that needs something the tracked config
-# should not carry, and keep it out of version control. This is where a
-# per-machine JUPYTER_PORT or MAMBA_ROOT_PREFIX override belongs.
-[ -f "$XDG_CONFIG_HOME/shell/extras.sh" ] && . "$XDG_CONFIG_HOME/shell/extras.sh"
-
 # --- prompt (must stay last) ------------------------------------------------
 
 command -v starship >/dev/null 2>&1 && eval "$(starship init "$__shell")"

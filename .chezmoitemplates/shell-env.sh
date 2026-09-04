@@ -157,3 +157,10 @@ case $- in
 {{ template "shell-path.sh" . }}
 ;;
 esac
+
+# --- local overrides --------------------------------------------------------
+
+# Machine-local escape hatch. Nothing in this repo creates or manages this
+# file. It runs after the shared defaults in every shell that reads a managed
+# startup file, so per-machine environment values also reach remote commands.
+[ -f "$XDG_CONFIG_HOME/shell/extras.sh" ] && . "$XDG_CONFIG_HOME/shell/extras.sh"

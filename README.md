@@ -121,11 +121,12 @@ self-contained, with no shared body sourced at runtime.
 PATH is built twice, on purpose, and the order is load-bearing. See
 [docs/shell-startup.md](docs/shell-startup.md).
 
-One per-machine escape hatch is sourced near the end of interactive startup:
-`~/.config/shell/extras.sh`, untracked and hand-written. Create it with private
-permissions and keep long-lived credentials out of shell startup. See
-[docs/shell-startup.md](docs/shell-startup.md#per-machine-overrides) for the
-local-secret procedure.
+One per-machine escape hatch is sourced after the shared environment defaults:
+`~/.config/shell/extras.sh`, untracked and hand-written. Its exported values
+also reach remote commands whose shell reads a managed startup file. Create it
+with private permissions and keep long-lived credentials out of shell startup.
+See [docs/shell-startup.md](docs/shell-startup.md#per-machine-overrides) for
+the local-secret procedure.
 
 ## Editors
 
