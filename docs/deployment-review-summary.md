@@ -52,6 +52,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | nix-darwin and the managed zsh configuration both ran `compinit` with different `fpath` values. | nix-darwin's global completion initialization is disabled, leaving the managed `~/.zshrc` as the single owner. | A5M-001 |
 | P2 | Resolved | AeroSpace was installed but did not start automatically, and its required Accessibility approval was easy to miss. | AeroSpace now starts at login after initial launch. The macOS cold-start guide names the approval path, restart, and verification command. | A2-008 |
 | P2 | Resolved | AeroSpace captured bare Control shortcuts before terminal shells, Vim, or Neovim could receive them. | Main-mode shortcuts now use a dedicated `Ctrl-Alt` prefix, and the keybinding guide records the full map. | A2-007 |
+| P2 | Accepted | Neovim does not share a plugin lock across hosts. | Plugin revisions intentionally float. lazy.nvim owns a machine-local `lazy-lock.json`, which remains ignored. | A6-007 |
 | P2 | Resolved | Refreshing a micromamba environment deleted the working environment and kernel before solving or installing its replacement. | The installer now builds and smoke-tests a staging environment first. It retains rollback copies until the final environment and staged kernel are ready. | A6-005 |
 | P2 | Resolved | A failed lazy.nvim clone waited forever for a key during headless Neovim startup. | The bootstrap waits for acknowledgement only when a UI is attached and exits immediately with failure in headless mode. | A6-008 |
 | P2 | Resolved | OpenCode migrated the managed theme out of `opencode.json`, leaving permanent chezmoi drift. | The runtime config no longer contains TUI settings. A managed `tui.json` owns the system theme through the current TUI schema. | A6-009 |
@@ -120,8 +121,7 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 - Resolve desktop ownership. Decide whether chezmoi or Omarchy owns monitor
   scaling and whether display-specific settings should be gated by host.
-- Make application installs reproducible. Add environment locks and decide
-  whether to track Neovim's lock.
+- Make micromamba environments reproducible with committed locks.
 
 ## P3 maintenance work
 
@@ -154,8 +154,7 @@ Implementation depends on owner decisions in these areas:
 
 - whether chezmoi or Omarchy owns runtime monitor scaling;
 - whether display-specific Hyprland settings apply globally;
-- whether Neovim and micromamba deployments must be reproducible from committed
-  locks.
+- whether micromamba deployments must be reproducible from committed locks.
 
 ## Remaining review gaps
 

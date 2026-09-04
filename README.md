@@ -135,6 +135,10 @@ They share one keymap as far as plain Vim reaches: Neovim is the reference, and
 `dot_vim/plugin/keymaps.vim` mirrors LazyVim's defaults. Changing a binding
 means changing both files. See [docs/keybindings.md](docs/keybindings.md).
 
+Neovim plugin revisions intentionally float between hosts. lazy.nvim owns the
+generated `lazy-lock.json`; the repo keeps it untracked and does not promise
+identical plugin revisions across installations.
+
 ## Theming
 
 Everything is [Gruvbox](https://github.com/morhetz/gruvbox), dark by default. Each
