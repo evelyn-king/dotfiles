@@ -207,6 +207,11 @@ smoke-tests a staging environment before it moves an existing environment. It
 keeps backups of the old environment and kernel until the replacement and its
 new kernel are both ready, and restores them if any replacement step fails.
 
+Micromamba environments intentionally resolve current package versions from
+the managed YAML files at each rebuild. The repo does not pin their packages or
+track environment lockfiles, so installations made at different times can
+differ.
+
 ```bash
 install-micromamba-env \
   ~/local-codex/environments/jupyter_environment.yml \
