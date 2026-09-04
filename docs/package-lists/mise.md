@@ -1,7 +1,7 @@
 # mise tool list
 
-mise installs the shared language runtimes and user-level CLI tools on macOS
-and Linux, plus three macOS-only tools. Their declarations live in
+mise installs the same language runtimes and user-level CLI tools on macOS and
+Linux. Their declarations live in
 [`dot_config/mise/conf.d/`](../../dot_config/mise/conf.d/).
 
 The TOML files are the source of truth for requested versions. Most tools have
@@ -14,16 +14,30 @@ resolves that channel when mise installs or updates it.
 
 ## Tool ownership
 
-The shared tools live in
-[`10-dotfiles.toml`](../../dot_config/mise/conf.d/10-dotfiles.toml). macOS adds
-`herdr`, `usage`, and `tree-sitter-cli` from
-[`20-macos.toml`](../../dot_config/mise/conf.d/20-macos.toml). Omarchy supplies
-those three as system packages, so installing them with mise on Linux would
-split update ownership and put stale versions ahead of `/usr/bin`.
+Every tool lives in
+[`10-dotfiles.toml`](../../dot_config/mise/conf.d/10-dotfiles.toml), and both
+platforms install all of it. There is no per-platform declaration file.
+
+Omarchy ships its own `herdr`, `usage` and `tree-sitter-cli` packages, so on
+Linux those three commands exist twice. The mise shims lead `/usr/bin` on
+`PATH`, so the pinned version is the one that runs. That overlap is chosen
+rather than tolerated: pinning one version per tool across both machines is
+worth more here than deferring to whatever Arch last shipped, which on the last
+survey trailed 5.1.0 to 6.6.1 on `usage` and 0.26.9 to 0.26.13 on
+`tree-sitter`. Nothing uninstalls the system copies, so anything invoking them
+by absolute path still gets the packaged build.
+
+`herdr` is the one to watch. Omarchy migration `1786273938` removes a
+mise-installed `herdr` precisely because a stale client can shadow the packaged
+one with an older wire protocol, and this declaration puts it back. If an
+Omarchy update ever moves the herdr protocol, either bump the pin here in the
+same session or drop the `herdr` line and let the package own it again.
 
 `~/.config/mise/config.toml` has higher precedence than the managed `conf.d`
-file. The migration script removes audited legacy versions but preserves and
-warns about unrecognized content. If it warns, move any wanted declarations to
+file, and a leftover `conf.d/20-macos.toml` from before the platforms were
+unified outranks `10-dotfiles.toml` the same way. `run_before_10-migrate-retired-configs.sh`
+removes either one when its contents match an audited version, and preserves
+and warns about anything else. If it warns, move any wanted declarations to
 `10-dotfiles.toml`, then remove the conflicting file.
 
 `unidep` installs with its `all` extra, and `pre-commit` installs with
@@ -46,9 +60,14 @@ provide them before applying. Apply a declaration change with:
 chezmoi apply
 ```
 
-Run `mup` to update floating tools and their platform-specific lock resolution.
-Review and commit the resulting `dot_config/mise/mise.lock` change. `mup` does
-not update the mise binary. Nix owns that binary on macOS, so update the flake
+Run `mup` to update floating tools. It resolves every declared tool for both
+`linux-x64` and `macos-arm64` no matter which machine runs it, then installs
+what the lock holds for that machine. Refreshing the lock is deliberately not a
+per-machine job: `mise lock` prunes the entries a run does not resolve, so a
+host-scoped refresh drops the other platform's artifacts for every tool it moves,
+and a Linux-scoped one deletes the three macOS-only records outright. Review and
+commit the resulting `dot_config/mise/mise.lock` change. `mup` does not update
+the mise binary. Nix owns that binary on macOS, so update the flake
 inputs and run `nix-switch`. Omarchy owns it through `mise-bin`, which the
 normal `omarchy update` process updates.
 

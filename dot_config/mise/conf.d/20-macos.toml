@@ -1,6 +1,0 @@
-# Tools that Omarchy supplies as system packages on Linux.
-
-[tools]
-"npm:tree-sitter-cli" = "0.26.13"
-herdr = "0.8.2"
-usage = "latest"

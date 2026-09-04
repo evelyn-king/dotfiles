@@ -66,8 +66,17 @@ pi = "latest"
 # --- javascript tooling -----------------------------------------------------
 "npm:@doist/todoist-cli" = "4.0.0"
 "npm:@googleworkspace/cli" = "0.22.5"
+"npm:tree-sitter-cli" = "0.26.13"
 
 # --- other ------------------------------------------------------------------
+# herdr, tree-sitter-cli and usage also exist as Omarchy system packages, and
+# the mise shims outrank /usr/bin. That overlap is deliberate: one pinned
+# version per tool across both machines is worth more here than deferring to
+# whatever Arch last shipped, which trailed by 5.1.0 to 6.6.1 on usage and
+# 0.26.9 to 0.26.13 on tree-sitter. The system copies stay installed for
+# anything that calls them by absolute path.
 gh = "latest"
+herdr = "0.8.2"
 micromamba = "2.9.0-0"
 pixi = "0.76.2"
+usage = "latest"

@@ -92,45 +92,36 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 
-{{ if eq .chezmoi.os "darwin" }}
 # The coding agents in ~/.config/mise/conf.d/10-dotfiles.toml sit at "latest",
-# but `mise upgrade` skips global config. Refresh the committed Mac lock, then
-# install the resolved versions. The new-release cooldown is waived for those
-# agents by minimum_release_age_excludes in that file, so both halves of this
-# agree on which versions exist.
+# but `mise upgrade` skips global config, so `mup` is what moves them. The
+# new-release cooldown is waived for those agents by minimum_release_age_excludes
+# in that file, so the lock and the install agree on which versions exist.
+#
+# The committed lock is one cross-platform artifact and the source tree holds the
+# only copy, so refreshing it is not a per-machine job: every run resolves every
+# declared tool for both target platforms, whichever machine it runs on. Scoping
+# a run to its own host is what makes it destructive, because `mise lock` prunes
+# whatever that run did not resolve, taking the other platform's artifacts with
+# it. Both machines declare the same tools, so this function is identical on
+# both and either one can refresh the lock the other installs from.
 if command -v mise >/dev/null 2>&1; then
   mup() {
     local mise_config_dir={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
 
     MISE_CONFIG_DIR="$mise_config_dir" \
-      mise lock --global --platform macos-arm64 --bump &&
-      MISE_CONFIG_DIR="$mise_config_dir" mise install --locked
+      mise lock --global --platform linux-x64 --platform macos-arm64 --bump || return
+
+    MISE_CONFIG_DIR="$mise_config_dir" mise install --locked
   }
 fi
-
+{{ if eq .chezmoi.os "darwin" }}
 # The counterpart to the drift check in run_after_darwin-rebuild.sh: that script
 # only nags, because `chezmoi apply` must not escalate. This is the explicit
 # command it tells you to run. The flake path is fixed at apply time from the
 # source tree the alias was rendered from, so it keeps pointing at this repo
 # from any directory.
 command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebuild switch --flake {{ printf "%s/nix#macbook" .chezmoi.sourceDir | quote }}'
-{{- else if eq .chezmoi.os "linux" }}
-# Linux commits its global lock, and the source tree holds the only copy: it is
-# repo content, never applied to $HOME. Refresh it for the target platform, then
-# install exactly what it resolved. Commit the result.
-if command -v mise >/dev/null 2>&1; then
-  mup() {
-    local mise_config_dir={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
-    local mise_macos_config="$mise_config_dir/conf.d/20-macos.toml"
-
-    MISE_CONFIG_DIR="$mise_config_dir" MISE_IGNORED_CONFIG_PATHS="$mise_macos_config" \
-      mise lock --global --platform linux-x64 --bump &&
-      MISE_CONFIG_DIR="$mise_config_dir" MISE_IGNORED_CONFIG_PATHS="$mise_macos_config" \
-        mise install --locked
-  }
-fi
-{{- end }}
-
+{{ end }}
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
 command -v emacsclient >/dev/null 2>&1 && alias emacs='emacsclient --no-window-system --alternate-editor=""'
 

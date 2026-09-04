@@ -67,9 +67,11 @@ Language runtimes and global CLI tools are declared in
 [`dot_config/mise/conf.d/`](dot_config/mise/conf.d/). The files live under
 `conf.d` rather than at `~/.config/mise/config.toml` so repo-managed tools stay
 separate from mise's interactive global state. This repo removes
-`~/.config/mise/config.toml`; declare every global tool in `conf.d`. Omarchy
-owns `herdr`, `usage`, and `tree-sitter` on Linux, so their mise declarations
-apply only on macOS.
+`~/.config/mise/config.toml`; declare every global tool in `conf.d`. Both
+platforms declare and install the same set, including `herdr`, `usage` and
+`tree-sitter`, whose mise shims deliberately outrank the Omarchy packages of
+the same name. See [docs/package-lists/mise.md](docs/package-lists/mise.md)
+for why.
 
 `run_onchange_after_mise-install.sh.tmpl` installs them, and re-runs whenever
 the file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
@@ -84,10 +86,12 @@ that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
 mup
 ```
 
-On macOS `mup` refreshes the committed `dot_config/mise/mise.lock` for
-`macos-arm64`; on Linux it refreshes the same lock for `linux-x64`. Both install
-with locked resolution. Review and commit the lockfile change afterwards. Rust
-is the one channel-based exception: its lock entry remains `stable`, and rustup
+`mup` refreshes the committed `dot_config/mise/mise.lock` for both `linux-x64`
+and `macos-arm64` whichever machine you run it on, then installs what that lock
+holds for the machine you are on. The lock is one shared artifact and
+`mise lock` prunes whatever a run does not resolve, so a refresh scoped to its
+own host would drop the other platform's entries. Review and commit the lockfile
+change afterwards. Rust is the one channel-based exception: its lock entry remains `stable`, and rustup
 resolves that channel when mise installs or updates it.
 
 Like `nix/flake.lock`, that lock is repo content rather than a home file. mise

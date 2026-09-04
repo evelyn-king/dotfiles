@@ -5,10 +5,7 @@
 # Re-runs whenever those files change, so adding a tool is a one-line edit plus
 # `chezmoi apply` rather than a remembered command.
 
-# shared tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
-{{- if eq .chezmoi.os "darwin" }}
-# macOS tool list hash: {{ include "dot_config/mise/conf.d/20-macos.toml" | sha256sum }}
-{{- end }}
+# tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
 # lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
 # mise executable: {{ lookPath "mise" | quote }}
 {{- $omarchy := includeTemplate "omarchy-detect.tmpl" . }}
@@ -21,24 +18,9 @@ set -euo pipefail
 command -v mise >/dev/null 2>&1 || exit 0
 
 # Read the managed tool declarations and the committed lock from the source
-# tree. Linux ignores the macOS-only declarations that chezmoi does not apply.
+# tree. Every declared tool is installed on both platforms.
 MISE_CONFIG_DIR={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
 export MISE_CONFIG_DIR
-{{- if ne .chezmoi.os "darwin" }}
-MISE_IGNORED_CONFIG_PATHS="$MISE_CONFIG_DIR/conf.d/20-macos.toml"
-export MISE_IGNORED_CONFIG_PATHS
-{{- end }}
-
-{{- if $omarchy }}
-# Omarchy migrated these commands to system packages. Remove copies installed
-# by older revisions so stale mise shims cannot keep shadowing /usr/bin.
-for tool in herdr usage npm:tree-sitter-cli; do
-  if [ -n "$(mise ls --installed --no-header "$tool")" ]; then
-    mise uninstall --all "$tool"
-  fi
-done
-unset tool
-{{- end }}
 
 # The npm backend is configured to require bun. The pipx backend requires uv or
 # pipx, and this repo standardizes on uv. Stock Omarchy ships neither package,
