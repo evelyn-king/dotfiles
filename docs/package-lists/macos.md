@@ -26,6 +26,9 @@ already resolved. `darwinConfigurations` defines only `macbook`, for
 
 Anything managed by mise is deliberately absent from the Nix package list.
 Both macOS and Omarchy use the stock `tldr` client; Nix owns it on macOS.
+The Xcode Command Line Tools supply `cc`, `c++`, the linker, and related build
+commands. GCC is not installed globally because its unprefixed commands would
+replace Apple's toolchain on `PATH`.
 
 GUI applications come from Homebrew casks declared in the flake. nix-darwin
 installs and upgrades them during `darwin-rebuild switch`. Homebrew is

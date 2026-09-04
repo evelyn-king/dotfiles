@@ -70,7 +70,6 @@
         cmake
         coreutils
         gawk
-        gcc
         graphicsmagick
         graphviz
         libxml2
