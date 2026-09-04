@@ -9,6 +9,12 @@ The reports reviewed source commits `30923db` and `abb2e56`. The latter added
 only review documents. The remediation table below records changes made after
 the review.
 
+This document was last reconciled against the working tree at commit `fd3a77d`.
+Re-check the macOS cask and App Store rows after any change to
+`nix/flake.nix`; commits `3a6fed4`, `2f8d0c0` and `fd3a77d` changed the package
+set after the first version of this summary was written, and one of them
+reversed a resolution recorded here.
+
 All four P0 findings and all ten P1 findings are resolved.
 
 The files-only chezmoi target set did converge in disposable homes. The main
@@ -38,7 +44,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P1 | Resolved | Managed terminal key behavior was inconsistent. macOS zsh switched to Emacs mode, and Omarchy Ghostty lost Shift+Enter encodings. | zsh now selects vi mode with a short escape timeout. Ghostty carries both CSI-u Shift+Enter bindings. | A3-001, A5M-002, A5-009, A5-010 |
 | P2 | Resolved | The privacy rule conflicted with employer addresses retained in commit history, and local credential files lacked protection guidance. | The rule now applies to the current tree and new commits while acknowledging retained history. The local-secret procedure covers credential stores, private modes, atomic writes, backups, and commit checks. | A7-006, A7-007 |
 | P2 | Resolved | Supported architectures and Omarchy versions were not defined. | The supported targets are now Apple Silicon macOS and Omarchy 4 on x86_64 Linux. Omarchy 3, Linux arm64 and Intel macOS are explicitly unsupported. | A3-006, A4-003, A4M-010 |
-| P2 | Resolved | Greedy Homebrew cask upgrades conflicted with application self-updaters. | Homebrew is intentionally authoritative for all declared casks during activation, including self-updating applications. The package guide documents the resulting downloads and bundle replacement. | A2-010, A4M-011 |
+| P2 | Resolved | Greedy Homebrew cask upgrades conflicted with application self-updaters. | Casks are non-greedy. 37 of the 40 declared casks self-update and now own their own versions; `upgrade = true` still covers the three that do not. `bartender` and `raindropio` opt back in because they rotted under their own updaters. Superseded the earlier "Homebrew is authoritative for every cask" resolution in commit `2f8d0c0`. | A2-010, A4M-011 |
 | P2 | Resolved | macOS mise installs resolved live versions without checksums or a reviewable record. | The shared lock now covers `linux-x64` and `macos-arm64`. Both install hooks and `mup` use the committed lock. | A4M-005 |
 | P2 | Resolved | Mise shadowed three Omarchy-owned commands and recreated a stale Herdr client that Omarchy removes. | `herdr`, `usage`, and `tree-sitter` now come from Omarchy packages on Linux and remain mise tools on macOS. The install hook removes old Linux mise copies. | A4-002 |
 | P2 | Resolved | Global macOS GCC replaced the Xcode Command Line Tools compiler and linker commands. | The flake no longer installs GCC globally. Project-specific development shells can add it when a build requires GCC. | A4M-006 |
@@ -146,13 +152,76 @@ No P2 stabilization work remains.
   still downloads missing externals. The Vim archive policy accepts
   commit-pinned GitHub URLs over HTTPS without committed content checksums.
 
+Found while reconciling this document against commit `fd3a77d`, after the
+package-set commits landed:
+
+- The flake's cask comment claimed 43 of 47 casks self-update and named
+  `1password-cli`, which the flake no longer declares. Counts are now 37 of 40,
+  verified with `brew info --json=v2`, and the three non-self-updating casks are
+  named correctly. A recount command sits next to them.
+- The greedy-cask note named `notion-calendar`, which is not declared. Only
+  `bartender` and `raindropio` opt in.
+- The macOS package guide claimed Homebrew is authoritative for every cask. It
+  now describes the non-greedy policy and the two opt-ins.
+- The cask adoption procedure listed nine applications, chosen before 30 more
+  casks were declared. It now derives the list from the flake with `nix eval`,
+  so it cannot go stale again, and shows how to preview the collisions.
+- `homebrew.masApps` was undocumented. The macOS guide now carries an ownership
+  row, the seven applications and their ids, the App Store sign-in prerequisite,
+  Xcode's size and its separation from the Command Line Tools, and the fact that
+  removing an entry does not uninstall the application.
+
 ### Open
 
-- test the remaining hypothesis about unbinding disabled Omarchy defaults.
+- test the remaining hypothesis about unbinding disabled Omarchy defaults
+  (A3-010).
 
 ## Required policy decisions
 
 No policy decisions remain.
+
+## Untraced findings
+
+The nine reports contain 93 findings. This document cites 66 by ID. Of the 27
+uncited, about 15 are covered by the P3 prose above without their IDs. The
+following 12 appear nowhere in this document in any form. Most are fixed or
+moot in the current tree, but the summary cannot show that, so record a
+disposition for each:
+
+| ID | Severity | Current tree state |
+| --- | --- | --- |
+| A1-006 | low | Covered by the P3 externals note. Needs an ID. |
+| A2-012 | low | First activation downloads roughly 1.2 GiB. Not in the cold-start guide. |
+| A2-014 | low | `darwinConfigurations` defines only `macbook`. The guide names it explicitly, so the mismatch is documented rather than fixed. |
+| A3-005 | medium | Open. `omarchy-detect.tmpl` tests `stat $envPath` first, so a stale `OMARCHY_PATH` pointing at any existing directory wins over the reliable `os-release` signal. |
+| A3-008 | low | Addressed. `dot_bashrc.tmpl` re-sources Omarchy's completions selectively and documents the replacement. |
+| A3-009 | low | Open. Conflicts between chezmoi and `omarchy refresh hyprland` are documented nowhere, though the plan asks for them. |
+| A4M-007 | low | Addressed. The mise hook installs `bun` and `uv` on Omarchy and fails with a clear message elsewhere. Nix supplies all three on macOS. |
+| A5-006 | low | Addressed. `shell-env.sh` sources Omarchy's `env-bootstrap`. |
+| A5-013 | low | Addressed. `dot_direnvrc` checks `DIRENV_SHELL` then the shell version variables. |
+| A5-016 | low | Moot once A5-001 fixed the login shell. |
+| A5-017 | low | Open decision. `local-projects/dot_mise.toml` is byte-identical to what Omarchy's installer writes. Keep or drop. |
+| A5M-008 | low | Addressed. `DOCKER_DEFAULT_PLATFORM` is inside a Darwin guard with its rationale. |
+| A5M-009 | low | Addressed. The cold-start guide tells the user not to append `brew shellenv` to `~/.zprofile`. |
+
+## Missing synthesis deliverables
+
+The plan's final synthesis asks for nine artifacts. These three exist only
+inside individual agent reports, which the plan treats as raw input rather than
+synthesis output:
+
+- **Readiness verdicts.** The plan requires separate macOS and Omarchy verdicts
+  drawn from `ready`, `ready with documented manual steps` and `blocked`. This
+  document gives an Omarchy verdict in prose and no macOS verdict.
+- **Target-selection matrix.** Only in the agent 1 report.
+- **First-apply hook timeline.** Only in the agent 1 report.
+
+The **manual-state inventory** is also incomplete. The plan lists ten
+categories to classify as automated, documented manual, or undocumented manual
+work. `docs/cold-start.md` covers GPG and App Store sign-in well, but never
+mentions SSH key creation or restoration, container runtime initialization, or
+host-specific monitor and input configuration, and reduces service
+authentication to a single sentence about launching applications.
 
 ## Remaining review gaps
 
