@@ -18,6 +18,9 @@
 
       nixpkgs.hostPlatform = "aarch64-darwin";
 
+      # ~/.zshrc initializes completion after adding user site-functions.
+      programs.zsh.enableGlobalCompInit = false;
+
       environment.systemPackages = with pkgs; [
         # --- shell and terminal ---
         atuin

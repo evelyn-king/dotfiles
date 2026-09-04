@@ -70,6 +70,8 @@ reaches both copies still ends up with the same order.
 - The rc file brings up completions before it includes
   `shell-interactive.sh`. The tool hooks in there register completions, so
   `compinit` and `bashcompinit` have to have run already.
+- nix-darwin's global `compinit` is disabled. `~/.zshrc` owns the single
+  completion initialization after adding user site-functions to `fpath`.
 - The prompt block (starship, zoxide, atuin) stays last.
 - bash gets its preexec/precmd hooks from atuin. `atuin init bash` carries its
   own bash-preexec and loads it only when no backend is present, so a copy

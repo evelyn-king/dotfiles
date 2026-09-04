@@ -49,6 +49,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | Shell startup overwrote inherited Jupyter bind, environment, and port variables. | Jupyter variables now use defaults only when the parent did not provide a value. | A5-005 |
 | P2 | Resolved | `extras.sh` overrides were documented for remote Jupyter use but loaded only by interactive shells. | The local override file now runs after shared defaults in every shell that reads a managed startup file. | A5-004 |
 | P2 | Resolved | Keychain replaced valid local SSH agents, including macOS's launchd agent, because only OpenSSH forwarding sockets were recognized. | Interactive startup keeps any inherited agent that responds to `ssh-add -l` and starts keychain only as a fallback. | A5-014, A5M-005 |
+| P2 | Resolved | nix-darwin and the managed zsh configuration both ran `compinit` with different `fpath` values. | nix-darwin's global completion initialization is disabled, leaving the managed `~/.zshrc` as the single owner. | A5M-001 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -112,7 +113,6 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## P2 stabilization work
 
-- Normalize shell behavior. Disable nix-darwin's second global `compinit`.
 - Resolve desktop ownership. Decide whether chezmoi or Omarchy owns monitor
   scaling, gate display-specific settings by host, configure AeroSpace startup
   and Accessibility onboarding, and move its global shortcuts away from
