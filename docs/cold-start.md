@@ -72,7 +72,9 @@ sudo shutdown -r now
 chezmoi apply
 ```
 
-Open AeroSpace and grant its requested Accessibility permission. Launch the
+Open AeroSpace once. In System Settings, open **Privacy & Security >
+Accessibility** and enable AeroSpace, then restart the application. Its managed
+configuration enables startup at login for later sessions. Launch the other
 managed applications that need first-use approval or account login. Complete
 the Jupyter environment setup in the main README if this host will run
 notebooks.
@@ -86,6 +88,7 @@ chezmoi apply --dry-run --refresh-externals=never
 darwin-rebuild --list-generations
 brew list --cask
 mise doctor
+aerospace list-workspaces --all
 zsh -ic 'bindkey -lL main; printf "KEYTIMEOUT=%s\n" "$KEYTIMEOUT"'
 ```
 

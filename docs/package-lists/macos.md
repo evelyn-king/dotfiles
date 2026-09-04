@@ -38,6 +38,10 @@ but the next activation can download and replace its bundle according to the
 current cask. This is intentional. Close managed applications before a switch.
 Homebrew itself must already be installed.
 
+AeroSpace starts at login after its first launch. macOS still requires a
+one-time Accessibility approval. The cold-start guide records that handoff and
+the command used to verify the running application.
+
 The flake owns the entire Homebrew prefix. Each activation removes every
 formula, cask, and tap that is not declared in `nix/flake.nix`. Add a package
 to the flake before installing it with Homebrew if it must survive the next
