@@ -19,20 +19,62 @@ export XDG_STATE_HOME="$HOME/.local/state"
 # there would always be false.
 export GOPATH="$XDG_DATA_HOME/go"
 
-# Preserve a valid inherited locale. Minimal Linux images often inherit an
-# en_US.UTF-8 that was never generated, while macOS and Linux do not guarantee
-# the same spelling. Pick the first available UTF-8 locale, then POSIX C as a
-# last resort. LC_ALL is used only for the probe and is never exported.
-if [ -z "${LANG:-}" ] || ! LC_ALL="$LANG" locale charmap >/dev/null 2>&1; then
-  LANG=C
-  for __locale in C.UTF-8 en_US.UTF-8 C; do
-    if LC_ALL="$__locale" locale charmap >/dev/null 2>&1; then
-      LANG=$__locale
-      break
+# Preserve a valid inherited locale. macOS returns success from `locale
+# charmap` even for an unknown name, so it must check the system's admitted
+# list. glibc reports an unknown locale correctly through the charmap probe.
+__locale_is_available() {
+  [ -n "$1" ] || return 1
+{{- if eq .chezmoi.os "darwin" }}
+  locale -a 2>/dev/null | grep -Fqx -- "$1"
+{{- else }}
+  LC_ALL="$1" locale charmap >/dev/null 2>&1
+{{- end }}
+}
+
+if ! __locale_is_available "${LANG:-}"; then
+  LANG=
+{{- if eq .chezmoi.os "linux" }}
+  # Non-login shells do not receive /etc/profile.d/locale.sh. Prefer the host's
+  # declared locale before portable fallbacks, matching Omarchy's bootstrap.
+  if [ -r /etc/locale.conf ]; then
+    __configured_lang=$(
+      (
+        unset LANG LC_ALL
+        . /etc/locale.conf
+        printf '%s\n' "${LANG:-}"
+      ) 2>/dev/null
+    )
+    if __locale_is_available "$__configured_lang"; then
+      LANG=$__configured_lang
     fi
-  done
-  unset __locale
+    unset __configured_lang
+  fi
+{{- else if eq .chezmoi.os "darwin" }}
+  # macOS keeps the desktop locale in global preferences rather than
+  # /etc/locale.conf. Strip preference modifiers before adding the encoding.
+  __configured_lang=$(defaults read -g AppleLocale 2>/dev/null || true)
+  __configured_lang=${__configured_lang%%@*}
+  case "$__configured_lang" in
+    *.* | "") ;;
+    *) __configured_lang="$__configured_lang.UTF-8" ;;
+  esac
+  if __locale_is_available "$__configured_lang"; then
+    LANG=$__configured_lang
+  fi
+  unset __configured_lang
+{{- end }}
+
+  if [ -z "$LANG" ]; then
+    for __locale in C.UTF-8 en_US.UTF-8 C; do
+      if __locale_is_available "$__locale"; then
+        LANG=$__locale
+        break
+      fi
+    done
+    unset __locale
+  fi
 fi
+unset -f __locale_is_available
 export LANG
 
 # Emacs on macOS starts its daemon in the per-user Darwin temp directory.

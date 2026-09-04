@@ -28,6 +28,10 @@ to `$XDG_STATE_HOME/zsh/history` and appends when a shell exits without
 interleaving commands live across open shells. Atuin keeps its own searchable
 database in addition to the shell-native history.
 
+Shell startup keeps an inherited locale only when the host supports it. Without
+one, Linux uses `/etc/locale.conf` and macOS uses the global `AppleLocale`
+preference before trying portable UTF-8 fallbacks.
+
 ## Why PATH is built twice
 
 Interactive shells build PATH in the rc file. macOS runs `path_helper` from

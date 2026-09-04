@@ -45,6 +45,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | macOS had no warning when bootstrap or manually installed commands shadowed Nix packages, and neither platform reported stale mise installs. | The cross-platform tool-drift hook reports duplicate manual installs and prunable mise versions. On macOS it also reports commands shadowing the active Nix generation. | A4M-008 |
 | P2 | Resolved | The documented `mise self-update` command could not update package-managed mise on either platform. | The update instructions now use the owning package manager: Nix flake activation on macOS and the normal Omarchy update on Linux. | A2-011, A4-004, A4M-009 |
 | P2 | Resolved | zsh history was absent on Linux and inherited small, platform-specific defaults on macOS. | zsh now keeps 100,000 entries under `$XDG_STATE_HOME` with explicit append and duplicate handling. | A5-002, A5M-003 |
+| P2 | Resolved | Linux ignored the system locale in clean sessions, while macOS accepted unsupported inherited locale names. | Shell startup validates inherited locales against the host, then reads `/etc/locale.conf` on Linux or `AppleLocale` on macOS before portable fallbacks. | A5-003, A5M-004 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -108,9 +109,9 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## P2 stabilization work
 
-- Normalize shell behavior. Fix locale validation, honor inherited Jupyter
-  variables, make `extras.sh` available where documented, preserve an existing
-  SSH agent, and disable nix-darwin's second global `compinit`.
+- Normalize shell behavior. Honor inherited Jupyter variables, make
+  `extras.sh` available where documented, preserve an existing SSH agent, and
+  disable nix-darwin's second global `compinit`.
 - Resolve desktop ownership. Decide whether chezmoi or Omarchy owns monitor
   scaling, gate display-specific settings by host, configure AeroSpace startup
   and Accessibility onboarding, and move its global shortcuts away from
