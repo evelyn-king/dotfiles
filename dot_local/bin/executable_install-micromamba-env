@@ -3,17 +3,17 @@
 set -euo pipefail
 
 SCRIPT_NAME="install-micromamba-env"
-JUPYTER_ENV_NAME="${JUPYTER_ENV_NAME:-jupyter}"
 
 usage() {
   cat <<EOF
 Usage: ${SCRIPT_NAME} <environment.yml> [more environment files...]
 
-Recreate each micromamba environment from its YAML file, removing any existing
-user kernel first and then reinstalling the kernel from the refreshed env.
+Refresh each micromamba environment from its YAML file. The script builds and
+tests a staging environment before replacing an existing environment. It also
+stages the Jupyter kernel and restores the old environment and kernel if the
+replacement fails.
 
 Environment:
-  JUPYTER_ENV_NAME   Kernel management environment name. Defaults to "jupyter".
   MAMBA_ROOT_PREFIX  Micromamba root prefix. Defaults to the chezmoi host config.
 EOF
 }
@@ -54,81 +54,144 @@ env_name_from_file() {
   )"
 
   [ -n "${env_name}" ] || die "Could not determine environment name from ${env_file}"
+  case "$env_name" in
+    . | .. | *[!A-Za-z0-9_.-]*)
+      die "Unsupported environment name in ${env_file}: ${env_name}"
+      ;;
+  esac
   printf '%s\n' "${env_name}"
 }
 
-env_exists() {
-  local env_name="$1"
-  "${MICROMAMBA[@]}" env list | awk 'NR > 2 { print $1 }' | grep -Fxq "${env_name}"
+smoke_test_env() {
+  local prefix="$1"
+
+  "${MICROMAMBA[@]}" run -p "$prefix" python -c \
+    'import ipykernel; print(ipykernel.__version__)' >/dev/null
 }
 
-jupyter_env_exists() {
-  env_exists "${JUPYTER_ENV_NAME}"
+reset_refresh_state() {
+  STAGING_DIR=
+  FINAL_PREFIX=
+  ENV_BACKUP=
+  ENV_BACKED_UP=0
+  FINAL_REPLACED=0
+  KERNEL_STAGING_DIR=
+  KERNEL_DIR=
+  KERNEL_BACKUP=
+  KERNEL_BACKED_UP=0
+  KERNEL_REPLACED=0
 }
 
-kernel_exists() {
-  local env_name="$1"
+cleanup_refresh() {
+  local status=$?
 
-  if ! jupyter_env_exists; then
-    return 1
+  trap - EXIT HUP INT TERM
+  set +e
+
+  if [ "$KERNEL_BACKED_UP" -eq 1 ]; then
+    rm -rf -- "$KERNEL_DIR"
+    mv -- "$KERNEL_BACKUP" "$KERNEL_DIR"
+  elif [ "$KERNEL_REPLACED" -eq 1 ]; then
+    rm -rf -- "$KERNEL_DIR"
   fi
 
-  "${MICROMAMBA[@]}" run -n "${JUPYTER_ENV_NAME}" python -c \
-    'import sys; from jupyter_client.kernelspec import KernelSpecManager; raise SystemExit(0 if sys.argv[1] in KernelSpecManager().find_kernel_specs() else 1)' \
-    "${env_name}" >/dev/null 2>&1
+  if [ "$ENV_BACKED_UP" -eq 1 ]; then
+    rm -rf -- "$FINAL_PREFIX"
+    mv -- "$ENV_BACKUP" "$FINAL_PREFIX"
+  elif [ "$FINAL_REPLACED" -eq 1 ]; then
+    rm -rf -- "$FINAL_PREFIX"
+  fi
+
+  [ -n "$KERNEL_STAGING_DIR" ] && rm -rf -- "$KERNEL_STAGING_DIR"
+  [ -n "$STAGING_DIR" ] && rm -rf -- "$STAGING_DIR"
+  exit "$status"
 }
 
-remove_kernel_if_present() {
-  local env_name="$1"
+finish_refresh() {
+  local staging_dir="$STAGING_DIR"
+  local env_backup="$ENV_BACKUP"
+  local kernel_staging_dir="$KERNEL_STAGING_DIR"
+  local kernel_backup="$KERNEL_BACKUP"
 
-  if ! jupyter_env_exists; then
-    log "Skipping kernel removal for ${env_name}: ${JUPYTER_ENV_NAME} env not found"
-    return 0
-  fi
-
-  if ! kernel_exists "${env_name}"; then
-    log "Kernel ${env_name} not installed"
-    return 0
-  fi
-
-  log "Removing kernel ${env_name}"
-  if "${MICROMAMBA[@]}" run -n "${JUPYTER_ENV_NAME}" python -m ipykernel remove --name "${env_name}" --yes; then
-    return 0
-  fi
-
-  log "Falling back to jupyter kernelspec uninstall for ${env_name}"
-  "${MICROMAMBA[@]}" run -n "${JUPYTER_ENV_NAME}" jupyter kernelspec uninstall -f "${env_name}"
+  # The new environment and kernel are now usable. Clear rollback state before
+  # deleting backups so an interrupted cleanup cannot remove the replacement.
+  reset_refresh_state
+  [ -n "$kernel_backup" ] && rm -rf -- "$kernel_backup"
+  [ -n "$env_backup" ] && rm -rf -- "$env_backup"
+  [ -n "$kernel_staging_dir" ] && rm -rf -- "$kernel_staging_dir"
+  [ -n "$staging_dir" ] && rm -rf -- "$staging_dir"
 }
 
-remove_env_if_present() {
-  local env_name="$1"
-
-  if ! env_exists "${env_name}"; then
-    log "Environment ${env_name} does not exist"
-    return 0
-  fi
-
-  log "Removing environment ${env_name}"
-  "${MICROMAMBA[@]}" env remove -n "${env_name}" -y
-}
-
-install_env() {
+refresh_env() {
   local env_file="$1"
   local env_name="$2"
+  local staging_prefix
+  local kernel_data_dir
+  local kernel_root
+  local kernel_staging_prefix
+  local kernel_candidate
 
-  log "Creating environment ${env_name} from ${env_file}"
-  "${MICROMAMBA[@]}" env create -f "${env_file}" -y
-}
+  reset_refresh_state
+  FINAL_PREFIX="$ENV_ROOT/$env_name"
+  ENV_BACKUP="$ENV_ROOT/.${env_name}.backup.$$"
 
-install_kernel() {
-  local env_name="$1"
-  local display_name="Python (${env_name})"
+  STAGING_DIR=$(mktemp -d "$ENV_ROOT/.${env_name}.staging.XXXXXX")
+  staging_prefix="$STAGING_DIR/prefix"
 
-  log "Installing kernel ${env_name}"
-  "${MICROMAMBA[@]}" run -n "${env_name}" python -m ipykernel install \
-    --user \
-    --name "${env_name}" \
-    --display-name "${display_name}"
+  log "Building staging environment ${env_name} from ${env_file}"
+  "${MICROMAMBA[@]}" env create -p "$staging_prefix" -f "$env_file" -y
+  smoke_test_env "$staging_prefix"
+
+  if [ -e "$FINAL_PREFIX" ] || [ -L "$FINAL_PREFIX" ]; then
+    [ -d "$FINAL_PREFIX/conda-meta" ] ||
+      die "Refusing to replace non-environment path: ${FINAL_PREFIX}"
+    [ ! -e "$ENV_BACKUP" ] && [ ! -L "$ENV_BACKUP" ] ||
+      die "Environment backup path already exists: ${ENV_BACKUP}"
+    mv -- "$FINAL_PREFIX" "$ENV_BACKUP"
+    ENV_BACKED_UP=1
+  fi
+
+  # Recreate at the final prefix so packages with embedded paths are not moved
+  # after installation. The staging build has already solved, downloaded,
+  # extracted, installed pip dependencies, and passed the smoke test.
+  FINAL_REPLACED=1
+  log "Creating replacement environment ${env_name}"
+  "${MICROMAMBA[@]}" env create -p "$FINAL_PREFIX" -f "$env_file" -y
+  smoke_test_env "$FINAL_PREFIX"
+
+  kernel_data_dir=$("${MICROMAMBA[@]}" run -p "$FINAL_PREFIX" jupyter --data-dir)
+  case "$kernel_data_dir" in
+    /*) ;;
+    *) die "Jupyter returned a non-absolute data directory: ${kernel_data_dir}" ;;
+  esac
+
+  kernel_root="${kernel_data_dir%/}/kernels"
+  mkdir -p "$kernel_root"
+  KERNEL_DIR="$kernel_root/$env_name"
+  KERNEL_BACKUP="$kernel_root/.${env_name}.backup.$$"
+  KERNEL_STAGING_DIR=$(mktemp -d "$kernel_root/.${env_name}.staging.XXXXXX")
+  kernel_staging_prefix="$KERNEL_STAGING_DIR/prefix"
+  mkdir -p "$kernel_staging_prefix"
+
+  log "Staging kernel ${env_name}"
+  "${MICROMAMBA[@]}" run -p "$FINAL_PREFIX" python -m ipykernel install \
+    --prefix "$kernel_staging_prefix" \
+    --name "$env_name" \
+    --display-name "Python (${env_name})"
+  kernel_candidate="$kernel_staging_prefix/share/jupyter/kernels/$env_name"
+  [ -d "$kernel_candidate" ] || die "Staged kernel was not created: ${env_name}"
+
+  if [ -e "$KERNEL_DIR" ] || [ -L "$KERNEL_DIR" ]; then
+    [ ! -e "$KERNEL_BACKUP" ] && [ ! -L "$KERNEL_BACKUP" ] ||
+      die "Kernel backup path already exists: ${KERNEL_BACKUP}"
+    mv -- "$KERNEL_DIR" "$KERNEL_BACKUP"
+    KERNEL_BACKED_UP=1
+  fi
+  KERNEL_REPLACED=1
+  mv -- "$kernel_candidate" "$KERNEL_DIR"
+
+  log "Installed environment and kernel ${env_name}"
+  finish_refresh
 }
 
 if [ "$#" -eq 0 ]; then
@@ -139,7 +202,7 @@ fi
 ENV_FILES=()
 while [ "$#" -gt 0 ]; do
   case "$1" in
-    -h|--help)
+    -h | --help)
       usage
       exit 0
       ;;
@@ -156,16 +219,20 @@ MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$(default_mamba_root_prefix)}"
 export MAMBA_ROOT_PREFIX
 readonly MAMBA_ROOT_PREFIX
 readonly MICROMAMBA=(micromamba --root-prefix "${MAMBA_ROOT_PREFIX}")
+readonly ENV_ROOT="$MAMBA_ROOT_PREFIX/envs"
 
 for env_file in "${ENV_FILES[@]}"; do
   [ -f "${env_file}" ] || die "Environment file not found: ${env_file}"
 done
 
+mkdir -p "$ENV_ROOT"
+reset_refresh_state
+trap cleanup_refresh EXIT
+trap 'exit 129' HUP
+trap 'exit 130' INT
+trap 'exit 143' TERM
+
 for env_file in "${ENV_FILES[@]}"; do
   env_name="$(env_name_from_file "${env_file}")"
-  log "Refreshing ${env_name} from ${env_file}"
-  remove_kernel_if_present "${env_name}"
-  remove_env_if_present "${env_name}"
-  install_env "${env_file}" "${env_name}"
-  install_kernel "${env_name}"
+  refresh_env "$env_file" "$env_name"
 done

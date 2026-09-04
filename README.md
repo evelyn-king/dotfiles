@@ -197,9 +197,10 @@ environment. Override any of them per machine in `~/.config/shell/extras.sh`.
 `conda run -n jupyter` by default, so the notebook server starts inside that
 environment without depending on an interactive shell activation step.
 
-Create the managed environments before first use. This remains an explicit
-step until the environment installer can replace an existing environment
-without deleting the working copy first:
+Create the managed environments before first use. The installer builds and
+smoke-tests a staging environment before it moves an existing environment. It
+keeps backups of the old environment and kernel until the replacement and its
+new kernel are both ready, and restores them if any replacement step fails.
 
 ```bash
 install-micromamba-env \
