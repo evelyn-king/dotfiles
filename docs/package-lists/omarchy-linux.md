@@ -107,6 +107,60 @@ ollama list
 The package hook is additive, so removing Ollama from the manifest does not
 uninstall it from a machine that already has it.
 
+## Refreshing Hyprland config
+
+`omarchy refresh hyprland` runs `omarchy-refresh-config` over all seven shipped
+Hypr files. This repo manages four of them:
+
+| File | Owner |
+| --- | --- |
+| `hyprland.lua` | this repo |
+| `bindings.lua` | this repo |
+| `looknfeel.lua` | this repo |
+| `monitors.lua` | seeded once by this repo, then yours and Omarchy's |
+| `input.lua` | Omarchy |
+| `autostart.lua` | Omarchy |
+| `hyprsunset.conf` | Omarchy |
+
+Each refresh copies the current file to `<name>.bak.<epoch>` and replaces it
+with the packaged default, so the desktop reverts to stock for the managed
+four. `omarchy refresh config hypr/<file>` on a single managed file does the
+same.
+
+**`chezmoi apply` is the recovery path, not `omarchy refresh hyprland`.** Run
+it to restore the repo copies:
+
+```bash
+chezmoi apply
+chezmoi status .config/hypr
+hyprctl configerrors
+```
+
+That restores `hyprland.lua`, `bindings.lua` and `looknfeel.lua` only.
+`monitors.lua` is a `create_` target, so chezmoi writes it when it is missing
+and never touches it again. A refresh leaves the stock file in place and
+`chezmoi apply` will not overwrite it. To go back to the repo's seed, delete
+the file first:
+
+```bash
+rm ~/.config/hypr/monitors.lua
+chezmoi apply
+```
+
+Check the restored scale against the `.bak` copy before deleting it, because
+any scale chosen through Omarchy's monitor menu lives in that file rather than
+in this repo.
+
+The refresh leaves its `.bak.<epoch>` files in `~/.config/hypr/` indefinitely.
+chezmoi does not manage them and nothing removes them, so delete them by hand:
+
+```bash
+ls ~/.config/hypr/*.bak.*
+```
+
+Refreshing the three unmanaged files is fine and is the intended way to pick up
+Omarchy's updates to them.
+
 ## Notes
 
 - Stock Omarchy owns the `tldr` command through its `tldr` package. Do not add

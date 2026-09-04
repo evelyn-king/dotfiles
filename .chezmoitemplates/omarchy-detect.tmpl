@@ -15,7 +15,12 @@ Four signals, because no single one covers every way an apply is invoked:
   OMARCHY_PATH       Set by `omarchy dev link` to a working tree outside both
                      standard locations. Checked first so a dev-linked tree
                      still counts, but never relied on alone: it is exported
-                     only by shells that ran Omarchy's env-bootstrap.
+                     only by shells that ran Omarchy's env-bootstrap. The
+                     variable outlives the tree it points at, so existence of
+                     the path is not enough. Require the `default` directory
+                     every Omarchy tree carries, or a stale variable pointing
+                     at any surviving directory would claim a plain Linux host
+                     and run `omarchy pkg add` there.
   /usr/share/omarchy Omarchy 4 ships the desktop as a package here.
   ~/.local/share/... Omarchy 3 and earlier used a git clone in the home
                      directory. Kept so an unmigrated host still matches, but
@@ -28,7 +33,7 @@ variable was absent.
 {{- $omarchy := false -}}
 {{- if eq .chezmoi.os "linux" -}}
 {{-   $envPath := env "OMARCHY_PATH" -}}
-{{-   if and $envPath (ne (stat $envPath) nil) -}}
+{{-   if and $envPath (ne (stat (joinPath $envPath "default")) nil) -}}
 {{-     $omarchy = true -}}
 {{-   else if eq (.chezmoi.osRelease.id | default "") "omarchy" -}}
 {{-     $omarchy = true -}}
