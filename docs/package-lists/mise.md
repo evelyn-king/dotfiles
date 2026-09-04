@@ -43,8 +43,10 @@ chezmoi apply
 ```
 
 Run `mup` to update floating tools and their platform-specific lock resolution.
-Review and commit the resulting `dot_config/mise/mise.lock` change. Update mise
-itself separately with `mise self-update`.
+Review and commit the resulting `dot_config/mise/mise.lock` change. `mup` does
+not update the mise binary. Nix owns that binary on macOS, so update the flake
+inputs and run `nix-switch`. Omarchy owns it through `mise-bin`, which the
+normal `omarchy update` process updates.
 
 After each apply, `run_after_tool-drift.sh.tmpl` reports duplicate manual
 installs and old mise versions that `mise prune --tools` can remove. The report

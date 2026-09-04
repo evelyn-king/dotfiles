@@ -98,10 +98,18 @@ and `mup` and the install script both reach it by setting `MISE_CONFIG_DIR`.
 The applied `conf.d` files still drive the interactive shell's own tool
 resolution.
 
-Update the mise binary itself separately:
+The platform package manager owns the mise binary. On macOS, update the Nix
+flake inputs and activate the new generation:
 
 ```bash
-mise self-update
+nix flake update --flake "$(chezmoi source-path)/nix"
+nix-switch
+```
+
+On Omarchy, the normal system update updates its `mise-bin` package:
+
+```bash
+omarchy update
 ```
 
 ## Shell
