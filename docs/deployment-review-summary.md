@@ -42,6 +42,7 @@ activation. It does not replace the severity recorded in the source reports.
 | P2 | Resolved | macOS mise installs resolved live versions without checksums or a reviewable record. | The shared lock now covers `linux-x64` and `macos-arm64`. Both install hooks and `mup` use the committed lock. | A4M-005 |
 | P2 | Resolved | Mise shadowed three Omarchy-owned commands and recreated a stale Herdr client that Omarchy removes. | `herdr`, `usage`, and `tree-sitter` now come from Omarchy packages on Linux and remain mise tools on macOS. The install hook removes old Linux mise copies. | A4-002 |
 | P2 | Resolved | Global macOS GCC replaced the Xcode Command Line Tools compiler and linker commands. | The flake no longer installs GCC globally. Project-specific development shells can add it when a build requires GCC. | A4M-006 |
+| P2 | Resolved | macOS had no warning when bootstrap or manually installed commands shadowed Nix packages, and neither platform reported stale mise installs. | The cross-platform tool-drift hook reports duplicate manual installs and prunable mise versions. On macOS it also reports commands shadowing the active Nix generation. | A4M-008 |
 
 ## `.chezmoiremove` necessity audit
 
@@ -105,8 +106,8 @@ installer, so the new policy preserves it; mise already takes precedence on
 
 ## P2 stabilization work
 
-- Make runtime ownership deterministic. Report PATH drift and correct the
-  `mise self-update` instructions.
+- Make runtime ownership deterministic. Correct the `mise self-update`
+  instructions.
 - Normalize shell behavior. Own zsh history explicitly, fix locale validation,
   honor inherited Jupyter variables, make `extras.sh` available where
   documented, preserve an existing SSH agent, and disable nix-darwin's second

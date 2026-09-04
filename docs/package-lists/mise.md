@@ -46,6 +46,10 @@ Run `mup` to update floating tools and their platform-specific lock resolution.
 Review and commit the resulting `dot_config/mise/mise.lock` change. Update mise
 itself separately with `mise self-update`.
 
+After each apply, `run_after_tool-drift.sh.tmpl` reports duplicate manual
+installs and old mise versions that `mise prune --tools` can remove. The report
+does not change installed tools.
+
 mise hides releases younger than a day so a compromised publish has time to be
 pulled before it lands here. The coding agents ship several times a day, which
 is the whole reason they float, so `minimum_release_age_excludes` in the shared

@@ -1,0 +1,101 @@
+#!/usr/bin/env bash
+
+# Report tool ownership drift after chezmoi applies. This script only reports;
+# it never removes a tool or changes the active system.
+
+set -u
+
+if command -v mise >/dev/null 2>&1; then
+  shims="${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims"
+
+  if [ -d "$shims" ]; then
+    shadows=$(
+      for shim in "$shims"/*; do
+        [ -f "$shim" ] && [ -x "$shim" ] || continue
+        name=${shim##*/}
+        managed=$(mise which "$name" 2>/dev/null || true)
+        [ -n "$managed" ] || continue
+        for dir in \
+          "$HOME/.local/bin" \
+          "$HOME/bin" \
+          "$HOME/.cargo/bin" \
+          "${BUN_INSTALL:-$HOME/.bun}/bin" \
+          "${GOPATH:-$HOME/.local/share/go}/bin" \
+          "$HOME/.local/share/npm/bin" \
+          "$HOME/.npm-global/bin"; do
+          [ -d "$dir" ] || continue
+          candidate="$dir/$name"
+          [ -f "$candidate" ] && [ -x "$candidate" ] || continue
+          # Rustup proxies and similar backends can place the managed binary in
+          # a standard tool-owned directory. Do not report the same file twice.
+          if [ "$candidate" -ef "$managed" ]; then
+            continue
+          fi
+          printf '    %-24s %s\n' "$name" "$candidate"
+        done
+      done
+    )
+
+    if [ -n "$shadows" ]; then
+      cat >&2 <<EOF
+
+  mise: these tools are declared by mise but also installed by hand.
+  A hand-installed copy can drift from the locked version and may still win
+  in shells that do not load the managed PATH.
+
+$shadows
+
+  Remove each one through the tool that installed it. For example, use
+  \`uv tool uninstall <name>\` or \`bun remove -g <package>\` instead of
+  deleting a symlink by hand.
+
+EOF
+    fi
+  fi
+
+  prunable=$(mise ls --prunable --no-header 2>/dev/null || true)
+  if [ -n "$prunable" ]; then
+    cat >&2 <<EOF
+
+  mise: these installed versions are no longer requested by tracked config:
+
+$prunable
+
+  Review them, then remove them with \`mise prune --tools\`.
+
+EOF
+  fi
+fi
+
+{{- if eq .chezmoi.os "darwin" }}
+system_bin=/run/current-system/sw/bin
+if [ -d "$system_bin" ]; then
+  system_shadows=$(
+    for candidate in "$system_bin"/*; do
+      [ -f "$candidate" ] && [ -x "$candidate" ] || continue
+      name=${candidate##*/}
+      resolved=$(command -v "$name" 2>/dev/null || true)
+      case "$resolved" in
+        /*) ;;
+        *) continue ;;
+      esac
+      [ "$resolved" = "$candidate" ] || printf '    %-24s %s\n' "$name" "$resolved"
+    done
+  )
+
+  if [ -n "$system_shadows" ]; then
+    cat >&2 <<EOF
+
+  nix-darwin: these system commands are shadowed earlier on PATH:
+
+$system_shadows
+
+  Remove the earlier copy or change its package ownership. The system command
+  remains available under $system_bin.
+
+EOF
+  fi
+fi
+{{- end }}
+
+exit 0

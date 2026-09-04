@@ -73,3 +73,8 @@ from `nix/flake.nix` before activation rather than skipping its collision.
 flake on every `chezmoi apply` and nags when they differ. It deliberately does
 not activate. `darwin-rebuild switch` requires root, and `chezmoi apply` must
 never escalate.
+
+`run_after_tool-drift.sh.tmpl` reports commands that an earlier `PATH` entry
+shadows ahead of `/run/current-system/sw/bin`. It also reports duplicate
+user-installed copies of mise tools and old mise versions eligible for pruning.
+The check does not remove anything.
