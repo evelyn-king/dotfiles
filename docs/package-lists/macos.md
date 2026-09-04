@@ -22,6 +22,7 @@ already resolved. `darwinConfigurations` defines only `macbook`, for
 | --- | --- |
 | `nix/flake.nix` `environment.systemPackages` | system CLI packages |
 | `nix/flake.nix` `homebrew.casks` | GUI applications |
+| `nix/flake.nix` `homebrew.masApps` | Mac App Store applications |
 | `dot_config/mise/conf.d/10-dotfiles.toml` | language runtimes and global CLI tools |
 
 Anything managed by mise is deliberately absent from the Nix package list.
@@ -31,12 +32,29 @@ commands. GCC is not installed globally because its unprefixed commands would
 replace Apple's toolchain on `PATH`.
 
 GUI applications come from Homebrew casks declared in the flake. nix-darwin
-installs and upgrades them during `darwin-rebuild switch`. Homebrew is
-authoritative for every declared cask during activation, including applications
-with built-in updaters. An application may update itself between activations,
-but the next activation can download and replace its bundle according to the
-current cask. This is intentional. Close managed applications before a switch.
-Homebrew itself must already be installed.
+installs and upgrades them during `darwin-rebuild switch`. Homebrew itself must
+already be installed.
+
+Casks are non-greedy (`greedyCasks = false`). 37 of the 40 declared casks set
+`auto_updates`, so each vendor's own updater owns its version and activation
+leaves it alone. This avoids a fortnightly fight with those updaters and avoids
+re-running a `pkg` installer under `sudo` for the Microsoft suite,
+google-drive, onedrive, cloudflare-warp, tailscale-app, zoom and the Logitech
+pair.
+
+`upgrade = true` still upgrades the three casks that do not self-update:
+aerospace, basictex and dot.
+
+Two casks opt back in with `greedy = true` because they rotted while installed
+by hand despite advertising `auto_updates`:
+
+| Cask | Why Homebrew forces it |
+| --- | --- |
+| `bartender` | sat months out of date under its own updater |
+| `raindropio` | sat months out of date under its own updater |
+
+Close those two before a switch, since activation can replace a running
+bundle.
 
 AeroSpace starts at login after its first launch. macOS still requires a
 one-time Accessibility approval. The cold-start guide records that handoff and
@@ -53,23 +71,76 @@ Before the first activation on an existing Mac, let Homebrew adopt applications
 that were installed by another method. Otherwise the cask installation stops
 when it finds the existing application in `/Applications`.
 
-The deployment review found these collisions on the `macbook` host:
+Derive the cask list from the flake rather than from a list written here. A
+hardcoded list goes stale on the next cask change; this reads the current
+declaration:
 
 ```bash
-brew install --cask --adopt \
-  bitwarden firefox ghostty iterm2 obsidian rancher raycast spotify \
-  visual-studio-code
-brew list --cask bitwarden firefox ghostty iterm2 obsidian rancher raycast \
-  spotify visual-studio-code
+casks=$(nix eval --json \
+  "$(chezmoi source-path)/nix#darwinConfigurations.macbook.config.homebrew.casks" \
+  | python3 -c 'import json,sys; print(" ".join(c["name"] for c in json.load(sys.stdin)))')
+printf '%s\n' "$casks"
+brew install --cask --adopt $casks
+brew list --cask
 ```
 
-Run this after installing Homebrew and before the first activation. The command
-also installs any listed application that is not already present, which is
-consistent with the flake's declared cask ownership. Remove an unwanted cask
-from `nix/flake.nix` before activation rather than skipping its collision.
+nix-darwin normalizes each entry to an attribute set, so `.name` covers both
+plain strings and the `{ name = ...; greedy = true; }` form.
+
+Run this after installing Nix and Homebrew and before the first activation. It
+adopts any application already in `/Applications`, installs any declared cask
+that is missing, and is a no-op for casks Homebrew already manages. Installing
+the missing ones is consistent with the flake's declared cask ownership. Remove
+an unwanted cask from `nix/flake.nix` before activation rather than skipping
+its collision.
+
+To see the collisions before acting, list declared casks that Homebrew does not
+yet manage:
+
+```bash
+comm -23 <(printf '%s\n' $casks | sed 's|.*/||' | sort) <(brew list --cask | sort)
+```
 
 `system.primaryUser` in the flake must match the macOS short account name
 (`id -un`) or activation fails.
+
+## Mac App Store applications
+
+`homebrew.masApps` declares seven App Store applications, installed with `mas`.
+nix-darwin puts `mas` on the activation PATH, so it is not declared as a
+formula.
+
+| Application | Adam ID |
+| --- | --- |
+| Amazon Kindle | 302584613 |
+| DaisyDisk | 411643860 |
+| Keynote | 409183694 |
+| Magnet | 441258766 |
+| Slack | 803453959 |
+| WireGuard | 1451685025 |
+| Xcode | 497799835 |
+
+**Sign in to the App Store before the first activation.** The account that owns
+these purchases must be signed in, or activation cannot install or upgrade
+them. `mas signin` does not work on current macOS; sign in through the App
+Store application itself. This is manual work that the repository cannot
+automate.
+
+Xcode is a multi-gigabyte download and adds noticeable time to the first
+activation. It is separate from the Xcode Command Line Tools that the
+cold-start guide installs with `xcode-select --install`; the tools are the
+compiler and linker the rest of this configuration depends on, and installing
+Xcode does not remove the need for them. After Xcode installs, launch it once
+to accept its license.
+
+Removing an entry from `masApps` does **not** uninstall the application, even
+under `cleanup = "uninstall"`. Delete those by hand.
+
+Get the id for a new entry from the installed bundle:
+
+```bash
+mdls -name kMDItemAppStoreAdamID -raw /Applications/<name>.app
+```
 
 ## Drift
 

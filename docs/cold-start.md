@@ -52,8 +52,16 @@ chezmoi apply
 ```
 
 If this is an existing Mac, complete the cask adoption procedure in
-[package-lists/macos.md](package-lists/macos.md) before activation. The first
-activation must use `nix run` because `darwin-rebuild` is not on `PATH` yet:
+[package-lists/macos.md](package-lists/macos.md) before activation.
+
+Sign in to the App Store with the account that owns the declared `masApps`.
+Activation cannot install or upgrade them otherwise, and `mas signin` does not
+work on current macOS. Xcode is among them, so expect a multi-gigabyte download
+during the activation below and launch it once afterwards to accept its
+license.
+
+The first activation must use `nix run` because `darwin-rebuild` is not on
+`PATH` yet:
 
 ```bash
 sudo nix run nix-darwin/master#darwin-rebuild -- \
