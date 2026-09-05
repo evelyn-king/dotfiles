@@ -7,7 +7,7 @@ defaults, and `dot_config/nvim/lua/config/keymaps.lua` adds exactly one thing.
 Vim mirrors that set from `dot_vim/plugin/keymaps.vim`. Leader is `<Space>` and
 localleader is `\` in both.
 
-Two consequences worth stating plainly:
+Two consequences:
 
 - Changing a keymap means changing it in both files. There is no shared source
   to generate one from; Vimscript and Lua are too far apart for that to pay off.
@@ -61,28 +61,29 @@ Neovim now copies it. LazyVim does not claim `jk`, so nothing collides.
 
 ## Same key, equivalent plugin
 
-The key matches; the implementation differs, and so does the fine detail.
+The key matches. The implementation differs, and sometimes the behaviour does
+too.
 
 | Key | Neovim | Vim | Difference |
 | --- | --- | --- | --- |
-| `gcc`, visual `gc` | Built-in commenting | nerdcommenter | — |
-| `gbc`, visual `gb` | Built-in block comment | `NERDCommenterMinimal` | — |
-| `gco` `gcO` | Comment line below / above | Same trick, ported | — |
+| `gcc`, visual `gc` | Built-in commenting | nerdcommenter | None |
+| `gbc`, visual `gb` | Built-in block comment | `NERDCommenterMinimal` | None |
+| `gco` `gcO` | Comment line below / above | Same trick, ported | None |
 | `gc{motion}` | Built-in operator | *unmapped* | nerdcommenter has no operator-pending support |
 | `gsa` `gsd` `gsr` | mini.surround | vim-surround `<Plug>` targets | Vim also keeps its native `ys`/`ds`/`cs`, which Neovim has no equivalent for |
-| `<leader>e` `<leader>fe` | Explorer at the root dir | `:NERDTreeToggleVCS` | — |
-| `<leader>E` `<leader>fE` | Explorer at the cwd | `:NERDTreeToggle` | — |
+| `<leader>e` `<leader>fe` | Explorer at the root dir | `:NERDTreeToggleVCS` | None |
+| `<leader>E` `<leader>fE` | Explorer at the cwd | `:NERDTreeToggle` | None |
 | `<leader>gg` `<leader>gG` | gitui in a Snacks terminal | gitui in a terminal tab | LazyVim's `util.gitui` extra puts gitui here, not lazygit |
 | `<leader>gb` | Snacks git log for the line | `:Git blame` (fugitive) | Whole-file blame, not one line |
-| `<leader>gL` | Snacks git log | `:Git log` (fugitive) | — |
+| `<leader>gL` | Snacks git log | `:Git log` (fugitive) | None |
 | `<leader>ft` `<leader>fT` | Floating terminal | `:terminal` in a split | Vim has no root-dir/cwd distinction here |
 
 ## Fallbacks
 
-Vim has no fuzzy finder. Rather than leave the picker keys dead, they open the
-command line on the nearest built-in, backed by `path+=**` and `grepprg=rg` in
-`.vimrc`. Wildmenu completion, not fuzzy matching — the key lands somewhere
-useful, but it does not feel the same.
+Vim has no fuzzy finder. Rather than leave the picker keys dead, each one opens
+the command line on the nearest built-in, backed by `path+=**` and `grepprg=rg` in
+`.vimrc`. This is wildmenu completion rather than fuzzy matching. The key lands
+somewhere useful, but it does not feel the same.
 
 | Key | Neovim | Vim |
 | --- | --- | --- |
@@ -97,8 +98,8 @@ grep, so these behave like one command rather than two.
 
 ## Not ported
 
-Deliberately unmapped in Vim. Every one of these needs something Vim does not
-have, and a key that behaves differently is worse than a key that does nothing.
+Deliberately unmapped in Vim. Each one needs something Vim does not have, and a
+key that behaves differently is worse than a key that does nothing.
 
 - **LSP**: `gd`, `gr`, `gI`, `gy`, `<leader>ca`, `<leader>cr`, `<leader>cd`,
   `]d` `[d`, `]e` `[e`, `]w` `[w`
@@ -106,7 +107,7 @@ have, and a key that behaves differently is worse than a key that does nothing.
 - **Pickers beyond the fallbacks above**: `<leader>sb`, `<leader>ss`, and the
   rest of `<leader>s*`
 - **flash.nvim**: `s`, `S`, `r`, `R`
-- **harpoon**: `<leader>H`, `<leader>h`, `<leader>1`–`<leader>5`
+- **harpoon**: `<leader>H`, `<leader>h`, `<leader>1` through `<leader>5`
 - **Snacks-specific toggles**: `<leader>ud`, `<leader>uh`, `<leader>uT`,
   `<leader>ug`, `<leader>uS`, `<leader>ua`, `<leader>uD`, `<leader>uz`
 - **LazyVim itself**: `<leader>l`, `<leader>L`, `<leader>dp*`

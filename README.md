@@ -12,16 +12,14 @@ Dotfiles managed directly with `chezmoi`.
 
 ## Supported platforms
 
-This branch supports only Apple Silicon macOS and Omarchy 4 on x86_64 Linux.
-Omarchy 3, Linux arm64 and Intel macOS are not supported. Native Windows uses
-the separate `windows` branch.
+Apple Silicon macOS and Omarchy 4 on x86_64 Linux. Native Windows lives on the
+separate `windows` branch.
 
 ## Cold start
 
-Use [docs/cold-start.md](docs/cold-start.md) for a supported Apple Silicon Mac
-or Omarchy 4 x86_64 host. It starts with platform prerequisites and source
-initialization, then covers activation, repeated applies, login or reboot,
-manual service setup, and final verification.
+[docs/cold-start.md](docs/cold-start.md) takes a fresh Mac or Omarchy host from
+platform prerequisites through source initialization, activation, the repeated
+applies, the manual service setup, and the final checks.
 
 ## Apply
 
@@ -29,19 +27,19 @@ manual service setup, and final verification.
 chezmoi apply
 ```
 
-Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes
-without updating pinned externals.
+`chezmoi apply --dry-run --refresh-externals=never` previews changes without
+updating pinned externals.
 
-`--refresh-externals=never` prevents refreshes of bodies already in chezmoi's
-cache. It does not make a cold-cache run offline. The first dry run or apply
-still downloads the six commit-pinned Vim plugin archives before writing any
-destination files. Run that first command with network access, or copy a
-populated cache from a trusted machine. The archive URLs are commit-pinned, but
-the repo intentionally relies on HTTPS and GitHub's commit archive endpoint
-instead of carrying checksums for their response bodies.
+`--refresh-externals=never` skips refreshing bodies chezmoi has already cached.
+It does not make a cold-cache run offline. The first dry run or apply still
+downloads the six commit-pinned Vim plugin archives before it writes any
+destination file, so give that first command network access or copy a populated
+cache from a machine you trust. The archive URLs are commit-pinned, and the repo
+relies on HTTPS and GitHub's commit archive endpoint rather than carrying
+checksums for their response bodies.
 
-`~/.config/chezmoi/chezmoi.toml` is rendered from `.chezmoi.toml.tmpl` at init
-time, not on every apply. After pulling a change to that template, run
+chezmoi renders `~/.config/chezmoi/chezmoi.toml` from `.chezmoi.toml.tmpl` at
+init time, not on every apply. After pulling a change to that template, run
 `chezmoi init` once so the generated config picks it up.
 
 ## Packages
@@ -59,26 +57,25 @@ removing packages installed by hand. See
 [docs/package-lists/macos.md](docs/package-lists/macos.md) and
 [docs/package-lists/omarchy-linux.md](docs/package-lists/omarchy-linux.md) for
 system packages, and [docs/package-lists/mise.md](docs/package-lists/mise.md)
-for the runtimes and CLI tools managed by mise.
+for the runtimes and CLI tools mise manages.
 
 ### mise
 
 Language runtimes and global CLI tools are declared in
-[`dot_config/mise/conf.d/`](dot_config/mise/conf.d/). The files live under
-`conf.d` rather than at `~/.config/mise/config.toml` so repo-managed tools stay
-separate from mise's interactive global state. This repo removes
+[`dot_config/mise/conf.d/`](dot_config/mise/conf.d/). They live under `conf.d`
+rather than at `~/.config/mise/config.toml` so repo-managed tools stay separate
+from mise's interactive global state. This repo removes
 `~/.config/mise/config.toml`; declare every global tool in `conf.d`. Both
-platforms declare and install the same set, including `herdr`, `usage` and
-`tree-sitter`, whose mise shims deliberately outrank the Omarchy packages of
-the same name. See [docs/package-lists/mise.md](docs/package-lists/mise.md)
-for why.
+platforms declare and install the same set. Three of those tools also ship as
+Omarchy packages, and the mise shims deliberately outrank them. See
+[docs/package-lists/mise.md](docs/package-lists/mise.md) for why.
 
-`run_onchange_after_mise-install.sh.tmpl` installs them, and re-runs whenever
-the file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
+`run_onchange_after_mise-install.sh.tmpl` installs them and re-runs whenever the
+file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
 
 Most versions are pinned exactly. Rust tracks the stable release channel; the
 coding agents, `gh` and `usage` float at `latest` on purpose. mise holds new
-releases for a day before it will resolve them; the coding agents opt out of
+releases for a day before it will resolve them, and the coding agents opt out of
 that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
 `mup` is what moves them:
 
@@ -91,8 +88,8 @@ and `macos-arm64` whichever machine you run it on, then installs what that lock
 holds for the machine you are on. The lock is one shared artifact and
 `mise lock` prunes whatever a run does not resolve, so a refresh scoped to its
 own host would drop the other platform's entries. Review and commit the lockfile
-change afterwards. Rust is the one channel-based exception: its lock entry remains `stable`, and rustup
-resolves that channel when mise installs or updates it.
+change afterwards. Rust is the one channel-based exception. Its lock entry stays
+`stable`, and rustup resolves that channel when mise installs or updates it.
 
 Like `nix/flake.lock`, that lock is repo content rather than a home file. mise
 rewrites a lock in place whenever it installs, so an applied second copy under
@@ -120,7 +117,7 @@ omarchy update
 
 zsh and bash share environment, PATH and interactive setup bodies from
 `.chezmoitemplates/shell-*.sh`. The rendered startup files stay flat and
-self-contained, with no shared body sourced at runtime.
+self-contained, with nothing sourced from the source tree at runtime.
 
 PATH is built twice, on purpose, and the order is load-bearing. See
 [docs/shell-startup.md](docs/shell-startup.md).
@@ -135,19 +132,19 @@ the local-secret procedure.
 ## Editors
 
 Neovim runs LazyVim; Vim runs a short `.vimrc` plus six pinned pack plugins.
-They share one keymap as far as plain Vim reaches: Neovim is the reference, and
-`dot_vim/plugin/keymaps.vim` mirrors LazyVim's defaults. Changing a binding
+They share one keymap as far as plain Vim reaches. Neovim is the reference, and
+`dot_vim/plugin/keymaps.vim` mirrors LazyVim's defaults, so changing a binding
 means changing both files. See [docs/keybindings.md](docs/keybindings.md).
 
-Neovim plugin revisions intentionally float between hosts. lazy.nvim owns the
-generated `lazy-lock.json`; the repo keeps it untracked and does not promise
-identical plugin revisions across installations.
+Neovim plugin revisions float between hosts. lazy.nvim owns the generated
+`lazy-lock.json`, the repo keeps it untracked, and installations can therefore
+sit on different plugin revisions.
 
 ## Theming
 
-Everything is [Gruvbox](https://github.com/morhetz/gruvbox), dark by default. Each
-config sets its own theme directly, with no shared theme data or indirection
-layer. Add a selector back if a second theme ever earns its keep.
+Everything is [Gruvbox](https://github.com/morhetz/gruvbox), dark by default.
+Each config names the theme directly. There is no shared theme data and no
+indirection layer.
 
 Ghostty, Doom, bat, Zellij, Herdr, superfile and Zed ship Gruvbox themes.
 Neovim pulls `gruvbox.nvim`, while Vim uses a pinned chezmoi external from
@@ -156,13 +153,12 @@ Neovim pulls `gruvbox.nvim`, while Vim uses a pinned chezmoi external from
 btop and atuin use the repo-managed theme files under each tool's `themes/`
 directory.
 
-tmux and starship deliberately stay on ANSI color names rather than hex, so
-they inherit whatever Ghostty is set to and never drift from it. Claude Code
-stays on `auto`, and OpenCode's TUI stays on `system` in its separate
-`tui.json`.
+tmux and starship stay on ANSI color names rather than hex, so they inherit
+whatever Ghostty is set to and never drift from it. Claude Code stays on `auto`,
+and OpenCode's TUI stays on `system` in its separate `tui.json`.
 
-Omarchy's own theme switching still themes the desktop chrome it owns, but no
-longer drives anything in this repo.
+Omarchy's theme switcher changes the desktop chrome it owns and nothing in this
+repo.
 
 The palette, for hand-editing a theme file:
 
@@ -184,7 +180,7 @@ force push, broad `git add`, protected-branch pushes, and PR merges.
 
 These hooks are guardrails, not a security boundary. Shell wrappers, nested
 interpreters, Git aliases, and commands that change directory before running
-Git can bypass the matcher. Hook errors also fail open in some adapters. Keep
+Git can bypass the matcher, and hook errors fail open in some adapters. Keep
 remote branch protection enabled and review agent commands before execution.
 
 The rules live in `.chezmoitemplates/git-rewrite-policy.py`; each hook is a thin
@@ -203,18 +199,17 @@ Shell startup exports `JUPYTER_BIND_HOST`, `JUPYTER_ENV_NAME` and
 environment. Override any of them per machine in `~/.config/shell/extras.sh`.
 
 `jupyter-remote-lab` runs `jupyter lab` through `micromamba run -n jupyter` or
-`conda run -n jupyter` by default, so the notebook server starts inside that
-environment without depending on an interactive shell activation step.
+`conda run -n jupyter`, so the notebook server starts inside that environment
+without an interactive shell activation step.
 
 Create the managed environments before first use. The installer builds and
-smoke-tests a staging environment before it moves an existing environment. It
-keeps backups of the old environment and kernel until the replacement and its
-new kernel are both ready, and restores them if any replacement step fails.
+smoke-tests a staging environment before it moves an existing one. It keeps
+backups of the old environment and kernel until the replacement and its new
+kernel are both ready, and restores them if any replacement step fails.
 
-Micromamba environments intentionally resolve current package versions from
-the managed YAML files at each rebuild. The repo does not pin their packages or
-track environment lockfiles, so installations made at different times can
-differ.
+Each rebuild resolves current package versions from the managed YAML files. The
+repo pins nothing there and tracks no environment lockfile, so environments
+built at different times can differ.
 
 ```bash
 install-micromamba-env \
@@ -238,8 +233,8 @@ ssh -N -L 8888:127.0.0.1:8888 <ssh-host>
 
 The launcher writes its last runtime metadata to
 `${JUPYTER_REMOTE_ENV_FILE:-~/.local/state/jupyter-remote/current.env}`. Run
-`jupyter_remote_load_env` in a shell if you want that runtime state loaded back
-into your current environment after launching with overrides like `--port`.
+`jupyter_remote_load_env` to load that runtime state back into your current
+shell after launching with overrides like `--port`.
 
 For a custom token, put the token in a mode-0600 file and pass its path with
 `--token-file`. The launcher copies it into its mode-0700 state directory and

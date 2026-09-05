@@ -1,8 +1,10 @@
 # macOS package list
 
-Apple Silicon macOS machines use nix-darwin. Intel macOS is not supported. The
-declaration is [`nix/flake.nix`](../../nix/flake.nix), which is repository
-content rather than a home file and is listed in `.chezmoiignore`.
+Apple Silicon macOS machines use nix-darwin. The declaration is
+[`nix/flake.nix`](../../nix/flake.nix), which is repository content rather than
+a home file and is listed in `.chezmoiignore`. Read the flake for the actual
+package, cask and App Store lists. This page covers only the ownership rules
+and the manual steps around them.
 
 The flake lives in the source tree and `.chezmoi.toml.tmpl` pins `sourceDir` to
 wherever the repo was cloned, so derive the path rather than hardcoding it:
@@ -25,54 +27,40 @@ already resolved. `darwinConfigurations` defines only `macbook`, for
 | `nix/flake.nix` `homebrew.masApps` | Mac App Store applications |
 | `dot_config/mise/conf.d/10-dotfiles.toml` | language runtimes and global CLI tools |
 
-Anything managed by mise is deliberately absent from the Nix package list.
-Both macOS and Omarchy use the stock `tldr` client; Nix owns it on macOS.
-The Xcode Command Line Tools supply `cc`, `c++`, the linker, and related build
-commands. GCC is not installed globally because its unprefixed commands would
-replace Apple's toolchain on `PATH`.
+Anything mise manages is deliberately absent from the Nix package list.
 
-GUI applications come from Homebrew casks declared in the flake. nix-darwin
-installs and upgrades them during `darwin-rebuild switch`. Homebrew itself must
-already be installed.
-
-Casks are non-greedy (`greedyCasks = false`). 37 of the 40 declared casks set
-`auto_updates`, so each vendor's own updater owns its version and activation
-leaves it alone. This avoids a fortnightly fight with those updaters and avoids
-re-running a `pkg` installer under `sudo` for the Microsoft suite,
-google-drive, onedrive, cloudflare-warp, tailscale-app, zoom and the Logitech
-pair.
-
-`upgrade = true` still upgrades the three casks that do not self-update:
-aerospace, basictex and dot.
-
-Two casks opt back in with `greedy = true` because they rotted while installed
-by hand despite advertising `auto_updates`:
-
-| Cask | Why Homebrew forces it |
-| --- | --- |
-| `bartender` | sat months out of date under its own updater |
-| `raindropio` | sat months out of date under its own updater |
-
-Close those two before a switch, since activation can replace a running
-bundle.
-
-AeroSpace starts at login after its first launch. macOS still requires a
-one-time Accessibility approval. The cold-start guide records that handoff and
-the command used to verify the running application.
+The Xcode Command Line Tools supply `cc`, `c++`, the linker and the related
+build commands. GCC is not installed globally, because its unprefixed commands
+would replace Apple's toolchain on `PATH`.
 
 The flake owns the entire Homebrew prefix. Each activation removes every
-formula, cask, and tap that is not declared in `nix/flake.nix`. Add a package
-to the flake before installing it with Homebrew if it must survive the next
-`darwin-rebuild switch`.
+formula, cask and tap that `nix/flake.nix` does not declare. Add a package to
+the flake before installing it with Homebrew if it has to survive the next
+`darwin-rebuild switch`. Homebrew itself must already be installed;
+nix-darwin drives it but does not install it.
 
-Pixi is supplied by [mise](mise.md) on both platforms. The next
-`nix-switch` removes it from the Nix system package set.
+## Cask update policy
+
+Casks are non-greedy (`greedyCasks = false`). Nearly all of the declared casks
+set `auto_updates`, so each vendor's own updater owns its version and activation
+leaves it alone. That avoids a fortnightly fight with those updaters, and avoids
+re-running vendor `pkg` installers under `sudo`. `upgrade = true` still picks up
+the handful of casks that do not update themselves.
+
+Two casks opt back in with `greedy = true`, because they sat months out of date
+under their own updaters despite advertising `auto_updates`. The flake marks
+them inline. Close a greedy cask's application before a switch, since activation
+can replace a running bundle.
+
+AeroSpace starts at login after its first launch, but macOS still requires a
+one-time Accessibility approval. The cold-start guide records that handoff and
+the command that verifies the running application.
 
 ## Adopt existing applications
 
 Before the first activation on an existing Mac, let Homebrew adopt applications
-that were installed by another method. Otherwise the cask installation stops
-when it finds the existing application in `/Applications`.
+installed by another method. Otherwise cask installation stops when it finds the
+existing application in `/Applications`.
 
 Derive the cask list from the flake rather than from a list written here. A
 hardcoded list goes stale on the next cask change; this reads the current
@@ -92,10 +80,10 @@ plain strings and the `{ name = ...; greedy = true; }` form.
 
 Run this after installing Nix and Homebrew and before the first activation. It
 adopts any application already in `/Applications`, installs any declared cask
-that is missing, and is a no-op for casks Homebrew already manages. Installing
-the missing ones is consistent with the flake's declared cask ownership. Remove
-an unwanted cask from `nix/flake.nix` before activation rather than skipping
-its collision.
+that is missing, and does nothing for casks Homebrew already manages. Installing
+the missing ones matches the flake's declared cask ownership. To skip one,
+remove it from `nix/flake.nix` before activation rather than working around the
+collision.
 
 To see the collisions before acting, list declared casks that Homebrew does not
 yet manage:
@@ -109,35 +97,24 @@ comm -23 <(printf '%s\n' $casks | sed 's|.*/||' | sort) <(brew list --cask | sor
 
 ## Mac App Store applications
 
-`homebrew.masApps` declares seven App Store applications, installed with `mas`.
-nix-darwin puts `mas` on the activation PATH, so it is not declared as a
-formula.
+`homebrew.masApps` declares the App Store applications and `mas` installs them.
+nix-darwin puts `mas` on the activation PATH, so the flake does not declare it
+as a formula.
 
-| Application | Adam ID |
-| --- | --- |
-| Amazon Kindle | 302584613 |
-| DaisyDisk | 411643860 |
-| Keynote | 409183694 |
-| Magnet | 441258766 |
-| Slack | 803453959 |
-| WireGuard | 1451685025 |
-| Xcode | 497799835 |
+Sign in to the App Store before the first activation. The account that owns
+these purchases has to be signed in, or activation cannot install or upgrade
+them. `mas signin` does not work on current macOS, so sign in through the App
+Store application. The repository cannot automate this.
 
-**Sign in to the App Store before the first activation.** The account that owns
-these purchases must be signed in, or activation cannot install or upgrade
-them. `mas signin` does not work on current macOS; sign in through the App
-Store application itself. This is manual work that the repository cannot
-automate.
+Xcode is one of the declared applications and is a multi-gigabyte download, so
+it adds noticeable time to the first activation. It is separate from the Xcode
+Command Line Tools that the cold-start guide installs with
+`xcode-select --install`; those tools are the compiler and linker the rest of
+this configuration depends on, and installing Xcode does not remove the need for
+them. Launch Xcode once after it installs to accept its license.
 
-Xcode is a multi-gigabyte download and adds noticeable time to the first
-activation. It is separate from the Xcode Command Line Tools that the
-cold-start guide installs with `xcode-select --install`; the tools are the
-compiler and linker the rest of this configuration depends on, and installing
-Xcode does not remove the need for them. After Xcode installs, launch it once
-to accept its license.
-
-Removing an entry from `masApps` does **not** uninstall the application, even
-under `cleanup = "uninstall"`. Delete those by hand.
+Removing an entry from `masApps` does not uninstall the application, even under
+`cleanup = "uninstall"`. Delete those by hand.
 
 Get the id for a new entry from the installed bundle:
 
@@ -147,12 +124,12 @@ mdls -name kMDItemAppStoreAdamID -raw /Applications/<name>.app
 
 ## Drift
 
-`run_after_darwin-rebuild.sh.tmpl` compares the running system against the
-flake on every `chezmoi apply` and nags when they differ. It deliberately does
-not activate. `darwin-rebuild switch` requires root, and `chezmoi apply` must
-never escalate.
+`run_after_darwin-rebuild.sh.tmpl` compares the running system against the flake
+on every `chezmoi apply` and nags when they differ. It deliberately does not
+activate. `darwin-rebuild switch` requires root, and `chezmoi apply` must never
+escalate.
 
 `run_after_tool-drift.sh.tmpl` reports commands that an earlier `PATH` entry
 shadows ahead of `/run/current-system/sw/bin`. It also reports duplicate
-user-installed copies of mise tools and old mise versions eligible for pruning.
-The check does not remove anything.
+user-installed copies of mise tools, and old mise versions eligible for pruning.
+The check removes nothing.

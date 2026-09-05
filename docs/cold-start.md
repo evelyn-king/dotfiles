@@ -5,9 +5,7 @@ system changes. The first dry run downloads pinned externals when the chezmoi
 cache is empty, even with `--refresh-externals=never`.
 
 The supported deployment targets are Apple Silicon macOS and Omarchy 4 on
-x86_64 Linux. Omarchy 3, Linux arm64 and Intel macOS are not supported. Do not
-use these instructions for native Windows. Its history lives on the `windows`
-branch.
+x86_64 Linux. Native Windows lives on the `windows` branch.
 
 ## Apple Silicon macOS
 
@@ -54,11 +52,10 @@ chezmoi apply
 If this is an existing Mac, complete the cask adoption procedure in
 [package-lists/macos.md](package-lists/macos.md) before activation.
 
-Sign in to the App Store with the account that owns the declared `masApps`.
-Activation cannot install or upgrade them otherwise, and `mas signin` does not
-work on current macOS. Xcode is among them, so expect a multi-gigabyte download
-during the activation below and launch it once afterwards to accept its
-license.
+Sign in to the App Store through the App Store application, using the account
+that owns the declared `masApps`. Activation cannot install or upgrade them
+otherwise. Xcode is one of them, so expect a multi-gigabyte download during the
+activation below, and launch it once afterwards to accept its license.
 
 The first activation must use `nix run` because `darwin-rebuild` is not on
 `PATH` yet:
@@ -68,11 +65,10 @@ sudo nix run nix-darwin/master#darwin-rebuild -- \
   switch --flake "$(chezmoi source-path)/nix#macbook"
 ```
 
-The activation removes the bootstrap Homebrew `chezmoi` formula because Nix
-owns that command. Restart the Mac so the system generation, applications, and
-fonts are available in a fresh login. Then run the second apply. This pass sees
-the newly installed Emacs and mise commands, so it can install Doom and the
-mise tool set.
+Activation removes the bootstrap Homebrew `chezmoi` formula, because Nix owns
+that command now. Restart the Mac so the system generation, applications and
+fonts are available in a fresh login. The second apply sees the newly installed
+Emacs and mise commands, so it can install Doom and the mise tool set.
 
 ```bash
 sudo shutdown -r now
@@ -80,12 +76,11 @@ sudo shutdown -r now
 chezmoi apply
 ```
 
-Open AeroSpace once. In System Settings, open **Privacy & Security >
-Accessibility** and enable AeroSpace, then restart the application. Its managed
-configuration enables startup at login for later sessions. Launch the other
-managed applications that need first-use approval or account login. Complete
-the Jupyter environment setup in the main README if this host will run
-notebooks.
+Open AeroSpace once. In System Settings, go to Privacy & Security >
+Accessibility, enable AeroSpace, then restart it. Its managed configuration
+starts it at login from then on. Launch the other managed applications that need
+first-use approval or an account login. If this host will run notebooks,
+complete the Jupyter environment setup in the main README.
 
 Run a third apply and the final checks:
 
@@ -105,9 +100,9 @@ should print nothing after the activated generation matches the flake.
 
 ## Omarchy 4 x86_64
 
-Start from a working Omarchy desktop. The package and shell hooks require the
-Omarchy 4 dispatcher, and the committed mise lock currently targets x86-64.
-Check those prerequisites first:
+Start from a working Omarchy desktop. The package and shell hooks need the
+Omarchy 4 dispatcher, and the committed mise lock targets x86-64. Check both
+first:
 
 ```bash
 test "$(uname -m)" = x86_64
@@ -116,9 +111,6 @@ omarchy version
 command -v mise || omarchy pkg add mise
 omarchy pkg add chezmoi
 ```
-
-Stock Omarchy owns the `tldr` command. The package manifest deliberately leaves
-out `tealdeer` because the two packages conflict.
 
 Initialize the source, inspect it, and run the first apply:
 
@@ -129,23 +121,23 @@ chezmoi apply --dry-run --refresh-externals=never
 chezmoi apply
 ```
 
-The first apply installs required pacman packages, then mise tools and local
-project trust. Optional AUR packages run last. Emacs arrives too late for the
-Doom hook on this pass.
+The first apply installs the required pacman packages, then mise tools and
+local project trust, then the optional AUR packages. Emacs arrives too late for
+the Doom hook on this pass, which is why there is a second apply below.
 
-Set zsh as the login shell after the package hook installs it. This is required
-for non-interactive SSH commands to receive the managed environment. Log out of
-the desktop completely or reboot after `chsh` succeeds.
+Set zsh as the login shell once the package hook has installed it. Without
+this, non-interactive SSH commands never see the managed environment. Log out of
+the desktop completely, or reboot, after `chsh` succeeds.
 
 ```bash
 chsh -s "$(command -v zsh)"
 sudo systemctl reboot
 ```
 
-After logging back in, run the second apply so Doom installs. Complete the
+After logging back in, run the second apply so Doom installs. Then complete the
 interactive Tailscale and Dropbox steps in
-[package-lists/omarchy-linux.md](package-lists/omarchy-linux.md). Complete the
-Jupyter environment setup in the main README if this host will run notebooks.
+[package-lists/omarchy-linux.md](package-lists/omarchy-linux.md), and the Jupyter
+environment setup in the main README if this host will run notebooks.
 
 ```bash
 chezmoi apply
@@ -173,9 +165,9 @@ ssh <host> 'printf "%s %s\n" "$MAMBA_ROOT_PREFIX" "$LANG"; printf "%s\n" "$PATH"
 
 ## SSH keys
 
-Each host gets its own key. Nothing is copied between machines, so a lost or
-retired host is revoked by removing one public key rather than rotating a
-shared identity.
+Each host gets its own key. Nothing is copied between machines, so revoking a
+lost or retired host means removing one public key instead of rotating a shared
+identity.
 
 ```bash
 ssh-keygen -t ed25519 -C "$(id -un)@$(hostname -s)"
@@ -190,24 +182,24 @@ verify:
 ssh -T git@github.com
 ```
 
-Keep the filename `id_ed25519`. Interactive shell startup first keeps any
-inherited agent that answers `ssh-add -l`, which covers OpenSSH forwarding,
-Apple's launchd agent, systemd sockets and password managers. Only when no
-agent answers does it fall back to `keychain --ignore-missing id_ed25519`, and
-that fallback loads exactly that name. A key called anything else is not picked
-up.
+Keep the filename `id_ed25519`. Interactive shell startup keeps any inherited
+agent that answers `ssh-add -l`, which covers OpenSSH forwarding, Apple's launchd
+agent, systemd sockets and password managers. Only when no agent answers does it
+fall back to `keychain --ignore-missing id_ed25519`, and that fallback loads
+exactly that name. A key called anything else is never picked up.
 
-keychain is installed on both platforms. On macOS launchd normally answers
-first, so keychain rarely runs; store the passphrase there with
+keychain is installed on both platforms. On macOS launchd usually answers first,
+so keychain rarely runs. Store the passphrase there with
 `ssh-add --apple-use-keychain ~/.ssh/id_ed25519`.
 
 `~/.ssh/config` and key material are not managed by this repository.
 
 ## Git commit signing
 
-Fresh hosts create unsigned commits until the signing key and pinentry work.
+A fresh host creates unsigned commits until the signing key and pinentry work.
 After the platform setup installs GPG, restore the secret key from its secure
-backup. Do not put the backup or exported owner-trust data in this repository.
+backup. Keep the backup and any exported owner-trust data out of this
+repository.
 
 Confirm the imported key has ultimate owner trust. If it does not, run
 `gpg --edit-key B1DD4047A0B58992573E7C5F08B79F9C4FA6D2E1 trust` and choose

@@ -5,8 +5,8 @@
 - The repo root is the chezmoi source state for files under `$HOME`.
 - `.chezmoidata/` carries template data; `.chezmoitemplates/` carries bodies shared
   between several rendered files.
-- `nix/`, `docs/`, `scripts/` and the top-level Markdown are repo content. They are
-  listed in `.chezmoiignore` and never applied to `$HOME`.
+- `nix/`, `docs/` and the top-level Markdown are repo content. `.chezmoiignore`
+  lists them and they are never applied to `$HOME`.
 
 ## Branching
 - Keep macOS/Linux configs on `main`.
@@ -41,9 +41,13 @@
   list.
 - `dot_config/mise/mise.lock` and `nix/flake.lock` are repo content. Never apply
   them to `$HOME`; mise rewrites its lock in place and a second copy diverges.
+- The docs under `docs/package-lists/` explain ownership rules and manual steps.
+  The declarations themselves are the package list. Do not copy package names,
+  versions or counts into the docs, where they go stale.
 
 ## Testing
-- There is no full automated test suite in this repo.
+- `python3 .chezmoitemplates/test_git_rewrite_policy.py` covers the agent git
+  policy. Nothing else in the repo has automated tests.
 - For changes that affect installation, run
   `chezmoi apply --dry-run --refresh-externals=never` and verify the rendered
   dotfiles.
