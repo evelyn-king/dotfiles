@@ -17,8 +17,8 @@ Four signals, because no single one covers every way an apply is invoked:
                      still counts, but never relied on alone: it is exported
                      only by shells that ran Omarchy's env-bootstrap. The
                      variable outlives the tree it points at, so existence of
-                     the path is not enough. Require the `default` directory
-                     every Omarchy tree carries, or a stale variable pointing
+                     the path is not enough. Require the `default/bash/env-bootstrap` file
+                     used by Omarchy shell startup, or a stale variable pointing
                      at any surviving directory would claim a plain Linux host
                      and run `omarchy pkg add` there.
   /usr/share/omarchy Omarchy 4 ships the desktop as a package here.
@@ -33,7 +33,29 @@ variable was absent.
 {{- $omarchy := false -}}
 {{- if eq .chezmoi.os "linux" -}}
 {{-   $envPath := env "OMARCHY_PATH" -}}
-{{-   if and $envPath (ne (stat (joinPath $envPath "default")) nil) -}}
+{{-   $bootstrap := false -}}
+{{-   if $envPath -}}
+{{-     $root := $envPath -}}
+{{-     range $part := list "default" "bash" "env-bootstrap" -}}
+{{-       if $root -}}
+{{-         with stat $root -}}
+{{-           if .isDir -}}
+{{-             $root = joinPath $root $part -}}
+{{-           else -}}
+{{-             $root = "" -}}
+{{-           end -}}
+{{-         else -}}
+{{-           $root = "" -}}
+{{-         end -}}
+{{-       end -}}
+{{-     end -}}
+{{-     if $root -}}
+{{-       with stat $root -}}
+{{-         $bootstrap = not .isDir -}}
+{{-       end -}}
+{{-     end -}}
+{{-   end -}}
+{{-   if $bootstrap -}}
 {{-     $omarchy = true -}}
 {{-   else if eq (.chezmoi.osRelease.id | default "") "omarchy" -}}
 {{-     $omarchy = true -}}

@@ -209,7 +209,7 @@ disposition for each:
 | A1-006 | low | Covered by the P3 externals note. Needs an ID. |
 | A2-012 | low | First activation downloads roughly 1.2 GiB. Not in the cold-start guide. |
 | A2-014 | low | `darwinConfigurations` defines only `macbook`. The guide names it explicitly, so the mismatch is documented rather than fixed. |
-| A3-005 | medium | Open. `omarchy-detect.tmpl` tests `stat $envPath` first, so a stale `OMARCHY_PATH` pointing at any existing directory wins over the reliable `os-release` signal. |
+| A3-005 | medium | Addressed. The `OMARCHY_PATH` probe requires a non-directory `default/bash/env-bootstrap` entry. Unrelated existing paths fall through to the OS and standard-installation signals. |
 | A3-008 | low | Addressed. `dot_bashrc.tmpl` re-sources Omarchy's completions selectively and documents the replacement. |
 | A3-009 | low | Open. Conflicts between chezmoi and `omarchy refresh hyprland` are documented nowhere, though the plan asks for them. |
 | A4M-007 | low | Addressed. The mise hook installs `bun` and `uv` on Omarchy and fails with a clear message elsewhere. Nix supplies all three on macOS. |
