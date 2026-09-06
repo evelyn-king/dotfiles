@@ -21,6 +21,21 @@ pacman_packages=(
 )
 
 if ((${#pacman_packages[@]})); then
+  # Zed depends on the virtual vulkan-driver package. Without an installed
+  # provider, pacman's non-interactive default can select NVIDIA libraries on
+  # unrelated hardware. The machine's graphics setup must choose the provider.
+  for package in "${pacman_packages[@]}"; do
+    if [[ $package == zed ]] && ! pacman -T vulkan-driver >/dev/null 2>&1; then
+      cat >&2 <<'EOF'
+packages: Zed requires an installed Vulkan provider before package restoration.
+Choose a provider for this machine and install it with:
+  omarchy pkg add <chosen-vulkan-provider>
+Then rerun chezmoi apply. See docs/package-lists/omarchy-linux.md in the source tree.
+EOF
+      exit 1
+    fi
+  done
+
   omarchy pkg add "${pacman_packages[@]}"
 fi
 {{- else }}

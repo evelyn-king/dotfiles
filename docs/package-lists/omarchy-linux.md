@@ -61,6 +61,22 @@ so a failed optional package does not stop mise or local project trust from
 being configured. Both hooks skip package restoration with a warning when the
 Omarchy 4 dispatcher is unavailable.
 
+Before the first apply, check that the machine's graphics setup has installed a
+Vulkan provider:
+
+```bash
+pacman -T vulkan-driver
+```
+
+Success produces no output. If the dependency is missing, choose a provider for
+the actual GPU or an explicit software-rendering provider for a VM, then install
+it with `omarchy pkg add <chosen-vulkan-provider>`. Provider selection belongs to
+the machine and is not declared in the shared manifest. The required package
+hook stops before installing anything when this prerequisite is missing, so
+Zed's dependency cannot silently select pacman's first provider. An installed
+provider satisfies this check; it does not prove that hardware acceleration
+works. Verify application rendering on the target machine.
+
 Three rules constrain what goes in the manifest:
 
 - Stock Omarchy owns the `tldr` command through its `tldr` package. Do not add

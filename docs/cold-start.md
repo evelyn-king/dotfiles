@@ -117,6 +117,10 @@ The ISO can start without synchronized package indexes. Complete the system
 package update before installing bootstrap tools; it refreshes the indexes and
 upgrades installed packages together.
 
+Check the [Vulkan provider prerequisite](package-lists/omarchy-linux.md#system-packages)
+before applying. Omarchy usually installs the provider during hardware setup,
+but a VM may need an explicit choice.
+
 Initialize the source, inspect it, and run the first apply:
 
 ```bash
