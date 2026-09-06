@@ -19,6 +19,13 @@ declarations to reviewable versions and checksums for `linux-x64` and
 stays `stable`, and rustup resolves that channel when mise installs or updates
 it.
 
+The lock controls the apply hook and `mup` installations. Normal shells read
+the applied declarations without that source-tree lock, so a `latest`
+declaration can select a newer version already installed on the machine. Removing
+a conflicting stock config restores the managed declarations but does not pin
+floating tools to the lock at runtime. Check the effective selection with
+`mise ls --current` and `mise which <command>` after migration.
+
 ## Overlap with Omarchy packages
 
 Omarchy ships its own `herdr`, `usage` and `tree-sitter-cli` packages, so on
@@ -45,8 +52,12 @@ itself.
 `~/.config/mise/config.toml` outranks the managed `conf.d` file, and so does a
 stray `conf.d/20-macos.toml`. `run_before_10-migrate-retired-configs.sh` removes
 either one when its contents match an audited version, and preserves and warns
-about anything else. If it warns, move any declarations you still want into
-`10-dotfiles.toml`, then remove the conflicting file.
+about anything else. The audited versions include the stock configuration
+captured during the Omarchy VM cold-start review.
+If it warns, inspect the preserved file and move any declarations or settings
+you still want into `10-dotfiles.toml`, then remove the conflicting file. A
+different stock release still needs review; the migration never deletes a file
+based on its location alone.
 
 ## Installation and updates
 

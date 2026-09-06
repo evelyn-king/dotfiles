@@ -18,10 +18,13 @@ file_sha256() {
 }
 
 is_known_version() {
+  # 924b8f... is the Omarchy 4.0.2 VM's audited stock mise config: only
+  # codex = "latest" and node = "26.8.1" under [tools]. No user settings.
   case "$1:$2" in
     .config/mise/config.toml:0892de21090153dfb41f0e7eeab9585eaa960c414fb1891190e2f586901e9d43 | \
       .config/mise/config.toml:554c5bdd59d7c7dc1b021fb2cecda8de371154944c2e2d4a06befccdf88aff4c | \
       .config/mise/config.toml:9ecaddce6bdbdf876c5f5fb0d6295c813eae71383bbf857c418d3a728cc20c28 | \
+      .config/mise/config.toml:924b8f389e90f3451ff3e81a5c6530d4ba1971e323e17345b1ca6775b4d3f6d3 | \
       .config/mise/conf.d/20-macos.toml:3938183be05942ccee0c07e6df22a888c35ef7f700ca51ab6e902dc38a05d2df | \
       .aerospace.toml:97481a46d8c2756d28fb7c1cc28295aee20d8d4298ebf0f3a9f8f54837e54467 | \
       .gitconfig:12e9b40a4fe5fa968e122ec98cfa4dbcf802880bcef6981ecf1d341a4f2541b5 | \
