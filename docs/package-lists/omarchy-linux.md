@@ -130,7 +130,7 @@ uninstall it from a machine that already has it.
 ## Refreshing Hyprland config
 
 `omarchy refresh hyprland` runs `omarchy-refresh-config` over all seven shipped
-Hypr files. This repo manages four of them:
+Hypr files. Three are managed by this repo and one is seeded only when missing:
 
 | File | Owner |
 | --- | --- |
@@ -140,42 +140,50 @@ Hypr files. This repo manages four of them:
 | `monitors.lua` | seeded once by this repo, then yours and Omarchy's |
 | `input.lua` | Omarchy |
 | `autostart.lua` | Omarchy |
-| `hyprsunset.conf` | Omarchy |
+| `.luarc.json` | Omarchy |
 
-Each refresh copies the current file to `<name>.bak.<epoch>` and replaces it
-with the packaged default, so the desktop reverts to stock for the managed four.
+Each refresh replaces the file with the packaged default. If an existing file
+differs, it keeps a backup at `<name>.bak.<epoch>`; identical files leave no
+backup. This overwrites the three managed files and the current monitor setup.
 `omarchy refresh config hypr/<file>` on a single managed file does the same.
+The full Hyprland refresh also resets the runtime toggle flags under
+`~/.local/state/omarchy/toggles/hypr/`, which chezmoi does not restore.
+`hyprsunset.conf` is a separate refresh target and is not touched by this command.
 
-**`chezmoi apply` is the recovery path, not `omarchy refresh hyprland`.** Run it
-to restore the repo copies:
+To restore the repo configuration after a refresh, run:
 
 ```bash
 chezmoi apply
 chezmoi status .config/hypr
+hyprctl reload
 hyprctl configerrors
 ```
 
 That restores `hyprland.lua`, `bindings.lua` and `looknfeel.lua` only.
 `monitors.lua` is a `create_` target, so chezmoi writes it when it is missing
-and never touches it again. A refresh leaves the stock file in place and
-`chezmoi apply` will not overwrite it. To go back to the repo's seed, delete the
-file first:
+and leaves existing content alone. A refresh leaves the stock file in place and
+`chezmoi apply` will not overwrite it. To recover your previous monitor layout,
+copy the selected `monitors.lua.bak.<epoch>` backup back to `monitors.lua`.
+To go back to the repo's seed instead, delete the file first:
 
 ```bash
 rm ~/.config/hypr/monitors.lua
 chezmoi apply
+hyprctl reload
+hyprctl configerrors
 ```
 
 Check the restored scale against the `.bak` copy before deleting it, because any
 scale chosen through Omarchy's monitor menu lives in that file rather than in
 this repo.
 
-A refresh leaves its `.bak.<epoch>` files in `~/.config/hypr/` indefinitely.
-chezmoi does not manage them and nothing removes them, so delete them by hand:
+Retained `.bak.<epoch>` files are unmanaged and remain in `~/.config/hypr/`.
+Inspect them before removing selected backups by hand:
 
 ```bash
 ls ~/.config/hypr/*.bak.*
 ```
 
-Refreshing the three unmanaged files is fine, and is the intended way to pick up
-Omarchy's updates to them.
+Use `omarchy refresh config hypr/<file>` to refresh only `.luarc.json`,
+`input.lua`, or `autostart.lua` when you want their packaged defaults without
+overwriting the repo configuration or monitor layout.

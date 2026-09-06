@@ -211,7 +211,7 @@ disposition for each:
 | A2-014 | low | `darwinConfigurations` defines only `macbook`. The guide names it explicitly, so the mismatch is documented rather than fixed. |
 | A3-005 | medium | Addressed. The `OMARCHY_PATH` probe requires a non-directory `default/bash/env-bootstrap` entry. Unrelated existing paths fall through to the OS and standard-installation signals. |
 | A3-008 | low | Addressed. `dot_bashrc.tmpl` re-sources Omarchy's completions selectively and documents the replacement. |
-| A3-009 | low | Open. Conflicts between chezmoi and `omarchy refresh hyprland` are documented nowhere, though the plan asks for them. |
+| A3-009 | low | Addressed. The [Hyprland refresh guide](package-lists/omarchy-linux.md#refreshing-hyprland-config) documents overwritten files, retained backups, toggle resets, and recovery, including the seed-only monitor exception. |
 | A4M-007 | low | Addressed. The mise hook installs `bun` and `uv` on Omarchy and fails with a clear message elsewhere. Nix supplies all three on macOS. |
 | A5-006 | low | Addressed. `shell-env.sh` sources Omarchy's `env-bootstrap`. |
 | A5-013 | low | Addressed. `dot_direnvrc` checks `DIRENV_SHELL` then the shell version variables. |
