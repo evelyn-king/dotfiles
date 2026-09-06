@@ -49,32 +49,3 @@ hl.on("hyprland.start", update_single_window_aspect_ratio)
 hl.on("config.reloaded", update_single_window_aspect_ratio)
 hl.on("monitor.added", update_single_window_aspect_ratio)
 hl.on("monitor.removed", update_single_window_aspect_ratio)
-
--- https://wiki.hypr.land/Configuring/Basics/Variables/#general
--- hl.config({
---   general = {
---     -- No gaps between windows or borders.
---     gaps_in = 0,
---     gaps_out = 0,
---     border_size = 0,
---
---     -- Change to niri-like side-scrolling layout.
---     layout = "scrolling",
---   },
--- })
-
--- https://wiki.hypr.land/Configuring/Basics/Variables/#animations
--- hl.config({
---   animations = {
---     -- Disable all animations.
---     enabled = false,
---   },
--- })
-
--- https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/
--- hl.config({
---   scrolling = {
---     -- See only one column per screen instead of two.
---     column_width = 0.97,
---   },
--- })
