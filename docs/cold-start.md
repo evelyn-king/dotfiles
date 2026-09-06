@@ -108,9 +108,14 @@ first:
 test "$(uname -m)" = x86_64
 command -v omarchy
 omarchy version
+omarchy update system-pkgs
 command -v mise || omarchy pkg add mise
 omarchy pkg add chezmoi
 ```
+
+The ISO can start without synchronized package indexes. Complete the system
+package update before installing bootstrap tools; it refreshes the indexes and
+upgrades installed packages together.
 
 Initialize the source, inspect it, and run the first apply:
 
