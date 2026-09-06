@@ -74,6 +74,16 @@ url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/521169108
 version = "2.9.0-0"
 backend = "github:mamba-org/micromamba-releases"
 
+[tools.micromamba."platforms.linux-x64"]
+checksum = "sha256:8761c382127e6363bd9e0a2451aa3ef90d071a79133f736e2f759a3bf13040dd"
+url = "https://github.com/mamba-org/micromamba-releases/releases/download/2.9.0-0/micromamba-linux-64.tar.bz2"
+url_api = "https://api.github.com/repos/mamba-org/micromamba-releases/releases/assets/505526153"
+
+[tools.micromamba."platforms.macos-arm64"]
+checksum = "sha256:500f5074feb8d02c4296ef9921c3650ed2874171805a9fbb8fbb53896433646b"
+url = "https://github.com/mamba-org/micromamba-releases/releases/download/2.9.0-0/micromamba-osx-arm64.tar.bz2"
+url_api = "https://api.github.com/repos/mamba-org/micromamba-releases/releases/assets/505526141"
+
 [[tools.node]]
 version = "26.8.0"
 backend = "core:node"
