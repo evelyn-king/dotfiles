@@ -12,7 +12,8 @@ hl.config({
 local golden_ratio = (1 + math.sqrt(5)) / 2
 
 local function monitor_is_wider_than_golden_ratio(monitor)
-  if not monitor.enabled or monitor.height <= 0 then
+  -- hl.get_monitors() returns active monitors; HL.Monitor has no enabled field.
+  if monitor.width <= 0 or monitor.height <= 0 then
     return false
   end
 
