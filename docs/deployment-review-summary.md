@@ -15,7 +15,9 @@ Re-check the macOS cask and App Store rows after any change to
 set after the first version of this summary was written, and one of them
 reversed a resolution recorded here.
 
-All four P0 findings and all ten P1 findings are resolved.
+All four original P0 findings and all ten original P1 findings are resolved.
+The [2026-09-06 Omarchy VM run](deployment-review-omarchy-vm.md) found new
+bootstrap and runtime blockers in commit `25af708`; these remain open.
 
 The files-only chezmoi target set did converge in disposable homes. The main
 failures sit at removal, package installation, system activation, and first-use
@@ -26,12 +28,11 @@ boundaries.
 | Platform | Verdict | Basis |
 | --- | --- | --- |
 | Apple Silicon macOS | `blocked` | No known unresolved defect. Blocked only because the plan's dynamic stage never ran: no stock cold start, no real `darwin-rebuild switch`, no cask adoption or cleanup on a disposable host. |
-| Omarchy 4 x86_64 | `blocked` | Same dynamic gap, and no Omarchy host was exercised at all. Agent 3 cleared the integration workstream, but the package and application reports found independent first-use blockers. |
+| Omarchy 4 x86_64 | `blocked` | A stock Omarchy 4.0.2 VM was exercised. Bootstrap needed package indexes, and all three applies failed at missing micromamba lock metadata. See the [VM report](deployment-review-omarchy-vm.md) for runtime ownership findings and remaining checks. |
 
-Both verdicts are about missing evidence rather than known breakage. Every P0
-and P1 finding is resolved and the static workstreams converged. The plan makes
-the cold-start tests part of its completion criteria, so neither platform can
-reach `ready with documented manual steps` until they run.
+The macOS verdict reflects missing dynamic evidence. Omarchy now has confirmed
+cold-start failures as well as incomplete checks. Neither platform can reach
+`ready with documented manual steps` until its full cold-start procedure passes.
 
 Converting either verdict requires the work in
 [Remaining review gaps](#remaining-review-gaps), and the tests must run against
@@ -187,10 +188,11 @@ package-set commits landed:
   Xcode's size and its separation from the Command Line Tools, and the fact that
   removing an entry does not uninstall the application.
 
-### Open
+### Dynamically verified
 
-- test the remaining hypothesis about unbinding disabled Omarchy defaults
-  (A3-010).
+- A3-010 passed in the Omarchy 4.0.2 VM: temporarily disabling preinstalled
+  bindings and reloading produced no config errors. Restoring the defaults
+  was also clean. See the [VM report](deployment-review-omarchy-vm.md).
 
 ## Required policy decisions
 
@@ -247,18 +249,18 @@ sign-in, and host-specific monitor and input configuration.
 The static review is strong, but the review plan's final validation stage is
 not complete:
 
-- No complete stock macOS or Omarchy cold start was run.
-- No real `darwin-rebuild switch`, Homebrew cask adoption or cleanup, Omarchy
-  package transaction, reboot, or service authentication sequence ran on a
-  disposable host.
-- First, second, and third apply transcripts are missing.
+- No complete stock macOS cold start was run. The Omarchy VM cold start ran
+  but failed; fix the [reported blockers](deployment-review-omarchy-vm.md) and
+  repeat it from the stock snapshot.
+- No real `darwin-rebuild switch`, Homebrew cask adoption or cleanup ran.
+  Omarchy package installation and reboot ran, but service authentication and
+  the remaining VM checks are still unverified.
+- Omarchy first, second, and third apply transcripts now exist, all showing
+  failure at the mise hook. macOS transcripts are still missing.
 - macOS application behavior, Docker behavior, Accessibility prompts, and
   findings marked `likely` or `hypothesis` still need dynamic verification.
 - The full cold-start tests must run after remediation and again against the
   commit that will land on `main`.
-- A3-010 remains a hypothesis: whether `hl.unbind` on a binding that only
-  exists when Omarchy's preinstalled bindings are enabled raises a config
-  error. It needs an Omarchy session and `hyprctl configerrors`.
 
 These are the only items standing between the current tree and a
 `ready with documented manual steps` verdict on either platform.
