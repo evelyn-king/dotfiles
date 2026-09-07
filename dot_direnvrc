@@ -4,14 +4,8 @@ layout_micromamba() {
   local active_environment="${CONDA_PREFIX##*/}"
 
   if [[ "${active_environment}" != "${environment_name}" ]]; then
-    local shell="bash"
-    if [[ "${DIRENV_SHELL:-}" == "zsh" || -n "${ZSH_VERSION:-}" ]]; then
-      shell="zsh"
-    elif [[ "${DIRENV_SHELL:-}" == "bash" || -n "${BASH_VERSION:-}" ]]; then
-      shell="bash"
-    fi
-
-    eval "$(micromamba shell hook --shell=${shell})"
+    # direnv evaluates .envrc in Bash, including when exporting to zsh.
+    eval "$(micromamba shell hook --shell=bash)"
     micromamba activate "${environment_name}"
   fi
 }

@@ -1,4 +1,4 @@
-# dotfiles-chezmoi
+# dotfiles
 
 Dotfiles managed directly with `chezmoi`.
 
@@ -7,7 +7,22 @@ Dotfiles managed directly with `chezmoi`.
 - `.chezmoi.toml.tmpl` bootstraps chezmoi and selects the repo root as `sourceDir`
 - the repo root contains the chezmoi source state for files under `$HOME`
 - `.chezmoidata/` keeps template data
-- top-level docs describe usage and repository conventions
+- `.chezmoitemplates/` keeps bodies shared between several rendered files
+- `docs/` and the top-level Markdown describe usage and repository conventions
+
+## Supported platforms
+
+Apple Silicon macOS and Omarchy 4 on x86_64 Linux. Native Windows lives on the
+separate `windows` branch.
+
+## Cold start
+
+[docs/cold-start.md](docs/cold-start.md) takes a fresh Mac or Omarchy host from
+platform prerequisites through source initialization, activation, the repeated
+applies, the manual service setup, and the final checks.
+
+[Deployment readiness](docs/deployment-review-summary.md) records the remaining
+validation before merging and deploying this branch.
 
 ## Apply
 
@@ -15,54 +30,202 @@ Dotfiles managed directly with `chezmoi`.
 chezmoi apply
 ```
 
-Use `chezmoi apply --dry-run --refresh-externals=never` to preview changes without updating pinned externals.
+`chezmoi apply --dry-run --refresh-externals=never` previews changes without
+updating pinned externals.
 
-If you already have this repo initialized from the previous `home/` layout, run `chezmoi init` once after pulling so your generated config picks up the repo-root `sourceDir`.
+`--refresh-externals=never` skips refreshing bodies chezmoi has already cached.
+It does not make a cold-cache run offline. The first dry run or apply still
+downloads the six commit-pinned Vim plugin archives before it writes any
+destination file, so give that first command network access or copy a populated
+cache from a machine you trust. The archive URLs are commit-pinned, and the repo
+relies on HTTPS and GitHub's commit archive endpoint rather than carrying
+checksums for their response bodies.
 
-## Homebrew
+chezmoi renders `~/.config/chezmoi/chezmoi.toml` from `.chezmoi.toml.tmpl` at
+init time, not on every apply. After pulling a change to that template, run
+`chezmoi init` once so the generated config picks it up.
 
-On macOS, this repo now manages a global Homebrew bundle in `~/.Brewfile`.
+## Packages
+
+Package ownership depends on the host.
+
+| Host | System packages | GUI apps | Runtimes and CLI tools |
+| --- | --- | --- | --- |
+| Apple Silicon macOS | nix-darwin | Homebrew casks, declared in the flake | mise |
+| Omarchy 4 x86_64 | pacman and the AUR, via Omarchy | Omarchy | mise |
+
+mise is the only package manager this repo drives on both platforms. On
+Omarchy, an additive apply hook also restores missing system packages without
+removing packages installed by hand. See
+[docs/package-lists/macos.md](docs/package-lists/macos.md) and
+[docs/package-lists/omarchy-linux.md](docs/package-lists/omarchy-linux.md) for
+system packages, and [docs/package-lists/mise.md](docs/package-lists/mise.md)
+for the runtimes and CLI tools mise manages.
+
+### mise
+
+Language runtimes and global CLI tools are declared in
+[`dot_config/mise/conf.d/`](dot_config/mise/conf.d/). They live under `conf.d`
+rather than at `~/.config/mise/config.toml` so repo-managed tools stay separate
+from mise's interactive global state. The migration removes audited versions of
+`~/.config/mise/config.toml` and preserves unfamiliar content with a warning;
+resolve that conflict and declare every global tool in `conf.d`. Both
+platforms declare and install the same set. Three of those tools also ship as
+Omarchy packages, and the mise shims deliberately outrank them. See
+[docs/package-lists/mise.md](docs/package-lists/mise.md) for why.
+
+`run_onchange_after_mise-install.sh.tmpl` installs them and re-runs whenever the
+file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
+
+Most versions are pinned exactly. Rust tracks the stable release channel; the
+coding agents, `gh` and `usage` float at `latest` on purpose. mise holds new
+releases for a day before it will resolve them, and the coding agents opt out of
+that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
+`mup` is what moves them:
 
 ```bash
-chezmoi edit ~/.Brewfile
-check-homebrew
-sync-homebrew
+mup
 ```
 
-`check-homebrew`, `sync-homebrew`, and `dump-homebrew` default `HOMEBREW_NO_AUTO_UPDATE=1` so the bundle workflow does not implicitly refresh Homebrew metadata. `sync-homebrew` also uses `brew bundle --no-upgrade` by default, so it converges on the tracked top-level packages without opportunistically upgrading everything already installed. Add `--cleanup` if you want undeclared top-level packages removed as well.
+`mup` refreshes the committed `dot_config/mise/mise.lock` for both `linux-x64`
+and `macos-arm64` whichever machine you run it on, then installs what that lock
+holds for the machine you are on. The lock is one shared artifact and
+`mise lock` prunes whatever a run does not resolve, so a refresh scoped to its
+own host would drop the other platform's entries. Review and commit the lockfile
+change afterwards. Rust is the one channel-based exception. Its lock entry stays
+`stable`, and rustup resolves that channel when mise installs or updates it.
 
-To seed the Brewfile from an existing Mac, run:
+Like `nix/flake.lock`, that lock is repo content rather than a home file. mise
+rewrites a lock in place whenever it installs, so an applied second copy under
+`~/.config/mise` would diverge from the source tree after every install and
+leave `chezmoi status` permanently dirty. The source tree holds the only copy,
+and `mup` and the install script both reach it by setting `MISE_CONFIG_DIR`.
+The applied `conf.d` files still drive the interactive shell's own tool
+resolution.
+
+The platform package manager owns the mise binary. On macOS, update the Nix
+flake inputs and activate the new generation:
 
 ```bash
-dump-homebrew --source-dir /path/to/this/repo
+nix flake update --flake "$(chezmoi source-path)/nix"
+nix-switch
 ```
 
-This is deterministic at the package-set level. Homebrew still resolves concrete formula and cask versions from the current state of its taps, so strict version pinning needs versioned formulae or a custom tap.
+On Omarchy, the normal system update updates its `mise-bin` package:
+
+```bash
+omarchy update
+```
+
+## Shell
+
+zsh and bash share environment, PATH and interactive setup bodies from
+`.chezmoitemplates/shell-*.sh`. The rendered startup files stay flat and
+self-contained, with nothing sourced from the source tree at runtime.
+
+PATH is built twice, on purpose, and the order is load-bearing. See
+[docs/shell-startup.md](docs/shell-startup.md).
+
+One per-machine escape hatch is sourced after the shared environment defaults:
+`~/.config/shell/extras.sh`, untracked and hand-written. Its exported values
+also reach remote commands whose shell reads a managed startup file. Create it
+with private permissions and keep long-lived credentials out of shell startup.
+See [docs/shell-startup.md](docs/shell-startup.md#per-machine-overrides) for
+the local-secret procedure.
+
+## Editors
+
+Neovim runs LazyVim; Vim runs a short `.vimrc` plus six pinned pack plugins.
+They share one keymap as far as plain Vim reaches. Neovim is the reference, and
+`dot_vim/plugin/keymaps.vim` mirrors LazyVim's defaults, so changing a binding
+means changing both files. See [docs/keybindings.md](docs/keybindings.md).
+
+Neovim plugin revisions float between hosts. lazy.nvim owns the generated
+`lazy-lock.json`, the repo keeps it untracked, and installations can therefore
+sit on different plugin revisions.
+
+## Theming
+
+Everything is [Gruvbox](https://github.com/morhetz/gruvbox), dark by default.
+Each config names the theme directly. There is no shared theme data and no
+indirection layer.
+
+Ghostty, Doom, bat, Zellij, Herdr, superfile and Zed ship Gruvbox themes.
+Neovim pulls `gruvbox.nvim`, while Vim uses a pinned chezmoi external from
+`.chezmoidata/versions.yaml`.
+
+btop and atuin use the repo-managed theme files under each tool's `themes/`
+directory.
+
+tmux and starship stay on ANSI color names rather than hex, so they inherit
+whatever Ghostty is set to and never drift from it. Claude Code stays on `auto`,
+and OpenCode's TUI stays on `system` in its separate `tui.json`.
+
+Omarchy's theme switcher changes the desktop chrome it owns and nothing in this
+repo.
+
+The palette, for hand-editing a theme file:
+
+| Token | Hex | | Token | Hex |
+| --- | --- | --- | --- | --- |
+| background | `#282828` | | red | `#cc241d` |
+| background soft | `#32302f` | | orange | `#d65d0e` |
+| background 1 | `#3c3836` | | yellow | `#d79921` |
+| foreground | `#ebdbb2` | | green | `#98971a` |
+| foreground 4 | `#a89984` | | aqua | `#689d6a` |
+| foreground 3 | `#bdae93` | | blue | `#458588` |
+| foreground 2 | `#d5c4a1` | | purple | `#b16286` |
+
+## Agent git safety
+
+Claude Code, Gemini CLI and opencode use advisory hooks for common unsafe Git
+commands. The hooks block direct forms of commit amendment, hard reset, rebase,
+force push, broad `git add`, protected-branch pushes, and PR merges.
+
+These hooks are guardrails, not a security boundary. Shell wrappers, nested
+interpreters, Git aliases, and commands that change directory before running
+Git can bypass the matcher, and hook errors fail open in some adapters. Keep
+remote branch protection enabled and review agent commands before execution.
+
+The rules live in `.chezmoitemplates/git-rewrite-policy.py`; each hook is a thin
+adapter for its tool's input and block protocol. Edit the shared policy, not the
+adapters. The tests record both blocked commands and known advisory limits.
 
 ## Branches
 
 - `main` contains the macOS/Linux chezmoi source tree at the repo root
 - native Windows history lives on the separate `windows` branch
 
-## Encryption
-
-Personal and work encrypted files use separate age keys. See
-`docs/encryption.md` for profile-specific key and recipient wiring.
-
 ## Remote Jupyter
 
-Shell startup exports `JUPYTER_BIND_HOST`, `JUPYTER_ENV_NAME`, and `JUPYTER_PORT`
-from the host config, with defaults that bind JupyterLab to `127.0.0.1:8888`
-inside the `jupyter` environment.
+Shell startup exports `JUPYTER_BIND_HOST`, `JUPYTER_ENV_NAME` and
+`JUPYTER_PORT`, binding JupyterLab to `127.0.0.1:8888` inside the `jupyter`
+environment. Override any of them per machine in `~/.config/shell/extras.sh`.
 
 `jupyter-remote-lab` runs `jupyter lab` through `micromamba run -n jupyter` or
-`conda run -n jupyter` by default, so the notebook server starts inside that
-environment without depending on an interactive shell activation step.
+`conda run -n jupyter`, so the notebook server starts inside that environment
+without an interactive shell activation step.
+
+Create the managed environments before first use. The installer builds and
+smoke-tests a staging environment before it moves an existing one. It keeps
+backups of the old environment and kernel until the replacement and its new
+kernel are both ready, and restores them if any replacement step fails.
+
+Each rebuild resolves current package versions from the managed YAML files. The
+repo pins nothing there and tracks no environment lockfile, so environments
+built at different times can differ.
+
+```bash
+install-micromamba-env \
+  ~/local-codex/environments/jupyter_environment.yml \
+  ~/local-codex/environments/analysis_environment.yml
+micromamba run -n jupyter jupyter kernelspec list
+```
 
 Use `jupyter-remote-lab` on the remote host to start a headless lab instance:
 
 ```bash
-jupyter-remote-lab --detach --dir ~/work/project
+jupyter-remote-lab --detach --dir ~/local-projects/project
 ```
 
 Then create the SSH tunnel from your local machine with the exact port the
@@ -74,5 +237,11 @@ ssh -N -L 8888:127.0.0.1:8888 <ssh-host>
 
 The launcher writes its last runtime metadata to
 `${JUPYTER_REMOTE_ENV_FILE:-~/.local/state/jupyter-remote/current.env}`. Run
-`jupyter_remote_load_env` in a shell if you want that runtime state loaded back
-into your current environment after launching with overrides like `--port`.
+`jupyter_remote_load_env` to load that runtime state back into your current
+shell after launching with overrides like `--port`.
+
+For a custom token, put the token in a mode-0600 file and pass its path with
+`--token-file`. The launcher copies it into its mode-0700 state directory and
+passes only the file path to Jupyter. After stopping the server, remove the
+token file named by `JUPYTER_REMOTE_TOKEN_FILE` and any old logs that contain
+tokenized startup URLs.

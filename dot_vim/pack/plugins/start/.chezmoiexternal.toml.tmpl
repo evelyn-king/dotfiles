@@ -7,15 +7,6 @@ stripComponents = 1
 include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
 {{- end }}
 
-["nord"]
-type = "archive"
-url = "{{ .plugins.vim.nord.url }}"
-exact = true
-stripComponents = 1
-{{- with .plugins.vim.nord.include }}
-include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
-{{- end }}
-
 ["nerdcommenter"]
 type = "archive"
 url = "{{ .plugins.vim.nerdcommenter.url }}"
@@ -31,6 +22,15 @@ url = "{{ .plugins.vim.nerdtree.url }}"
 exact = true
 stripComponents = 1
 {{- with .plugins.vim.nerdtree.include }}
+include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
+{{- end }}
+
+["vim-airline"]
+type = "archive"
+url = "{{ .plugins.vim.vim_airline.url }}"
+exact = true
+stripComponents = 1
+{{- with .plugins.vim.vim_airline.include }}
 include = [{{- range $index, $pattern := . }}{{ if $index }}, {{ end }}"{{ $pattern }}"{{- end }}]
 {{- end }}
 

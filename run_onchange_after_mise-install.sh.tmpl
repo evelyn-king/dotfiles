@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+
+# Install the runtimes and global CLI tools declared in the mise conf.d files.
+#
+# Re-runs whenever those files change, so adding a tool is a one-line edit plus
+# `chezmoi apply` rather than a remembered command.
+
+# tool list hash: {{ include "dot_config/mise/conf.d/10-dotfiles.toml" | sha256sum }}
+# lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
+# mise executable: {{ lookPath "mise" | quote }}
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . }}
+
+set -euo pipefail
+
+# mise is yours to install; on a machine without it there is nothing to do.
+# Its resolved path is rendered above so installing it changes this script and
+# makes chezmoi retry on the next apply.
+command -v mise >/dev/null 2>&1 || exit 0
+
+# Read the managed tool declarations and the committed lock from the source
+# tree. Every declared tool is installed on both platforms.
+MISE_CONFIG_DIR={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
+export MISE_CONFIG_DIR
+
+# The npm backend is configured to require bun. The pipx backend requires uv or
+# pipx, and this repo standardizes on uv. Stock Omarchy ships neither package,
+# so install them before asking mise to install tools that depend on them.
+missing_backends=()
+for backend in bun uv; do
+  command -v "$backend" >/dev/null 2>&1 || missing_backends+=("$backend")
+done
+
+if ((${#missing_backends[@]})); then
+{{- if $omarchy }}
+  echo "mise: installing required Omarchy packages: ${missing_backends[*]}"
+  omarchy pkg add "${missing_backends[@]}"
+{{- else }}
+  printf 'mise: missing required backend command: %s\n' "${missing_backends[*]}" >&2
+  exit 1
+{{- end }}
+fi
+
+# The lockfile is repo content and is never applied to $HOME, so the locked
+# install reads it from the source tree, which is also what `mup` does.
+mise install --locked

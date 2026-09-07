@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+
+# Restore optional AUR packages after required package, mise, and trust hooks.
+# A failure still makes the apply report the package that needs attention, but
+# it cannot prevent required runtime setup from running first.
+
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . }}
+
+set -euo pipefail
+
+{{ if $omarchy -}}
+if ! command -v omarchy >/dev/null 2>&1; then
+  echo "omarchy CLI not found; skipping optional AUR package restore." >&2
+  exit 0
+fi
+
+aur_packages=(
+{{- range .omarchyPackages.aur }}
+  {{ . | quote }}
+{{- end }}
+)
+
+if ((${#aur_packages[@]})); then
+  omarchy pkg aur add "${aur_packages[@]}"
+fi
+{{- else }}
+exit 0
+{{- end }}

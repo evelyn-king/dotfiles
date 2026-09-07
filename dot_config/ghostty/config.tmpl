@@ -1,46 +1,43 @@
-{{- $profileOverride := env "CHEZMOI_PROFILE" -}}
-{{- $hostKnown := hasKey .hosts .chezmoi.hostname -}}
-{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
-{{- $profileName := $profileOverride -}}
-{{- if eq $profileName "" -}}
-{{- if not $hostKnown -}}
-{{- fail (printf "hostname %q has no configured profile; set CHEZMOI_PROFILE=personal or CHEZMOI_PROFILE=work explicitly" .chezmoi.hostname) -}}
-{{- end -}}
-{{- $profileName = get $host "profile" | default .profiles.default -}}
-{{- end -}}
-{{- $profile := get .profiles $profileName | default dict -}}
-{{- $features := get $host "features" | default dict -}}
-{{- $omarchyDesktop := and
-  (eq .chezmoi.os "linux")
-  (get $profile "omarchy_desktop_allowed" | default false)
-  (get $features "omarchy_desktop" | default false)
--}}
-{{- if $omarchyDesktop }}
-# Dynamic theme colors
-config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
-{{- else }}
-# Repo-managed theming
-config-file = ?"~/.config/themes/current/ghostty.conf"
-{{- end }}
+{{- /* Shared with .chezmoiignore.tmpl; edit
+       .chezmoitemplates/omarchy-detect.tmpl, not this. */ -}}
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
+# Ghostty config - Evelyn King
 
-# Font
-font-family = "CaskaydiaCove Nerd Font"
+theme = "light:Gruvbox Light,dark:Gruvbox Dark"
+
+# First match wins; the rest are fallbacks for hosts missing the primary font.
+# CaskaydiaCove is the macOS primary and is installed by nix/flake.nix. Omarchy
+# packages no equivalent and ships JetBrainsMono Nerd Font instead, so name it
+# exactly rather than letting the chain fall through: fontconfig answers an
+# unknown family with its nearest match instead of failing, which looks like it
+# worked while ignoring every face actually asked for. The unpatched
+# "JetBrains Mono" stays last for a host that has only that.
+font-family = ""
+font-family = "CaskaydiaCove Nerd Font Mono"
+font-family = "FiraCode Nerd Font Mono"
+font-family = "JetBrainsMono Nerd Font"
+font-family = "JetBrains Mono"
 font-style = Regular
-{{- if $omarchyDesktop }}
+{{- if $omarchy }}
 # Hyprland scaling
 font-size = 9
 {{- else }}
-# Decent MacOS size for my screen
 font-size = 12
 {{- end }}
+
+background-opacity = 1.00
 
 # Window
 window-theme = ghostty
 window-padding-x = 14
 window-padding-y = 14
-confirm-close-surface=false
+confirm-close-surface = false
 resize-overlay = never
 gtk-toolbar-style = flat
+
+# GUI launches inherit launchd cwd (/) without this. New tabs and splits still
+# follow the current directory via the shell-integration path feature.
+working-directory = home
 
 # Cursor styling
 cursor-style = "block"
@@ -53,6 +50,8 @@ shell-integration-features = no-cursor,ssh-env
 # Keyboard bindings
 keybind = shift+insert=paste_from_clipboard
 keybind = control+insert=copy_to_clipboard
+keybind = shift+enter=csi:13;2u
+keybind = alt+shift+enter=csi:13;4u
 keybind = super+control+shift+alt+arrow_down=resize_split:down,100
 keybind = super+control+shift+alt+arrow_up=resize_split:up,100
 keybind = super+control+shift+alt+arrow_left=resize_split:left,100
@@ -60,6 +59,9 @@ keybind = super+control+shift+alt+arrow_right=resize_split:right,100
 
 # Slowdown mouse scrolling
 mouse-scroll-multiplier = 0.95
+{{- if $omarchy }}
 
-# Fix general slowness on hyprland (https://github.com/ghostty-org/ghostty/discussions/3224)
+# Fix general slowness on hyprland
+# https://github.com/ghostty-org/ghostty/discussions/3224
 async-backend = epoll
+{{- end }}
