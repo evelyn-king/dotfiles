@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+# Trust the project-root environment after chezmoi applies it. Re-run when its
+# contents change or when mise first becomes available on a new machine.
+
+# local project config hash: {{ include "local-projects/dot_mise.toml" | sha256sum }}
+# mise executable: {{ lookPath "mise" | quote }}
+
+set -euo pipefail
+
+command -v mise >/dev/null 2>&1 || exit 0
+
+config="$HOME/local-projects/.mise.toml"
+[[ -f "$config" ]] || exit 0
+
+mise trust "$config"

@@ -21,11 +21,10 @@
             "name": "block-git-rewrites",
             "type": "command",
             "command": "sh -c \"$HOME/.gemini/hooks/block-git-rewrites.py\"",
-            "description": "Block git commit --ammend and git push --force"
+            "description": "Enforce the shared git safety policy"
           }
         ]
       }
     ]
   }
 }
-
