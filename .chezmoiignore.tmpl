@@ -1,65 +1,32 @@
-{{- $profileName := .profile -}}
-{{- $host := get .hosts .chezmoi.hostname | default .hosts.default -}}
-{{- $profile := get .profiles $profileName | default dict -}}
-{{- $features := get $host "features" | default dict -}}
-{{- $personalAgeIdentity := env "CHEZMOI_PERSONAL_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/personal-key.txt") -}}
-{{- $workAgeIdentity := env "CHEZMOI_WORK_AGE_IDENTITY" | default (joinPath .chezmoi.homeDir ".config/chezmoi/work-key.txt") -}}
-{{- $activeAgeIdentity := $personalAgeIdentity -}}
-{{- if eq $profileName "work" -}}
-{{- $activeAgeIdentity = $workAgeIdentity -}}
-{{- end -}}
-{{- $activeAgeIdentityExists := ne (stat $activeAgeIdentity) nil -}}
-{{- $omarchyDesktop := and
-  (eq .chezmoi.os "linux")
-  (get $profile "omarchy_desktop_allowed" | default false)
-  (get $features "omarchy_desktop" | default false)
--}}
+{{- /* Detected rather than gated on a hostname, so a rebuilt or renamed
+       machine needs no change here. Shared with dot_config/ghostty/config.tmpl;
+       edit .chezmoitemplates/omarchy-detect.tmpl, not this. */ -}}
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
 
+# Repo content, not dotfiles: read from the source tree, never applied to $HOME.
 AGENTS.md
 CLAUDE.md
-.mailmap
-docs/**
 LICENSE
 README.md
-scripts/**
+.mailmap
+docs/**
+nix
+# mise rewrites its lock in place on every install. Applying a second copy to
+# $HOME gives the two copies a way to diverge and leaves `chezmoi status`
+# permanently dirty, so the source tree keeps the only copy and the locked mise
+# commands point at it with MISE_CONFIG_DIR.
+.config/mise/mise.lock
 
 {{- if ne .chezmoi.os "darwin" }}
-.Brewfile
-.aerospace.toml
-.hyprspace.toml
-.local/bin/check-homebrew
-.local/bin/dump-homebrew
-.local/bin/sync-homebrew
-{{- end }}
-
-{{- if not (or (eq .chezmoi.os "darwin") $omarchyDesktop) }}
-.config/ghostty/config
-{{- end }}
-
-{{- if ne .chezmoi.os "darwin" }}
-.config/ghostty/themes/**
-{{- end }}
-
-{{- if ne .chezmoi.os "darwin" }}
-Library/**
+.config/aerospace
+darwin-rebuild.sh
 {{- end }}
 
 {{- if ne .chezmoi.os "linux" }}
 .config/superfile/**
 {{- end }}
 
-{{- if not $omarchyDesktop }}
+{{- if not $omarchy }}
+install-omarchy-packages.sh
 .config/hypr/**
-.config/omarchy/**
-{{- end }}
-
-{{- if eq $profileName "personal" }}
-.icas.toml
-.config/shell/work/**
-{{- else if eq $profileName "work" }}
-.config/shell/personal/**
-{{- end }}
-
-{{- if not $activeAgeIdentityExists }}
-.config/shell/{{ $profileName }}/90_extras.sh
 {{- end }}

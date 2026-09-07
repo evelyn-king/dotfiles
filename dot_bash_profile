@@ -1,11 +1,5 @@
-case "$-" in
-*i*) shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/interactive.sh" ;;
-*) shell_loader="${XDG_CONFIG_HOME:-${HOME}/.config}/shell/base.sh" ;;
-esac
+# Login bash reads ~/.bash_profile and skips ~/.bashrc entirely. Sourcing one
+# from the other keeps login and non-login shells identical, which is what zsh
+# gets for free from .zshenv/.zshrc.
 
-if [ -f "${shell_loader}" ]; then
-  # shellcheck source=/dev/null
-  . "${shell_loader}"
-else
-  printf 'Missing source file: %s\n' "${shell_loader}" >&2
-fi
+[ -f "$HOME/.bashrc" ] && . "$HOME/.bashrc"

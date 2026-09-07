@@ -1,5 +1,5 @@
 # Bashtop gruvbox (https://github.com/morhetz/gruvbox) theme
-# First version created By BachoSeven
+# First version created by BachoSeven
 # Adjustments to proper colors by Pietryszak (https://github.com/pietryszak/)
 
 # Colors should be in 6 or 2 character hexadecimal or single spaced rgb decimal: "#RRGGBB", "#BW" or "0-255 0-255 0-255"
@@ -29,7 +29,7 @@ theme[selected_bg]="#32302F"
 theme[selected_fg]="#D3869B"
 
 # Color of inactive/disabled text
-theme[inactive_fg]="#3C3836"  
+theme[inactive_fg]="#3C3836"
 
 # Color of text appearing on top of graphs, i.e uptime and current network graph scaling
 theme[graph_text]="#A89984"
@@ -84,13 +84,13 @@ theme[used_end]="#CC241D"
 
 # Download graph colors
 theme[download_start]="#98971A"
-theme[download_mid]="#689d6A"
+theme[download_mid]="#689D6A"
 theme[download_end]="#B8BB26"
 
 # Upload graph colors
 theme[upload_start]="#CC241D"
-theme[upload_mid]="#D65d0E"
-theme[upload_end]="#FABF2F"
+theme[upload_mid]="#D65D0E"
+theme[upload_end]="#FABD2F"
 
 # Process box color gradient for threads, mem and cpu usage
 theme[process_start]="#8EC07C"

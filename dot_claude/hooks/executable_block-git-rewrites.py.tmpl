@@ -1,0 +1,43 @@
+#!/usr/bin/env python3
+"""Block history rewrites, broad staging, protected pushes, and PR merges.
+
+Special thanks to @basnijholt for this one
+
+The rules are shared with ~/.gemini/hooks/block-git-rewrites.py; edit
+.chezmoitemplates/git-rewrite-policy.py, not this file. Only the adapter stays
+here. Claude Code reads exit codes, so main() exits 0 to allow and 2 to block.
+"""
+
+import json
+import sys
+
+{{ template "git-rewrite-policy.py" . }}
+
+# Claude Code allows on exit 0 and blocks on exit 2 with a stderr reason.
+
+
+def main() -> None:
+    try:
+        input_data = json.load(sys.stdin)
+    except json.JSONDecodeError as e:
+        print(f"Error: Invalid JSON input: {e}", file=sys.stderr)
+        sys.exit(1)
+
+    tool_name = input_data.get("tool_name", "")
+    tool_input = input_data.get("tool_input", {})
+    command = tool_input.get("command", "")
+
+    # Only check Bash commands
+    if tool_name != "Bash" or not command:
+        sys.exit(0)
+
+    error = check_command(command)
+    if error:
+        print(f"Blocked: {error}", file=sys.stderr)
+        sys.exit(2)
+
+    sys.exit(0)
+
+
+if __name__ == "__main__":
+    main()

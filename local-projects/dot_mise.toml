@@ -1,0 +1,3 @@
+# Match the project-root environment Omarchy normally installs in ~/Work.
+[env]
+_.path = "{{ cwd }}/bin"

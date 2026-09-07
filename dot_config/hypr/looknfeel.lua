@@ -9,40 +9,44 @@ hl.config({
 })
 
 -- https://wiki.hypr.land/Configuring/Basics/Variables/#layout
-hl.config({
-  layout = {
-    -- Avoid overly wide single-window layouts on this 5K2K display.
-    -- The single-window-aspect-ratio toggle temporarily forces 1:1 over this;
-    -- switching it back off restores this ratio.
-    single_window_aspect_ratio = { 1.618, 1 },
-  },
-})
+local golden_ratio = (1 + math.sqrt(5)) / 2
 
--- https://wiki.hypr.land/Configuring/Basics/Variables/#general
--- hl.config({
---   general = {
---     -- No gaps between windows or borders.
---     gaps_in = 0,
---     gaps_out = 0,
---     border_size = 0,
---
---     -- Change to niri-like side-scrolling layout.
---     layout = "scrolling",
---   },
--- })
+local function monitor_is_wider_than_golden_ratio(monitor)
+  -- hl.get_monitors() returns active monitors; HL.Monitor has no enabled field.
+  if monitor.width <= 0 or monitor.height <= 0 then
+    return false
+  end
 
--- https://wiki.hypr.land/Configuring/Basics/Variables/#animations
--- hl.config({
---   animations = {
---     -- Disable all animations.
---     enabled = false,
---   },
--- })
+  local width = monitor.width
+  local height = monitor.height
 
--- https://wiki.hypr.land/Configuring/Layouts/Scrolling-Layout/
--- hl.config({
---   scrolling = {
---     -- See only one column per screen instead of two.
---     column_width = 0.97,
---   },
--- })
+  -- Hyprland reports the untransformed mode dimensions.
+  if monitor.transform % 2 == 1 then
+    width, height = height, width
+  end
+
+  return width > height * golden_ratio
+end
+
+local function update_single_window_aspect_ratio()
+  local ratio = { 0, 0 }
+
+  for _, monitor in ipairs(hl.get_monitors()) do
+    if monitor_is_wider_than_golden_ratio(monitor) then
+      ratio = { golden_ratio, 1 }
+      break
+    end
+  end
+
+  hl.config({
+    layout = {
+      single_window_aspect_ratio = ratio,
+    },
+  })
+end
+
+update_single_window_aspect_ratio()
+hl.on("hyprland.start", update_single_window_aspect_ratio)
+hl.on("config.reloaded", update_single_window_aspect_ratio)
+-- Also covers runtime resolution, rotation, and scale changes without a reload.
+hl.on("monitor.layout_changed", update_single_window_aspect_ratio)
