@@ -48,4 +48,5 @@ omarchyPackages:
     - zsh
   aur:
     - google-cloud-cli
+    - proton-mail-bin
     - slack-desktop
