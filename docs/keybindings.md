@@ -118,8 +118,11 @@ key that behaves differently is worse than a key that does nothing.
   `<Esc>` then the key. `keymaps.vim` declares `<M-j>` and `<M-k>` as terminal
   key codes to fix that, and `.vimrc` sets `ttimeoutlen=10` so the `<Esc>`
   mapping stays responsive alongside them. Neovim needs none of this.
-- **`<C-s>`.** Terminal flow control eats it unless the shell has run
-  `stty -ixon`.
+- **`<C-s>`.** Works as mapped, with nothing to configure. Ctrl-S is XOFF, but
+  Vim, Neovim and tmux each clear `IXON` when they take the terminal into raw
+  mode, so the keystroke reaches the editor and no `stty -ixon` is needed. The
+  old advice to run one predates Vim clearing the flag itself. Flow control is
+  still on at the shell prompt, where Ctrl-S pauses output until Ctrl-Q.
 
 ## AeroSpace on macOS
 
