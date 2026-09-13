@@ -30,3 +30,6 @@ require("default.hypr.toggles")
 
 -- Save screenshots into the journal instead of ~/Pictures.
 hl.env("OMARCHY_SCREENSHOT_DIR", os.getenv("HOME") .. "/local-journal/screenshots")
+
+-- Keep Steam's interface at 100% scaling.
+hl.env("STEAM_FORCE_DESKTOPUI_SCALING", "1")
