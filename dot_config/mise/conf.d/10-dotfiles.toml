@@ -54,12 +54,8 @@ pi = "latest"
 "pipx:black" = "26.5.1"
 "pipx:conda-lock" = "4.0.2"
 "pipx:conda-package-handling" = "2.6.0"
-"pipx:docling-slim" = "2.126.0"
-"pipx:markdown-code-runner" = "2.7.0"
 "pipx:mypy" = "2.3.1"
-"pipx:poethepoet" = "0.48.0"
 "pipx:ruff" = "0.16.6"
-"pipx:tuitorial" = "0.16.0"
 "pipx:unidep" = { version = "3.4.2", uvx_args = "--with unidep[all]" }
 "pipx:pre-commit" = { version = "4.6.2", uvx_args = "--with pre-commit-uv" }
 

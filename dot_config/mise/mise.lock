@@ -175,25 +175,10 @@ version = "2.6.0"
 backend = "pipx:conda-package-handling"
 specifiers = ["2.6.0"]
 
-[[tools."pipx:docling-slim"]]
-version = "2.126.0"
-backend = "pipx:docling-slim"
-specifiers = ["2.126.0"]
-
-[[tools."pipx:markdown-code-runner"]]
-version = "2.7.0"
-backend = "pipx:markdown-code-runner"
-specifiers = ["2.7.0"]
-
 [[tools."pipx:mypy"]]
 version = "2.3.1"
 backend = "pipx:mypy"
 specifiers = ["2.3.1"]
-
-[[tools."pipx:poethepoet"]]
-version = "0.48.0"
-backend = "pipx:poethepoet"
-specifiers = ["0.48.0"]
 
 [[tools."pipx:pre-commit"]]
 version = "4.6.2"
@@ -207,11 +192,6 @@ uvx_args = "--with pre-commit-uv"
 version = "0.16.6"
 backend = "pipx:ruff"
 specifiers = ["0.16.6"]
-
-[[tools."pipx:tuitorial"]]
-version = "0.16.0"
-backend = "pipx:tuitorial"
-specifiers = ["0.16.0"]
 
 [[tools."pipx:unidep"]]
 version = "3.4.2"
