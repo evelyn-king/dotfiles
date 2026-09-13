@@ -120,10 +120,10 @@
         tesseract
 
         # --- network and misc ---
+        awscli2
         chezmoi
         cloudflared
         gnupg
-        google-cloud-sdk
         lima
         pinentry_mac
         prettyping

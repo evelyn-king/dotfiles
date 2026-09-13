@@ -6,6 +6,7 @@ omarchyPackages:
     - aspell-en
     - ast-grep
     - atuin
+    - aws-cli-v2
     - bat
     - bitwarden
     - bitwarden-cli
@@ -47,6 +48,5 @@ omarchyPackages:
     - zoxide
     - zsh
   aur:
-    - google-cloud-cli
     - proton-mail-bin
     - slack-desktop
