@@ -37,8 +37,16 @@
   `dot_config/ghostty/config.tmpl` that include it.
 - Declare runtimes and global CLI tools in `dot_config/mise/conf.d/`, Omarchy
   system packages in `.chezmoidata/packages.yaml`, and macOS system packages
-  in `nix/flake.nix`. Do not declare the same tool in mise and a system package
-  list.
+  in `nix/flake.nix`. Ubuntu native packages belong in `[bootstrap.packages]`
+  in `dot_config/mise/conf.d/20-ubuntu.toml`. Do not declare the same tool in
+  mise's `[tools]` and a system package list. Native Python remains an OS
+  dependency; mise owns the development interpreter.
+- Ubuntu support targets 26.04 x86_64 headless hosts. Keep distribution
+  detection in `.chezmoitemplates/ubuntu-detect.tmpl`. The Ubuntu before-hook
+  applies native files/packages, including its APT recommendation policy; the
+  shared tool hook applies tools only. Chezmoi owns dotfiles and shell startup.
+- Keep mise declarations as plain TOML: installation and locking read the
+  source files directly, without chezmoi rendering.
 - `dot_config/mise/mise.lock` and `nix/flake.lock` are repo content. Never apply
   them to `$HOME`; mise rewrites its lock in place and a second copy diverges.
 - The docs under `docs/package-lists/` explain ownership rules and manual steps.
@@ -47,7 +55,9 @@
 
 ## Testing
 - `python3 .chezmoitemplates/test_git_rewrite_policy.py` covers the agent git
-  policy. Nothing else in the repo has automated tests.
+  policy.
+- `python3 .chezmoitemplates/test_ubuntu_bootstrap.py` renders and exercises the
+  Ubuntu bootstrap hook with a fake mise executable; it makes no system changes.
 - For changes that affect installation, run
   `chezmoi apply --dry-run --refresh-externals=never` and verify the rendered
   dotfiles.

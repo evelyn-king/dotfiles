@@ -4,7 +4,8 @@ Reviewed 2026-09-06 against `48ad9b1`. Omarchy follow-up on 2026-09-07
 covered the lock at `92afe3f`, code fixes through `a78adca`, and the notebook
 runbook correction at `08330ca`.
 Supported targets are Apple Silicon macOS with account
-`evelynking` and flake `macbook`, and Omarchy 4 on x86_64.
+`evelynking` and flake `macbook`, Omarchy 4 on x86_64, and Ubuntu 26.04 x86_64
+headless hosts. The older reviews below predate Ubuntu support.
 
 **Ready to open a PR into `main`; merge validation remains incomplete.** No
 confirmed core installation blocker remains from the earlier reviews. Complete
@@ -18,9 +19,43 @@ Account and hardware checks belong to each host's deployment sign-off.
 | Omarchy follow-up, `a78adca` | Current locked tools installed from stock; incremental fixes, Doom, reboot, SSH environment, file convergence and dry run passed. Drift warnings were accurate; apply became quiet after removing unused stock Node. Notebook and monitor probes passed as detailed below. |
 | macOS source review, `48ad9b1` | macOS dry run and file status are empty. Locked Nix evaluation, both platform shell renderings, lock artifact coverage and nine Git-policy tests passed. No live installation or activation ran. |
 
+## Ubuntu support validation, 2026-09-13
+
+The Ubuntu support working tree passed installation in a disposable KVM VM
+using the official Ubuntu 26.04 LTS x86_64 cloud image. The final bootstrap
+applied its root-owned APT recommendation policy before package installation;
+the fresh host did not install Postfix. All declared native packages and locked
+mise tools installed. Doom installation completed, including ahead-of-time
+native Lisp compilation.
+
+Subsequent applies converged. Both `chezmoi status --exclude=scripts` and
+`chezmoi diff --exclude=scripts` were empty, and the final dry run succeeded.
+The APT file and package phases reported no changes on the repeated apply.
+
+SSH checks covered the zsh login environment, interactive bash and zsh, locale,
+tool selection, and the terminal configurations. `mise doctor` reported no
+problems. Vim started, Doom loaded its modules, and vterm compiled its native
+module and opened a terminal buffer. Doom doctor reported optional font and
+language-tool warnings. Neovim loaded its plugins and compiled and used the
+Python parser. Its tree-sitter health check reported a trailing-slash mismatch
+when comparing the install directory with runtime paths; actual parser loading
+and parsing succeeded. Optional language-provider warnings also remain.
+
+The managed Jupyter environment built successfully. A detached launch over SSH
+bound to localhost, served an authenticated kernelspec request, executed code
+in the registered kernel, and shut down successfully.
+
+The Ubuntu bootstrap regression tests, shell syntax checks, and ShellCheck of
+the changed hooks passed. macOS and Omarchy template dry runs succeeded.
+Existing tool lock entries remained unchanged, and the new tools have
+checksummed artifacts for both target architectures. The mise release pinned
+by the macOS flake also passed an isolated dependency-installation check using
+its Linux build and parsed the complete configuration in a tools-only dry run.
+This does not replace a live macOS or Omarchy deployment of these changes.
+
 ## Before merge
 
-- Test the candidate commit on both platforms using the [cold-start guide](cold-start.md).
+- Test the candidate commit on the supported platforms using the [cold-start guide](cold-start.md).
   The mise lock changed after the macOS VM run. The Omarchy follow-up below
   covers the current lock and corrected drift hook. Record the commit, successful
   locked installation, subsequent applies, empty `status` and `diff` with

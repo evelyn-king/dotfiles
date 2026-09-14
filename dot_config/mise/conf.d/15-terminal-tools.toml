@@ -1,0 +1,9 @@
+# Portable terminal tools shared by all supported hosts. These tools either
+# lack an Ubuntu package or need their upstream command names/config options.
+# Keep their explicit declarations out of the native package lists.
+[tools]
+ast-grep = "0.45.3"
+bat = "0.26.1"
+fd = "10.5.0"
+superfile = "1.6.0"
+zellij = "0.45.1"

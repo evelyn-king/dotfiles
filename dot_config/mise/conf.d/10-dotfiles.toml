@@ -8,8 +8,8 @@
 # Update pinned versions in this file. Entries set to "latest" or a release
 # channel such as "stable" intentionally float.
 #
-# Nix supplies uv and bun on macOS; Omarchy supplies them on Linux. mise uses
-# those system tools as the fast installers for its npm and pipx backends.
+# mise also owns bun and uv, the installers for its npm and pipx backends.
+# Declaring them lets mise install them before their dependent tools.
 #
 # Interactive shells use `mise activate`; static shims cover remote SSH commands
 # whose shell reads the managed environment.
@@ -41,6 +41,8 @@ node = "26.8.1"
 python = "3.14.7"
 go = "1.27.1"
 rust = { version = "stable", profile = "default" }
+bun = "1.4.0"
+uv = "0.12.10"
 
 # --- coding agents ----------------------------------------------------------
 claude = "latest"

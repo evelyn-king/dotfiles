@@ -102,16 +102,16 @@ alias ....='cd ../../..'
 # declared tool for both target platforms, whichever machine it runs on. Scoping
 # a run to its own host is what makes it destructive, because `mise lock` prunes
 # whatever that run did not resolve, taking the other platform's artifacts with
-# it. Both machines declare the same tools, so this function is identical on
-# both and either one can refresh the lock the other installs from.
+# it. All supported hosts declare the same tools, so any one can refresh the
+# lock the others install from.
 if command -v mise >/dev/null 2>&1; then
   mup() {
     local mise_config_dir={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
 
     MISE_CONFIG_DIR="$mise_config_dir" \
-      mise lock --global --platform linux-x64 --platform macos-arm64 --bump || return
+      mise --cd / lock --global --platform linux-x64 --platform macos-arm64 --bump || return
 
-    MISE_CONFIG_DIR="$mise_config_dir" mise install --locked
+    MISE_CONFIG_DIR="$mise_config_dir" mise --cd / bootstrap --only tools --locked
   }
 fi
 {{ if eq .chezmoi.os "darwin" }}

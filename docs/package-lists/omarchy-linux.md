@@ -83,12 +83,12 @@ Three rules constrain what goes in the manifest:
   `tealdeer`; the two packages conflict.
 - mise owns Rust and installs rustup with the stable toolchain. Do not add a
   system `rust` or `rustup` package. The same goes for Pixi, which
-  [mise](mise.md) owns on both platforms.
+  [mise](mise.md) owns on every supported host.
 - `zsh` has to stay in the manifest. It is not part of a stock Omarchy install,
   and this repo is zsh-first: `~/.bashrc` hands off to zsh whenever it is
   present. Leave the package out and every login lands in the bash fallback.
 
-Fonts are the one place where the two platforms differ on purpose. Ghostty's
+The desktop platforms use different fonts. Ghostty's
 font chain names `JetBrainsMono Nerd Font`, which Omarchy already ships, so the
 manifest does not list it. The preferred CaskaydiaCove face has no Omarchy
 package and is macOS only, from `nix/flake.nix`.
