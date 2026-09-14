@@ -1,0 +1,6 @@
+{{- /* Include filenames as well as contents so additions and removals retrigger
+the install hook. mise reads these plain TOML files directly from the source.
+*/ -}}
+{{- range glob (joinPath .chezmoi.sourceDir "dot_config/mise/conf.d/*.toml") | sortAlpha }}
+# {{ base . }} hash: {{ include (printf "dot_config/mise/conf.d/%s" (base .)) | sha256sum }}
+{{- end }}

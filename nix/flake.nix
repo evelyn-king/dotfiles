@@ -59,16 +59,12 @@
         keychain
         starship
         tmux
-        zellij
         zoxide
 
         # --- search and file tools ---
-        ast-grep
-        bat
         dust
         duf
         eza
-        fd
         fzf
         jq
         ripgrep
@@ -82,11 +78,9 @@
 
         # --- languages, runtimes, package managers ---
         # Anything managed by mise is deliberately not here
-        bun
         luarocks
         lua-language-server
         miseOmarchy
-        uv
 
         # --- editors ---
         emacs-macport

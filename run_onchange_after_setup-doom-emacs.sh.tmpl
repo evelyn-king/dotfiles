@@ -9,10 +9,14 @@
 # Emacs executable: {{ lookPath "emacs" | quote }}
 # Doom rev: {{ .doom.rev }}
 # config.el hash: {{ include "dot_config/doom/config.el" | sha256sum }}
-# init.el hash: {{ include "dot_config/doom/init.el" | sha256sum }}
+# init.el hash: {{ includeTemplate "dot_config/doom/init.el.tmpl" . | sha256sum }}
 # packages.el hash: {{ include "dot_config/doom/packages.el" | sha256sum }}
 
 set -euo pipefail
+
+# This hook sorts after mise installation. The calling shell may predate the
+# shim directory, so expose the newly installed tools to Doom on the first apply.
+export PATH="${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims:$PATH"
 
 if ! command -v git >/dev/null 2>&1; then
   echo "Git is not installed; skipping Doom Emacs setup."

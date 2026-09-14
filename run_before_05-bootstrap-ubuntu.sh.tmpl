@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Restore native dependencies before writing configs or installing tools.
+{{- $ubuntu := includeTemplate "ubuntu-detect.tmpl" . }}
+set -euo pipefail
+
+{{ if $ubuntu -}}
+{{ if or (ne (.chezmoi.osRelease.versionID | default "") "26.04") (ne .chezmoi.arch "amd64") -}}
+echo "dotfiles: Ubuntu support requires Ubuntu 26.04 on x86_64." >&2
+exit 1
+{{ else -}}
+if ! command -v mise >/dev/null 2>&1; then
+  echo "dotfiles: install mise before applying; see docs/cold-start.md." >&2
+  exit 1
+fi
+if ! mise bootstrap files apply --help >/dev/null 2>&1; then
+  echo "dotfiles: this mise release lacks system-file bootstrap; update mise first." >&2
+  exit 1
+fi
+
+# Keep project-local mise declarations out of system package restoration.
+export MISE_CONFIG_DIR={{ joinPath .chezmoi.sourceDir "dot_config/mise" | quote }}
+MISE_SYSTEM_PACKAGES_MANAGERS=apt mise --cd / bootstrap --only files,packages --yes
+{{ end -}}
+{{ else -}}
+exit 0
+{{ end -}}

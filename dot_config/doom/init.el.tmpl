@@ -47,8 +47,8 @@
        (eval +overlay)
        lookup
        magit
-       pdf
-       tmux
+{{ if not (includeTemplate "ubuntu-detect.tmpl" .) }}       pdf
+{{ end }}       tmux
        tree-sitter
 
        :os

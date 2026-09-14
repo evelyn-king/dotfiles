@@ -4,14 +4,11 @@ omarchyPackages:
   pacman:
     - aspell
     - aspell-en
-    - ast-grep
     - atuin
     - aws-cli-v2
-    - bat
     - bitwarden
     - bitwarden-cli
     - btop
-    - bun
     - chezmoi
     - cmake
     - direnv
@@ -21,7 +18,6 @@ omarchyPackages:
     - dust
     - emacs-wayland
     - eza
-    - fd
     - firefox
     - fzf
     - ghostty
@@ -38,13 +34,10 @@ omarchyPackages:
     - sccache
     - shellcheck
     - starship
-    - superfile
     - tailscale
-    - uv
     - vim
     - visual-studio-code-bin
     - zed
-    - zellij
     - zoxide
     - zsh
   aur:

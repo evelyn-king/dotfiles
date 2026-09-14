@@ -1,0 +1,60 @@
+# Native dependencies for Ubuntu 26.04 x86_64 headless hosts.
+# mise skips unavailable package managers on other hosts. Chezmoi invokes
+# the files/packages phases only after checking the Ubuntu release and arch.
+# "latest" accepts an installed package; normal Ubuntu updates own upgrades.
+
+# A host-wide policy for this headless target. Apply it before packages so
+# optional dependencies cannot pull in mail servers or graphical applications.
+[bootstrap.files."/etc/apt/apt.conf.d/99-dotfiles-no-recommends"]
+content = 'APT::Install-Recommends "false";'
+owner = "root"
+group = "root"
+mode = "0644"
+phase = "pre-packages"
+
+[bootstrap.packages]
+"apt:aspell" = "latest"
+"apt:aspell-en" = "latest"
+"apt:atuin" = "latest"
+"apt:bash-completion" = "latest"
+"apt:btop" = "latest"
+"apt:build-essential" = "latest"
+"apt:ca-certificates" = "latest"
+"apt:cmake" = "latest"
+"apt:curl" = "latest"
+"apt:direnv" = "latest"
+"apt:du-dust" = "latest"
+"apt:duf" = "latest"
+"apt:emacs-nox" = "latest"
+"apt:eza" = "latest"
+"apt:fzf" = "latest"
+"apt:git" = "latest"
+"apt:git-delta" = "latest"
+"apt:git-lfs" = "latest"
+"apt:gnupg" = "latest"
+"apt:graphviz" = "latest"
+"apt:jq" = "latest"
+"apt:keychain" = "latest"
+"apt:lazygit" = "latest"
+"apt:libssl-dev" = "latest"
+"apt:libtool-bin" = "latest"
+"apt:libvterm-dev" = "latest"
+"apt:locales" = "latest"
+"apt:ncurses-term" = "latest"
+"apt:neovim" = "latest"
+"apt:openssh-client" = "latest"
+"apt:pinentry-curses" = "latest"
+"apt:pkg-config" = "latest"
+"apt:python3" = "latest"
+"apt:ripgrep" = "latest"
+"apt:sccache" = "latest"
+"apt:shellcheck" = "latest"
+"apt:sqlite3" = "latest"
+"apt:starship" = "latest"
+"apt:tmux" = "latest"
+"apt:unzip" = "latest"
+"apt:vim" = "latest"
+"apt:wget" = "latest"
+"apt:xz-utils" = "latest"
+"apt:zoxide" = "latest"
+"apt:zsh" = "latest"

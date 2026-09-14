@@ -1,0 +1,7 @@
+{{- /* Ubuntu support currently targets 26.04 x86_64 headless hosts.
+Detect the distribution here; the bootstrap hook checks release and architecture
+before making changes. Do not infer Ubuntu from the presence of apt.
+*/ -}}
+{{- if eq .chezmoi.os "linux" -}}
+{{-   if eq (.chezmoi.osRelease.id | default "") "ubuntu" -}}true{{- end -}}
+{{- end -}}

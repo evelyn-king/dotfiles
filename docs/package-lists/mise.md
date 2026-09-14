@@ -1,18 +1,18 @@
 # mise tool list
 
-mise installs the same language runtimes and user-level CLI tools on macOS and
-Linux. The declarations live in
-[`dot_config/mise/conf.d/`](../../dot_config/mise/conf.d/), and
-[`10-dotfiles.toml`](../../dot_config/mise/conf.d/10-dotfiles.toml) is the
-source of truth for which tools exist and which version each one requests. Read
-that file for the list. This page covers the ownership rules and the update
-workflow.
+mise installs the same language runtimes and user-level CLI tools on macOS,
+Omarchy, and Ubuntu. The plain TOML files in
+[`dot_config/mise/conf.d/`](../../dot_config/mise/conf.d/) declare tool versions
+under `[tools]`. Read those files for the lists. Ubuntu also has native package
+declarations under `[bootstrap.packages]`; those are applied through APT.
 
-Both platforms install everything declared there. There is no per-platform
-declaration file.
+The source files must remain plain TOML. Installation and locking read them
+directly through `MISE_CONFIG_DIR`, without chezmoi rendering. Chezmoi applies
+the shared declarations to every host and the Ubuntu native declaration file
+only to Ubuntu.
 
 Most tools carry exact pins. The coding agents, `gh` and `usage` track `latest`
-by design, and Rust tracks the stable release channel. On both platforms,
+by design, and Rust tracks the stable release channel. On every supported host,
 [`dot_config/mise/mise.lock`](../../dot_config/mise/mise.lock) resolves the
 declarations to reviewable versions and checksums for `linux-x64` and
 `macos-arm64` wherever the backend exposes a fixed artifact. The Rust entry
@@ -29,9 +29,9 @@ floating tools to the lock at runtime. Check the effective selection with
 ## Overlap with Omarchy packages
 
 Omarchy ships its own `herdr`, `usage` and `tree-sitter-cli` packages, so on
-Linux those three commands exist twice. The mise shims lead `/usr/bin` on
+Omarchy those commands exist twice. The mise shims lead `/usr/bin` on
 `PATH`, so the pinned version is the one that runs. That overlap is chosen
-rather than tolerated. Pinning one version per tool across both machines is
+rather than tolerated. Pinning one version per tool across supported hosts is
 worth more here than deferring to whatever Arch last shipped, which has trailed
 the pinned versions, in `usage`'s case by a major release. Nothing uninstalls
 the system copies, so anything invoking them by absolute path still gets the
@@ -43,7 +43,7 @@ one with an older wire protocol, and this declaration puts it back. If an
 Omarchy update ever moves the herdr protocol, either bump the pin here in the
 same session or drop the `herdr` line and let the package own it again.
 
-Pixi is managed only by mise, on both platforms. Do not add it to pacman or Nix
+Pixi is managed only by mise on every supported host. Do not add it to pacman or Nix
 package lists. `~/.pixi/bin` stays on PATH for tools installed through Pixi
 itself.
 
@@ -61,15 +61,28 @@ based on its location alone.
 
 ## Installation and updates
 
-`run_onchange_after_mise-install.sh.tmpl` runs the install after the
-configuration file changes. Its npm and pipx backends need `bun` and `uv`. On
-Omarchy the hook installs either missing package with `omarchy pkg add` before
-running mise. Nix supplies both commands on macOS; any other host has to provide
-them before applying. Apply a declaration change with:
+`run_onchange_after_mise-install.sh.tmpl` hashes every managed `conf.d/*.toml`
+filename and body, plus the shared lock. Adding, editing, or removing a
+configuration file retriggers installation. It invokes only the tools phase of
+`mise bootstrap --locked`; chezmoi owns dotfiles and shell activation.
+
+The npm and pipx installers are themselves pinned mise tools. Mise installs
+those dependencies before their consumers, including on a fresh host with no
+system copies. The terminal tool declarations also replace explicit native
+package declarations. Existing Omarchy copies may remain as distribution
+packages; mise's PATH takes precedence. On macOS, apply the tool installation
+before activating the Nix generation that removes the old native declarations.
+
+After editing a declaration, refresh the lock without bumping unrelated tools:
 
 ```bash
+MISE_CONFIG_DIR="$(chezmoi source-path)/dot_config/mise" \
+  mise --cd / lock --global --platform linux-x64 --platform macos-arm64
 chezmoi apply
 ```
+
+The install hook and `mup` use `/` as the working directory so a project's local
+mise config cannot add tools or change the versions selected for this operation.
 
 Run `mup` to update the floating tools. It resolves every declared tool for both
 `linux-x64` and `macos-arm64` no matter which machine runs it, then installs
@@ -86,7 +99,9 @@ the macOS installation and disables self-updates; updating flake inputs does not
 move this pin. After updating Omarchy, check `mise --version` there, update the
 macOS version and checksum to match, and run `nix-switch`. Check `mise --version`
 on both hosts before refreshing the shared tool lock. This pin matches a checked
-Omarchy release; it does not automatically track later Omarchy updates.
+Omarchy release; it does not automatically track later Omarchy updates. Ubuntu
+uses the upstream user installation, updated with `mise self-update`. Check
+its version too before refreshing the shared lock.
 
 After each apply, `run_after_tool-drift.sh.tmpl` reports duplicate manual
 installs. On Omarchy it ignores audited stock launchers only when their

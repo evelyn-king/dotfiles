@@ -2,6 +2,7 @@
        machine needs no change here. Shared with dot_config/ghostty/config.tmpl;
        edit .chezmoitemplates/omarchy-detect.tmpl, not this. */ -}}
 {{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
+{{- $ubuntu := includeTemplate "ubuntu-detect.tmpl" . -}}
 
 # Repo content, not dotfiles: read from the source tree, never applied to $HOME.
 AGENTS.md
@@ -17,13 +18,19 @@ nix
 # commands point at it with MISE_CONFIG_DIR.
 .config/mise/mise.lock
 
+{{- if not $ubuntu }}
+05-bootstrap-ubuntu.sh
+.config/mise/conf.d/20-ubuntu.toml
+{{- else }}
+# Ubuntu is a headless deployment target.
+.config/ghostty/**
+.config/zed/**
+.claude/skills/omarchy/**
+{{- end }}
+
 {{- if ne .chezmoi.os "darwin" }}
 .config/aerospace
 darwin-rebuild.sh
-{{- end }}
-
-{{- if ne .chezmoi.os "linux" }}
-.config/superfile/**
 {{- end }}
 
 {{- if not $omarchy }}

@@ -12,12 +12,12 @@ Dotfiles managed directly with `chezmoi`.
 
 ## Supported platforms
 
-Apple Silicon macOS and Omarchy 4 on x86_64 Linux. Native Windows lives on the
-separate `windows` branch.
+Apple Silicon macOS, Omarchy 4 on x86_64 Linux, and Ubuntu 26.04 on x86_64
+headless development hosts. Native Windows lives on the separate `windows` branch.
 
 ## Cold start
 
-[docs/cold-start.md](docs/cold-start.md) takes a fresh Mac or Omarchy host from
+[docs/cold-start.md](docs/cold-start.md) takes a fresh supported host from
 platform prerequisites through source initialization, activation, the repeated
 applies, the manual service setup, and the final checks.
 
@@ -53,14 +53,14 @@ Package ownership depends on the host.
 | --- | --- | --- | --- |
 | Apple Silicon macOS | nix-darwin | Homebrew casks, declared in the flake | mise |
 | Omarchy 4 x86_64 | pacman and the AUR, via Omarchy | Omarchy | mise |
+| Ubuntu 26.04 x86_64 | APT, via mise bootstrap | Headless | mise |
 
-mise is the only package manager this repo drives on both platforms. On
-Omarchy, an additive apply hook also restores missing system packages without
-removing packages installed by hand. See
-[docs/package-lists/macos.md](docs/package-lists/macos.md) and
-[docs/package-lists/omarchy-linux.md](docs/package-lists/omarchy-linux.md) for
-system packages, and [docs/package-lists/mise.md](docs/package-lists/mise.md)
-for the runtimes and CLI tools mise manages.
+mise installs the shared versioned tools on every supported host. Linux apply
+hooks also restore missing native packages without removing packages installed
+by hand. See [macOS packages](docs/package-lists/macos.md),
+[Omarchy packages](docs/package-lists/omarchy-linux.md), and
+[Ubuntu packages](docs/package-lists/ubuntu-linux.md) for native package
+ownership, and [mise tools](docs/package-lists/mise.md) for versioned tools.
 
 ### mise
 
@@ -69,13 +69,14 @@ Language runtimes and global CLI tools are declared in
 rather than at `~/.config/mise/config.toml` so repo-managed tools stay separate
 from mise's interactive global state. The migration removes audited versions of
 `~/.config/mise/config.toml` and preserves unfamiliar content with a warning;
-resolve that conflict and declare every global tool in `conf.d`. Both
-platforms declare and install the same set. Three of those tools also ship as
+resolve that conflict and declare every global tool in `conf.d`. All supported
+hosts install the shared `[tools]` declarations. Some tools also ship as
 Omarchy packages, and the mise shims deliberately outrank them. See
 [docs/package-lists/mise.md](docs/package-lists/mise.md) for why.
 
 `run_onchange_after_mise-install.sh.tmpl` installs them and re-runs whenever the
-file changes, so adding a tool is a one-line edit plus `chezmoi apply`.
+declarations or the lock change. After adding a tool, refresh the shared lock
+for both target platforms and run `chezmoi apply`.
 
 Most versions are pinned exactly. Rust tracks the stable release channel; the
 coding agents, `gh` and `usage` float at `latest` on purpose. mise holds new
@@ -103,7 +104,7 @@ and `mup` and the install script both reach it by setting `MISE_CONFIG_DIR`.
 The applied `conf.d` files still drive the interactive shell's own tool
 resolution.
 
-The platform package manager owns the mise binary. On macOS, update the Nix
+The platform package manager owns the mise binary on macOS and Omarchy. On macOS, update the Nix
 flake inputs and activate the new generation:
 
 ```bash
@@ -116,6 +117,10 @@ On Omarchy, the normal system update updates its `mise-bin` package:
 ```bash
 omarchy update
 ```
+
+Ubuntu uses the upstream user installation of mise. Update it with
+`mise self-update`; the bootstrap command requires a release with package
+bootstrap support.
 
 ## Shell
 

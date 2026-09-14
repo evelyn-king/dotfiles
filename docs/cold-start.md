@@ -4,8 +4,9 @@ These procedures require an internet connection and an account that can approve
 system changes. The first dry run downloads pinned externals when the chezmoi
 cache is empty, even with `--refresh-externals=never`.
 
-The supported deployment targets are Apple Silicon macOS and Omarchy 4 on
-x86_64 Linux. Native Windows lives on the `windows` branch.
+The supported deployment targets are Apple Silicon macOS, Omarchy 4 on
+x86_64 Linux, and Ubuntu 26.04 x86_64 headless hosts. Native Windows lives on the
+`windows` branch.
 
 When validating a PR before merge, add `--branch <candidate-branch>` to each
 `chezmoi init` below. Otherwise init selects the public default branch. Record
@@ -151,9 +152,9 @@ chezmoi apply --dry-run --refresh-externals=never
 chezmoi apply
 ```
 
-The first apply installs the required pacman packages, then mise tools and
-local project trust, then the optional AUR packages. Emacs arrives too late for
-the Doom hook on this pass, which is why there is a second apply below.
+The first apply installs the required pacman packages, then mise tools, Doom,
+and local project trust, then the optional AUR packages. The Doom hook sorts
+after tool installation so it can use the newly installed runtimes.
 
 Set zsh as the login shell once the package hook has installed it. Without
 this, non-interactive SSH commands never see the managed environment. Log out of
@@ -164,7 +165,8 @@ chsh -s "$(command -v zsh)"
 sudo systemctl reboot
 ```
 
-After logging back in, run the second apply so Doom installs. Then complete the
+After logging back in, run the second apply to resolve executable paths in
+templates against the installed tools. Then complete the
 interactive Tailscale and Dropbox steps in
 [package-lists/omarchy-linux.md](package-lists/omarchy-linux.md), and the Jupyter
 environment setup in the main README if this host will run notebooks.
@@ -197,6 +199,93 @@ that an SSH command receives the managed environment:
 ssh <host> 'printf "%s %s\n" "$MAMBA_ROOT_PREFIX" "$LANG"; printf "%s\n" "$PATH"'
 ```
 
+## Ubuntu 26.04 x86_64, headless
+
+Start with an account that has sudo access and a working SSH login. The native
+package hook uses sudo only when packages need installation. It does not create
+accounts, configure the SSH server, or change firewall rules.
+
+Check the target and install the small set of bootstrap prerequisites:
+
+```bash
+. /etc/os-release
+test "$ID" = ubuntu && test "$VERSION_ID" = 26.04
+test "$(uname -m)" = x86_64
+sudo apt-get update
+sudo apt-get install --no-install-recommends ca-certificates curl git unzip
+```
+
+Install mise and chezmoi using their upstream user installers. The managed shell
+files provide mise activation after apply; skip the installer's suggestion to
+append activation lines by hand.
+
+```bash
+curl -fsSL https://mise.run | sh
+mkdir -p ~/.local/bin
+sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b ~/.local/bin
+export PATH="$HOME/.local/bin:$PATH"
+mise --version
+mise bootstrap files apply --help
+chezmoi --version
+```
+
+Initialize the source and inspect both the file changes and the package plan.
+The Ubuntu package declarations require the Ubuntu `universe` component. If the
+package preview reports unavailable entries, check that component and refresh
+APT metadata before proceeding.
+
+```bash
+chezmoi init https://github.com/evelyn-king/dotfiles.git
+chezmoi apply --dry-run --refresh-externals=never
+MISE_CONFIG_DIR="$(chezmoi source-path)/dot_config/mise" \
+  MISE_SYSTEM_PACKAGES_MANAGERS=apt \
+  mise --cd / bootstrap --only files,packages --dry-run
+chezmoi apply
+```
+
+The Ubuntu before-hook disables APT recommendations globally, then restores
+native packages with their required dependencies. After writing dotfiles,
+chezmoi installs the locked mise tools, sets up Doom, and trusts the managed
+project-root environment. Ubuntu skips the desktop configs and Doom's graphical
+PDF module. Vterm remains enabled.
+
+Doom's first native compilation can take tens of minutes on a small host.
+Let that apply finish before starting another one.
+
+Set the login shell, then reconnect so SSH starts the managed zsh environment:
+
+```bash
+chsh -s "$(command -v zsh)"
+exit
+```
+
+From a new SSH session, apply again so path-sensitive templates see the installed
+tools. A further apply should converge:
+
+```bash
+chezmoi apply
+chezmoi apply
+chezmoi status --exclude=scripts
+chezmoi diff --exclude=scripts
+chezmoi apply --dry-run --refresh-externals=never
+mise doctor
+getent passwd "$USER" | cut -d: -f7
+```
+
+From another machine, check non-interactive SSH, which must find the same tools:
+
+```bash
+ssh <host> 'command -v node python bun uv fd bat; printf "%s\n" "$LANG"'
+ssh <host> 'command -v jupyter-remote-lab; infocmp "$TERM" >/dev/null'
+```
+
+Check Neovim with `:checkhealth`, Doom with `doom doctor`, and open a vterm buffer.
+Accept vterm's first-use prompt to compile its native module; the bootstrap
+installs its build dependencies.
+The Jupyter launcher needs the environments described in the README before it
+can start a notebook server. SSH keys and Git signing remain manual setup below.
+See [Ubuntu package ownership](package-lists/ubuntu-linux.md) for update behavior.
+
 ## SSH keys
 
 Each host gets its own key. Nothing is copied between machines, so revoking a
@@ -222,7 +311,7 @@ agent, systemd sockets and password managers. Only when no agent answers does it
 fall back to `keychain --ignore-missing id_ed25519`, and that fallback loads
 exactly that name. A key called anything else is never picked up.
 
-keychain is installed on both platforms. On macOS launchd usually answers first,
+keychain is installed on every supported host. On macOS launchd usually answers first,
 so keychain rarely runs. Store the passphrase there with
 `ssh-add --apple-use-keychain ~/.ssh/id_ed25519`.
 
