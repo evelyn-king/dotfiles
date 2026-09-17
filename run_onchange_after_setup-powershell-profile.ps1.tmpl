@@ -1,0 +1,20 @@
+# Mirror the chezmoi-managed PowerShell profile to its real location.
+#
+# $PROFILE resolves under the OneDrive-redirected Documents folder on this
+# machine (Known Folder Move), which sits outside chezmoi's own $HOME tree, so
+# chezmoi cannot target it directly with a dot_ mapping. Re-runs whenever the
+# managed copy below changes.
+
+# source hash: {{ include "dot_config/powershell/Microsoft.PowerShell_profile.ps1" | sha256sum }}
+
+$ErrorActionPreference = 'Stop'
+
+$source = "{{ joinPath .chezmoi.homeDir ".config/powershell/Microsoft.PowerShell_profile.ps1" }}"
+$target = $PROFILE.CurrentUserCurrentHost
+
+$targetDir = Split-Path -Parent $target
+if (-not (Test-Path -LiteralPath $targetDir)) {
+    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+}
+
+Copy-Item -LiteralPath $source -Destination $target -Force
