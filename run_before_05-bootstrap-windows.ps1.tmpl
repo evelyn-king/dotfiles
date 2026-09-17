@@ -1,0 +1,29 @@
+# Restore native Windows packages before writing configs or installing tools.
+#
+# Runs on every apply, like the Ubuntu native-package hook: mise's winget
+# backend checks status first and only installs what is missing, so it is
+# additive and safe to re-run. Configs whose templates check `lookPath
+# "git-lfs"` / `lookPath "gpg"` need this to run before they render.
+
+$ErrorActionPreference = 'Stop'
+
+if (-not (Get-Command mise -ErrorAction SilentlyContinue)) {
+    [Console]::Error.WriteLine("dotfiles: install mise before applying; see docs/cold-start.md.")
+    exit 1
+}
+
+if (-not (Get-Command winget -ErrorAction SilentlyContinue)) {
+    [Console]::Error.WriteLine("dotfiles: winget is required on native Windows; see docs/cold-start.md.")
+    exit 1
+}
+
+mise bootstrap packages apply --help *> $null
+if ($LASTEXITCODE -ne 0) {
+    [Console]::Error.WriteLine("dotfiles: this mise release lacks winget package bootstrap; update mise first.")
+    exit 1
+}
+
+# Keep project-local mise declarations out of system package restoration.
+$env:MISE_CONFIG_DIR = "{{ joinPath .chezmoi.sourceDir "dot_config/mise" }}"
+
+mise bootstrap packages apply --manager winget --yes

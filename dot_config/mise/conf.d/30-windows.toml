@@ -1,0 +1,43 @@
+# Native Windows packages, restored via mise's winget bootstrap backend.
+# Mirrors the CLI tools and apps declared for Omarchy in
+# .chezmoidata/packages.yaml. "latest" accepts an installed package; winget
+# and each app's own updater own upgrades from there.
+#
+# Skipped with no native Windows equivalent: aspell/aspell-en, dropbox-cli,
+# keychain, pinentry (bundled with Gpg4win), zsh, emacs-wayland, ghostty.
+
+[bootstrap.packages]
+"winget:Git.Git" = "latest"
+"winget:GitHub.GitLFS" = "latest"
+"winget:GnuPG.Gpg4win" = "latest"
+"winget:twpayne.chezmoi" = "latest"
+"winget:Starship.Starship" = "latest"
+"winget:BurntSushi.ripgrep.MSVC" = "latest"
+"winget:Atuinsh.Atuin" = "latest"
+"winget:Amazon.AWSCLI" = "latest"
+"winget:Bitwarden.Bitwarden" = "latest"
+"winget:Bitwarden.CLI" = "latest"
+"winget:aristocratos.btop4win" = "latest"
+"winget:Kitware.CMake" = "latest"
+"winget:direnv.direnv" = "latest"
+"winget:muesli.duf" = "latest"
+"winget:bootandy.dust" = "latest"
+"winget:eza-community.eza" = "latest"
+"winget:Dropbox.Dropbox" = "latest"
+"winget:Mozilla.Firefox" = "latest"
+"winget:junegunn.fzf" = "latest"
+"winget:dandavison.delta" = "latest"
+"winget:Graphviz.Graphviz" = "latest"
+"winget:sharkdp.hyperfine" = "latest"
+"winget:JesseDuffield.lazygit" = "latest"
+"winget:LuaLS.lua-language-server" = "latest"
+"winget:Neovim.Neovim" = "latest"
+"winget:Mozilla.sccache" = "latest"
+"winget:koalaman.shellcheck" = "latest"
+"winget:Tailscale.Tailscale" = "latest"
+"winget:vim.vim" = "latest"
+"winget:Microsoft.VisualStudioCode" = "latest"
+"winget:ZedIndustries.Zed" = "latest"
+"winget:ajeetdsouza.zoxide" = "latest"
+"winget:Proton.ProtonMail" = "latest"
+"winget:SlackTechnologies.Slack" = "latest"
