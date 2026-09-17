@@ -37,3 +37,15 @@ darwin-rebuild.sh
 install-omarchy-packages.sh
 .config/hypr/**
 {{- end }}
+
+{{- if eq .chezmoi.os "windows" }}
+# chezmoi cannot execute a bash/sh target on native Windows: there is no
+# associated interpreter, so the script fails to fork/exec outright rather
+# than just misbehaving. Doom Emacs and mise's tools domain are not yet
+# supported on Windows; see AGENTS.md.
+tool-drift.sh
+mise-install.sh
+trust-local-projects-mise.sh
+setup-doom-emacs.sh
+10-migrate-retired-configs.sh
+{{- end }}

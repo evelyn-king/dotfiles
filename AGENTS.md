@@ -52,6 +52,15 @@
 - The docs under `docs/package-lists/` explain ownership rules and manual steps.
   The declarations themselves are the package list. Do not copy package names,
   versions or counts into the docs, where they go stale.
+- Native Windows packages belong in `[bootstrap.packages]` in
+  `dot_config/mise/conf.d/30-windows.toml`, using mise's `winget:` backend.
+- Native Windows has no interpreter for a bash/sh `run_` script, so chezmoi
+  fails to fork/exec one outright rather than just misbehaving. `.chezmoiignore.tmpl`
+  excludes the shared scripts that assume a POSIX host under its
+  `eq .chezmoi.os "windows"` block. Doom Emacs and mise's tools domain
+  (`mise-install.sh`, installing `10-dotfiles.toml`/`15-terminal-tools.toml`)
+  are not yet supported on Windows; add a new script there once they are,
+  rather than removing the exclusion.
 
 ## Testing
 - `python3 .chezmoitemplates/test_git_rewrite_policy.py` covers the agent git
