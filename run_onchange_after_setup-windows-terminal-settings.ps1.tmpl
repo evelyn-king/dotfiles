@@ -1,0 +1,27 @@
+# Mirror the chezmoi-managed Windows Terminal settings to their real location.
+#
+# The packaged (Microsoft Store) build keeps settings.json under a per-package
+# LocalState folder that chezmoi cannot target directly. Windows Terminal also
+# writes back to that same file itself (new dynamic profiles, GUI-driven
+# edits), so after changing settings through the app, copy the live file back
+# over the managed copy and run `chezmoi re-add` to keep the two in sync.
+# Re-runs whenever the managed copy below changes.
+
+# source hash: {{ include "dot_config/windows-terminal/settings.json" | sha256sum }}
+
+$ErrorActionPreference = 'Stop'
+
+$packageDir = Join-Path $env:LOCALAPPDATA "Packages\Microsoft.WindowsTerminal_8wekyb3d8bbwe"
+if (-not (Test-Path -LiteralPath $packageDir)) {
+    exit 0
+}
+
+$source = "{{ joinPath .chezmoi.homeDir ".config/windows-terminal/settings.json" }}"
+$target = Join-Path $packageDir "LocalState\settings.json"
+
+$targetDir = Split-Path -Parent $target
+if (-not (Test-Path -LiteralPath $targetDir)) {
+    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+}
+
+Copy-Item -LiteralPath $source -Destination $target -Force
