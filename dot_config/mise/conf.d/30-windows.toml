@@ -19,7 +19,6 @@
 "winget:Bitwarden.CLI" = "latest"
 "winget:aristocratos.btop4win" = "latest"
 "winget:Kitware.CMake" = "latest"
-"winget:direnv.direnv" = "latest"
 "winget:muesli.duf" = "latest"
 "winget:bootandy.dust" = "latest"
 "winget:eza-community.eza" = "latest"

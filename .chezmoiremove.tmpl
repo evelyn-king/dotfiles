@@ -1,0 +1,11 @@
+{{- /* Remove only the audited old config, preserving custom files and symlinks. */ -}}
+{{- $retired := joinPath .chezmoi.destDir ".direnvrc" -}}
+{{- with lstat $retired -}}
+{{- if eq .type "file" -}}
+{{- if eq (include $retired | replace "\r\n" "\n" | sha256sum) "c771c9835c4eb7a029f331a6b86a1d512c25bd4e10c8b58e0bc43c065c7960b7" }}
+.direnvrc
+{{- else -}}
+{{- warnf "Preserving customized ~/.direnvrc; direnv is retired, so review and remove it manually." -}}
+{{- end -}}
+{{- end -}}
+{{- end }}

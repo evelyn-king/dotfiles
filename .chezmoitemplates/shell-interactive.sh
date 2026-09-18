@@ -37,7 +37,6 @@ unset __use_existing_agent
 
 # --- tool integrations ------------------------------------------------------
 
-command -v direnv >/dev/null 2>&1 && eval "$(direnv hook "$__shell")"
 command -v pixi >/dev/null 2>&1 && eval "$(pixi completion --shell "$__shell")"
 
 # micromamba's shell hook prepends $MAMBA_ROOT_PREFIX/condabin, so it has to run
@@ -170,19 +169,6 @@ if ! command -v open >/dev/null 2>&1 && command -v xdg-open >/dev/null 2>&1; the
     xdg-open "$@" >/dev/null 2>&1 &
   )
 fi
-
-create_direnv_micromamba() {
-  env_name=${1:-${PWD##*/}}
-  env_name_quoted=$(printf '%s' "$env_name" | sed "s/'/'\\\\''/g")
-  printf "layout micromamba '%s'\n" "$env_name_quoted" >.envrc
-  unset env_name env_name_quoted
-  direnv allow .
-}
-
-create_direnv_venv() {
-  echo "source .venv/bin/activate" >.envrc
-  direnv allow .
-}
 
 jupyter_remote_load_env() {
   env_file=${1:-$JUPYTER_REMOTE_ENV_FILE}

@@ -1,4 +1,4 @@
-# used for direnv, always ignore
+# Legacy local environment files may contain secrets.
 .envrc
 
 **/.claude/settings.local.json

@@ -1,20 +1,30 @@
-# Mirror the chezmoi-managed PowerShell profile to its real location.
+# Mirror the managed profile to Windows PowerShell and PowerShell 7.
 #
-# $PROFILE resolves under the OneDrive-redirected Documents folder on this
-# machine (Known Folder Move), which sits outside chezmoi's own $HOME tree, so
-# chezmoi cannot target it directly with a dot_ mapping. Re-runs whenever the
-# managed copy below changes.
+# Ask each installed shell for its profile path to honor redirected Documents
+# folders. The two editions use different profile directories. Re-runs whenever
+# the managed copy below changes.
 
 # source hash: {{ include "dot_config/powershell/Microsoft.PowerShell_profile.ps1" | sha256sum }}
 
 $ErrorActionPreference = 'Stop'
 
-$source = "{{ joinPath .chezmoi.homeDir ".config/powershell/Microsoft.PowerShell_profile.ps1" }}"
-$target = $PROFILE.CurrentUserCurrentHost
-
-$targetDir = Split-Path -Parent $target
-if (-not (Test-Path -LiteralPath $targetDir)) {
-    New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+$source = '{{ joinPath .chezmoi.homeDir ".config/powershell/Microsoft.PowerShell_profile.ps1" | replace "'" "''" }}'
+$targets = @($PROFILE.CurrentUserCurrentHost)
+foreach ($shell in @('powershell.exe', 'pwsh.exe')) {
+    $command = Get-Command $shell -CommandType Application -ErrorAction SilentlyContinue
+    if ($command) {
+        $target = & $command.Source -NoLogo -NoProfile -NonInteractive -Command '$PROFILE.CurrentUserCurrentHost'
+        if ($LASTEXITCODE -ne 0 -or -not $target) {
+            throw "Could not determine the profile path for $shell."
+        }
+        $targets += ($target | Out-String).Trim()
+    }
 }
 
-Copy-Item -LiteralPath $source -Destination $target -Force
+foreach ($target in ($targets | Select-Object -Unique)) {
+    $targetDir = Split-Path -Parent $target
+    if (-not (Test-Path -LiteralPath $targetDir)) {
+        New-Item -ItemType Directory -Path $targetDir -Force | Out-Null
+    }
+    Copy-Item -LiteralPath $source -Destination $target -Force
+}

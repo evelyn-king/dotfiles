@@ -32,6 +32,56 @@ Shell startup keeps an inherited locale only when the host supports it. Without
 one, Linux reads `/etc/locale.conf` and macOS reads the global `AppleLocale`
 preference, then both fall back to a portable UTF-8 locale.
 
+## Project environments
+
+mise owns automatic project environment activation. Add this to the project's
+`mise.toml` to activate an existing Python virtual environment:
+
+```toml
+[env]
+_.python.venv = ".venv"
+```
+
+Review the file, run `mise trust`, then verify with
+`mise exec -- python -c "import sys; print(sys.executable)"`. Create the environment
+first if it does not exist. This configuration works in the managed POSIX and
+PowerShell shells; see [mise's Python documentation](https://mise.jdx.dev/lang/python.html).
+
+For an existing micromamba environment, use
+`micromamba run -n <environment> <command>` (for example,
+`micromamba run -n analysis python`) or explicitly activate it in a shell with
+micromamba integration. The former automatic micromamba activation helper is
+retired; mise's Python venv directive does not replace conda activation scripts.
+
+The old `create_direnv_venv` and `create_direnv_micromamba` helpers and shell hooks
+have been removed. Existing project `.envrc` files are no longer evaluated;
+migrate any project-specific variables into `[env]` before deleting those files.
+Chezmoi removes the old `~/.direnvrc` only when it matches the previously managed
+contents; customized copies are preserved with a warning. Existing packages on
+other hosts need removal through their owning package manager (or a Nix rebuild);
+additive package bootstrap does not uninstall retired packages.
+
+## Native Windows PowerShell
+
+Edit `dot_config/powershell/Microsoft.PowerShell_profile.ps1` for native Windows
+startup. The profile setup hook asks both installed editions (`powershell.exe`
+and `pwsh.exe`) for their profile paths and copies the managed profile to each,
+including when Documents is redirected to OneDrive.
+
+The profile selects the managed configs under `~/.config`, sets Neovim as the
+editor, and activates mise, Starship, zoxide (`cd`), and Atuin when installed.
+Atuin uses PSReadLine for history capture and Ctrl-R / UpArrow search. Tool data
+and caches retain their native Windows locations. This activates installed mise
+tools; automated Windows installation of the shared tool set is still pending.
+
+Windows PowerShell 5.1 refreshes mise at the prompt instead of on directory
+changes. Hook syntax follows the upstream [mise](https://mise.jdx.dev/cli/activate.html),
+[zoxide](https://github.com/ajeetdsouza/zoxide), and
+[Atuin](https://docs.atuin.sh/main/reference/init/) documentation.
+
+Open a fresh session of either edition after applying. The Windows Terminal
+profile selection controls which edition launches.
+
 ## Why PATH is built twice
 
 Interactive shells build PATH in the rc file. macOS runs `path_helper` from

@@ -55,7 +55,6 @@
       environment.systemPackages = with pkgs; [
         # --- shell and terminal ---
         atuin
-        direnv
         keychain
         starship
         tmux

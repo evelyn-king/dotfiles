@@ -1,5 +1,38 @@
 # Deployment readiness
 
+## Windows bootstrap status, 2026-09-17
+
+- Completed: managed PowerShell profiles for both Windows PowerShell 5.1 and
+  PowerShell 7.6.6, including redirected Documents paths; mise, Starship, zoxide,
+  and Atuin integration; guarded startup when tools are absent.
+- Completed: native direnv uninstall and removal of its managed configuration.
+  Both PowerShell editions passed fresh-session startup checks after applying.
+- Decided: Doom Emacs configuration and setup are excluded from native Windows;
+  Windows Doom support is no longer planned.
+- Remaining: native mise tool installation and project trust hooks, a Windows
+  cold-start procedure, and an interactive check of Atuin history search.
+- Windows Terminal still defaults to Windows PowerShell 5.1. Select its
+  PowerShell profile to use the installed 7.6.6 edition.
+
+The Windows dry-run apply passed with external refresh disabled. These checks
+cover the current machine, not a fresh Windows installation.
+
+## Environment cleanup, 2026-09-17
+
+Direnv has been removed from the package declarations, shell hooks, activation
+helpers, and Doom module. Project environment setup now uses mise; the migration
+instructions are in [shell-startup.md](shell-startup.md#project-environments).
+The old managed `.direnvrc` is removed only when its contents match the audited
+version. Customized files and symlinks are preserved.
+
+Validation passed: dry-run apply with external refresh disabled, shell and Doom
+template rendering, Bash syntax, all seven Ubuntu bootstrap tests, and isolated
+cleanup checks for LF/CRLF files, customized files, symlinks, and missing files.
+Existing packages on other hosts still require package-manager removal or a Nix
+rebuild. The local WSL package removal is pending interactive sudo authentication.
+
+## Earlier deployment reviews
+
 Reviewed 2026-09-06 against `48ad9b1`. Omarchy follow-up on 2026-09-07
 covered the lock at `92afe3f`, code fixes through `a78adca`, and the notebook
 runbook correction at `08330ca`.

@@ -57,10 +57,12 @@
 - Native Windows has no interpreter for a bash/sh `run_` script, so chezmoi
   fails to fork/exec one outright rather than just misbehaving. `.chezmoiignore.tmpl`
   excludes the shared scripts that assume a POSIX host under its
-  `eq .chezmoi.os "windows"` block. Doom Emacs and mise's tools domain
+  `eq .chezmoi.os "windows"` block. mise's tools domain
   (`mise-install.sh`, installing `10-dotfiles.toml`/`15-terminal-tools.toml`)
-  are not yet supported on Windows; add a new script there once they are,
+  is not yet supported on Windows; add a new script there once it is,
   rather than removing the exclusion.
+- Doom Emacs is intentionally excluded from native Windows, including its
+  configuration and setup hook. It is not a planned Windows bootstrap feature.
 
 ## Testing
 - `python3 .chezmoitemplates/test_git_rewrite_policy.py` covers the agent git
