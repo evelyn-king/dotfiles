@@ -311,9 +311,30 @@ agent, systemd sockets and password managers. Only when no agent answers does it
 fall back to `keychain --ignore-missing id_ed25519`, and that fallback loads
 exactly that name. A key called anything else is never picked up.
 
-keychain is installed on every supported host. On macOS launchd usually answers first,
+keychain is installed on supported POSIX hosts. On macOS launchd usually answers first,
 so keychain rarely runs. Store the passphrase there with
 `ssh-add --apple-use-keychain ~/.ssh/id_ed25519`.
+
+On native Windows, use the Windows OpenSSH Authentication Agent service. Once
+per machine, run in an elevated PowerShell:
+
+```powershell
+Set-Service ssh-agent -StartupType Automatic
+Start-Service ssh-agent
+```
+
+Then add the key from your normal user PowerShell and enter its passphrase:
+
+```powershell
+& "$env:SystemRoot/System32/OpenSSH/ssh-add.exe" "$HOME/.ssh/id_ed25519"
+& "$env:SystemRoot/System32/OpenSSH/ssh-add.exe" -l
+```
+
+The native agent stores keys protected by your Windows account and makes them
+available across shell sessions and restarts. No per-shell `keychain` invocation
+is needed. The Windows Git configuration selects the system OpenSSH client so
+Git uses this same agent; Git's bundled SSH client may otherwise keep asking for
+the passphrase. Add any other keys explicitly with the same `ssh-add.exe`.
 
 `~/.ssh/config` and key material are not managed by this repository.
 

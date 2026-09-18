@@ -8,6 +8,10 @@
 [core]
   autocrlf = false
   editor = nvim
+{{ if eq .chezmoi.os "windows" }}
+  # Use the native agent service, including keys added from PowerShell.
+  sshCommand = {{ joinPath (env "SystemRoot") "System32/OpenSSH/ssh.exe" | replace "\\" "/" | quote }}
+{{ end -}}
 
 [init]
   defaultBranch = main
