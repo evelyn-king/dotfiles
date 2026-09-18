@@ -29,7 +29,7 @@ Validation passed: dry-run apply with external refresh disabled, shell and Doom
 template rendering, Bash syntax, all seven Ubuntu bootstrap tests, and isolated
 cleanup checks for LF/CRLF files, customized files, symlinks, and missing files.
 Existing packages on other hosts still require package-manager removal or a Nix
-rebuild. The local WSL package removal is pending interactive sudo authentication.
+rebuild.
 
 ## Earlier deployment reviews
 
