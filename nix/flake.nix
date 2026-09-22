@@ -19,10 +19,10 @@
       # the version and the official macOS archive checksum here.
       miseOmarchy = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
         pname = "mise";
-        version = "2026.9.1";
+        version = "2026.9.12";
         src = pkgs.fetchurl {
           url = "https://github.com/jdx/mise/releases/download/v${finalAttrs.version}/mise-v${finalAttrs.version}-macos-arm64.tar.gz";
-          hash = "sha256-v+oKtBe0jB6LmUEvyvIM4XQkoyhqh2bX0rAFH+Mh1WU=";
+          hash = "sha256-Dxx/PnTYya6Cl25pkAWPK8aIIazGtMN6aMIGyDZpJBk=";
         };
         nativeBuildInputs = [ pkgs.installShellFiles ];
         dontBuild = true;
