@@ -5,6 +5,7 @@
 #
 # Skipped with no native Windows equivalent: aspell/aspell-en, dropbox-cli,
 # keychain, pinentry (bundled with Gpg4win), zsh, emacs-wayland, ghostty.
+# Deliberately omitted on Windows: vim.
 
 [bootstrap.packages]
 "winget:Git.Git" = "latest"
@@ -34,7 +35,6 @@
 "winget:Mozilla.sccache" = "latest"
 "winget:koalaman.shellcheck" = "latest"
 "winget:Tailscale.Tailscale" = "latest"
-"winget:vim.vim" = "latest"
 "winget:Microsoft.VisualStudioCode" = "latest"
 "winget:ZedIndustries.Zed" = "latest"
 "winget:ajeetdsouza.zoxide" = "latest"
