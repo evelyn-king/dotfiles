@@ -61,11 +61,12 @@ based on its location alone.
 
 ## Installation and updates
 
-`run_onchange_after_mise-install.sh.tmpl` (and its native Windows counterpart,
-`run_onchange_after_mise-install.ps1.tmpl`) hashes every managed `conf.d/*.toml`
-filename and body, plus the shared lock. Adding, editing, or removing a
-configuration file retriggers installation. It invokes only the tools phase of
-`mise bootstrap --locked`; chezmoi owns dotfiles and shell activation.
+`run_onchange_after_mise-install.sh.tmpl` (and its native Windows counterpart on
+the `windows` branch, `run_onchange_after_mise-install.ps1.tmpl`) hashes every
+managed `conf.d/*.toml` filename and body, plus the shared lock. Adding,
+editing, or removing a configuration file retriggers installation. It invokes
+only the tools phase of `mise bootstrap --locked`; chezmoi owns dotfiles and
+shell activation.
 
 The npm and pipx installers are themselves pinned mise tools. Mise installs
 those dependencies before their consumers, including on a fresh host with no
@@ -93,8 +94,8 @@ deliberately not a per-machine job. `mise lock` prunes the entries a run does
 not resolve, so a host-scoped refresh drops the other platforms' artifacts for
 every tool it moves, and a Linux-scoped one deletes the macOS- and Windows-only
 records outright. On native Windows (the `windows` branch), `mup` is a
-PowerShell function in the managed profile with the same platform list. Review and commit the resulting
-`dot_config/mise/mise.lock` change.
+PowerShell function in the managed profile with the same platform list. Review
+and commit the resulting `dot_config/mise/mise.lock` change.
 
 `mup` does not update the mise binary. Omarchy owns it through `mise-bin`, which
 the normal `omarchy update` updates. macOS follows that installed release through

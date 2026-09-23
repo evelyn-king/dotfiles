@@ -90,11 +90,12 @@ mup
 
 `mup` refreshes the committed `dot_config/mise/mise.lock` for `linux-x64`,
 `macos-arm64` and `windows-x64` whichever machine you run it on, then installs
-what that lock holds for the machine you are on. The lock is one shared artifact and
-`mise lock` prunes whatever a run does not resolve, so a refresh scoped to its
-own host would drop the other platform's entries. Review and commit the lockfile
-change afterwards. Rust is the one channel-based exception. Its lock entry stays
-`stable`, and rustup resolves that channel when mise installs or updates it.
+what that lock holds for the machine you are on. The lock is one shared artifact
+and `mise lock` prunes whatever a run does not resolve, so a refresh scoped to
+its own host would drop the other platforms' entries. Review and commit the
+lockfile change afterwards. Rust is the one channel-based exception. Its lock
+entry stays `stable`, and rustup resolves that channel when mise installs or
+updates it.
 
 Like `nix/flake.lock`, that lock is repo content rather than a home file. mise
 rewrites a lock in place whenever it installs, so an applied second copy under

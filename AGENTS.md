@@ -62,8 +62,8 @@
   does for the mise tools install.
 - `mise.lock` covers `linux-x64`, `macos-arm64` and `windows-x64`. `mup` exists
   twice, in `.chezmoitemplates/shell-interactive.sh` and in the PowerShell
-  profile; keep their `--platform` lists identical, since `mise lock` prunes
-  any platform a run omits.
+  profile on the `windows` branch; keep their `--platform` lists identical,
+  since `mise lock` prunes any platform a run omits.
 - Doom Emacs is intentionally excluded from native Windows, including its
   configuration and setup hook. It is not a planned Windows bootstrap feature.
 
