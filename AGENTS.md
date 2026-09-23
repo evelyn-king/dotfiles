@@ -57,10 +57,13 @@
 - Native Windows has no interpreter for a bash/sh `run_` script, so chezmoi
   fails to fork/exec one outright rather than just misbehaving. `.chezmoiignore.tmpl`
   excludes the shared scripts that assume a POSIX host under its
-  `eq .chezmoi.os "windows"` block. mise's tools domain
-  (`mise-install.sh`, installing `10-dotfiles.toml`/`15-terminal-tools.toml`)
-  is not yet supported on Windows; add a new script there once it is,
-  rather than removing the exclusion.
+  `eq .chezmoi.os "windows"` block. Give such a script a `.ps1` counterpart
+  rather than removing the exclusion, as `run_onchange_after_mise-install.ps1.tmpl`
+  does for the mise tools install.
+- `mise.lock` covers `linux-x64`, `macos-arm64` and `windows-x64`. `mup` exists
+  twice, in `.chezmoitemplates/shell-interactive.sh` and in the PowerShell
+  profile; keep their `--platform` lists identical, since `mise lock` prunes
+  any platform a run omits.
 - Doom Emacs is intentionally excluded from native Windows, including its
   configuration and setup hook. It is not a planned Windows bootstrap feature.
 

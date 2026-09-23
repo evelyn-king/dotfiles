@@ -76,7 +76,7 @@ Omarchy packages, and the mise shims deliberately outrank them. See
 
 `run_onchange_after_mise-install.sh.tmpl` installs them and re-runs whenever the
 declarations or the lock change. After adding a tool, refresh the shared lock
-for both target platforms and run `chezmoi apply`.
+for all target platforms and run `chezmoi apply`.
 
 Most versions are pinned exactly. Rust tracks the stable release channel; the
 coding agents, `gh` and `usage` float at `latest` on purpose. mise holds new
@@ -88,9 +88,9 @@ that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
 mup
 ```
 
-`mup` refreshes the committed `dot_config/mise/mise.lock` for both `linux-x64`
-and `macos-arm64` whichever machine you run it on, then installs what that lock
-holds for the machine you are on. The lock is one shared artifact and
+`mup` refreshes the committed `dot_config/mise/mise.lock` for `linux-x64`,
+`macos-arm64` and `windows-x64` whichever machine you run it on, then installs
+what that lock holds for the machine you are on. The lock is one shared artifact and
 `mise lock` prunes whatever a run does not resolve, so a refresh scoped to its
 own host would drop the other platform's entries. Review and commit the lockfile
 change afterwards. Rust is the one channel-based exception. Its lock entry stays

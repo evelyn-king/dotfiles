@@ -44,8 +44,8 @@ install-omarchy-packages.sh
 setup-doom-emacs.sh
 # chezmoi cannot execute a bash/sh target on native Windows: there is no
 # associated interpreter, so the script fails to fork/exec outright rather
-# than just misbehaving. mise's tools domain is not yet supported on Windows;
-# see AGENTS.md.
+# than just misbehaving. mise-install.sh has a PowerShell counterpart,
+# run_onchange_after_mise-install.ps1.tmpl; see AGENTS.md.
 tool-drift.sh
 mise-install.sh
 trust-local-projects-mise.sh

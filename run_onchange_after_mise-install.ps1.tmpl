@@ -1,0 +1,39 @@
+# Install the runtimes and global CLI tools declared in the mise conf.d files.
+#
+# Native Windows counterpart of run_onchange_after_mise-install.sh.tmpl, which
+# chezmoi cannot execute here. Re-runs whenever the declarations or the lock
+# change. Refresh the shared lock after editing a tool declaration, then apply.
+
+{{ template "mise-config-hashes.tmpl" . }}
+# lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
+# mise executable: {{ lookPath "mise" | quote }}
+
+$ErrorActionPreference = 'Stop'
+
+# mise is yours to install; on a machine without it there is nothing to do.
+# Its resolved path is rendered above so installing it changes this script and
+# makes chezmoi retry on the next apply.
+if (-not (Get-Command mise -ErrorAction SilentlyContinue)) {
+    exit 0
+}
+
+# Read the managed tool declarations and the committed lock from the source
+# tree, exactly as the POSIX hook and `mup` do.
+$env:MISE_CONFIG_DIR = '{{ joinPath .chezmoi.sourceDir "dot_config/mise" | replace "'" "''" }}'
+
+# A lock refreshed before Windows joined the platform list has no windows-x64
+# entries, and a locked install would fail on every apply. Skip with a pointer
+# instead; the lock hash above re-runs this once `mup` adds them.
+$lock = Join-Path $env:MISE_CONFIG_DIR 'mise.lock'
+if (-not (Select-String -LiteralPath $lock -Pattern 'platforms.windows-x64' -SimpleMatch -Quiet)) {
+    [Console]::Error.WriteLine("dotfiles: mise.lock has no windows-x64 entries; run mup to refresh it, then apply again.")
+    exit 0
+}
+
+# Use only the tools phase: chezmoi owns files and shell activation, and the
+# before-hook has already restored winget packages. `--cd /` keeps a project's
+# local mise config out of this install.
+mise --cd / bootstrap --only tools --locked
+if ($LASTEXITCODE -ne 0) {
+    exit $LASTEXITCODE
+}

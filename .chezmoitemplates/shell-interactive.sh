@@ -98,17 +98,19 @@ alias ....='cd ../../..'
 #
 # The committed lock is one cross-platform artifact and the source tree holds the
 # only copy, so refreshing it is not a per-machine job: every run resolves every
-# declared tool for both target platforms, whichever machine it runs on. Scoping
-# a run to its own host is what makes it destructive, because `mise lock` prunes
-# whatever that run did not resolve, taking the other platform's artifacts with
-# it. All supported hosts declare the same tools, so any one can refresh the
-# lock the others install from.
+# declared tool for all three target platforms, whichever machine it runs on.
+# Scoping a run to its own host is what makes it destructive, because `mise lock`
+# prunes whatever that run did not resolve, taking the other platforms' artifacts
+# with it. All supported hosts declare the same tools, so any one can refresh the
+# lock the others install from. Native Windows (the `windows` branch) has its own
+# copy of this function in its PowerShell profile; keep the platform lists in
+# step.
 if command -v mise >/dev/null 2>&1; then
   mup() {
     local mise_config_dir={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
 
     MISE_CONFIG_DIR="$mise_config_dir" \
-      mise --cd / lock --global --platform linux-x64 --platform macos-arm64 --bump || return
+      mise --cd / lock --global --platform linux-x64 --platform macos-arm64 --platform windows-x64 --bump || return
 
     MISE_CONFIG_DIR="$mise_config_dir" mise --cd / bootstrap --only tools --locked
   }
