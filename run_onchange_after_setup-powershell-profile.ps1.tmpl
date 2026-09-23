@@ -11,14 +11,32 @@ $ErrorActionPreference = 'Stop'
 $source = '{{ joinPath .chezmoi.homeDir ".config/powershell/Microsoft.PowerShell_profile.ps1" | replace "'" "''" }}'
 $targets = @($PROFILE.CurrentUserCurrentHost)
 foreach ($shell in @('powershell.exe', 'pwsh.exe')) {
-    $command = Get-Command $shell -CommandType Application -ErrorAction SilentlyContinue
-    if ($command) {
-        $target = & $command.Source -NoLogo -NoProfile -NonInteractive -Command '$PROFILE.CurrentUserCurrentHost'
-        if ($LASTEXITCODE -ne 0 -or -not $target) {
-            throw "Could not determine the profile path for $shell."
-        }
-        $targets += ($target | Out-String).Trim()
+    # PATH can hold more than one copy, such as a Store package's install
+    # directory next to its WindowsApps execution alias. Store packages may
+    # refuse to launch from the install directory, so try each until one
+    # answers.
+    $candidates = @(Get-Command $shell -CommandType Application -All -ErrorAction SilentlyContinue |
+        Select-Object -ExpandProperty Source -Unique)
+    if ($candidates.Count -eq 0) {
+        continue
     }
+    $target = $null
+    foreach ($candidate in $candidates) {
+        try {
+            $output = & $candidate -NoLogo -NoProfile -NonInteractive -Command '$PROFILE.CurrentUserCurrentHost' 2>$null
+            if ($LASTEXITCODE -eq 0 -and $output) {
+                $target = ($output | Out-String).Trim()
+                break
+            }
+        }
+        catch {
+            continue
+        }
+    }
+    if (-not $target) {
+        throw "Could not determine the profile path for $shell (tried: $($candidates -join ', '))."
+    }
+    $targets += $target
 }
 
 foreach ($target in ($targets | Select-Object -Unique)) {
