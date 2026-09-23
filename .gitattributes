@@ -1,0 +1,3 @@
+# Store and check out text as LF on every host, Windows included. Nothing here
+# needs CRLF: PowerShell and Windows Terminal both read LF files.
+* text=auto eol=lf
