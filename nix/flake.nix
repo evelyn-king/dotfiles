@@ -12,38 +12,7 @@
 
   outputs = inputs@{ self, nix-darwin, ... }:
   let
-    configuration = { pkgs, ... }:
-    let
-      # Follow Omarchy's installed mise release, independently of nixpkgs.
-      # After an Omarchy update, check `mise --version` there and update both
-      # the version and the official macOS archive checksum here.
-      miseOmarchy = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
-        pname = "mise";
-        version = "2026.9.12";
-        src = pkgs.fetchurl {
-          url = "https://github.com/jdx/mise/releases/download/v${finalAttrs.version}/mise-v${finalAttrs.version}-macos-arm64.tar.gz";
-          hash = "sha256-Dxx/PnTYya6Cl25pkAWPK8aIIazGtMN6aMIGyDZpJBk=";
-        };
-        nativeBuildInputs = [ pkgs.installShellFiles ];
-        dontBuild = true;
-        # Preserve the upstream executable and its signature.
-        dontFixup = true;
-        installPhase = ''
-          runHook preInstall
-          install -Dm755 bin/mise "$out/bin/mise"
-          installManPage man/man1/mise.1
-          installShellCompletion --cmd mise \
-            --bash <(bin/mise completion bash) \
-            --fish <(bin/mise completion fish) \
-            --zsh <(bin/mise completion zsh)
-          mkdir -p "$out/lib/mise"
-          touch "$out/lib/mise/.disable-self-update"
-          runHook postInstall
-        '';
-        meta.mainProgram = "mise";
-        meta.platforms = [ "aarch64-darwin" ];
-      });
-    in {
+    configuration = { pkgs, ... }: {
       # Determinate Nix manages the daemon and /etc/nix/nix.conf itself.
       determinateNix.enable = true;
 
@@ -77,10 +46,10 @@
         lazygit
 
         # --- languages, runtimes, package managers ---
-        # Anything managed by mise is deliberately not here
+        # Anything managed by mise is deliberately not here, and neither is
+        # mise itself: run_before_00-install-mise installs the pinned release.
         luarocks
         lua-language-server
-        miseOmarchy
 
         # --- editors ---
         emacs-macport

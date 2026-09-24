@@ -44,8 +44,9 @@ SSH server configuration, firewall rules, service enrollment, and signing keys
 remain host administration tasks.
 
 Follow [cold-start deployment](../cold-start.md#ubuntu-2604-x86_64-headless)
-for initial installation and verification. The upstream user installation of
-mise updates through `mise self-update`. Preview native file and package changes with:
+for initial installation and verification. Chezmoi installs the pinned mise
+release; see [mise ownership](mise.md#installation-and-updates) for updates.
+Preview native file and package changes with:
 
 ```bash
 MISE_CONFIG_DIR="$(chezmoi source-path)/dot_config/mise" \

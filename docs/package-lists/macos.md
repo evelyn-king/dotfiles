@@ -27,7 +27,8 @@ already resolved. `darwinConfigurations` defines only `macbook`, for
 | `nix/flake.nix` `homebrew.masApps` | Mac App Store applications |
 | `dot_config/mise/conf.d/10-dotfiles.toml` | language runtimes and global CLI tools |
 
-Anything mise manages is deliberately absent from the Nix package list.
+Anything mise manages is deliberately absent from the Nix package list. So is
+mise itself: chezmoi installs the pinned release into `~/.local/bin`.
 
 The Xcode Command Line Tools supply `cc`, `c++`, the linker and the related
 build commands. GCC is not installed globally, because its unprefixed commands

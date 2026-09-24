@@ -1,5 +1,15 @@
 # Tool and runtime versions live under dot_config/mise/conf.d/. This file pins
 # what chezmoi itself fetches.
+
+# The mise binary itself, installed on every host by run_before_00-install-mise.
+# The checksums are for the release tarballs; take them from the release's
+# SHASUMS256.txt.
+mise:
+  version: "2026.9.12"
+  sha256:
+    linux-x64: b4058dece685259910d3aba5782445996eea79dbdb3cf952a6eb81aadf0373ff
+    macos-arm64: 0f1c7f3e74d8c9ae82976e6990058f2bc68821acc6b4c37a68c206c836692419
+
 doom:
   repo: https://github.com/doomemacs/core.git
   rev: 1404f1bac5a2ae8602b4d861f7805e194c05d28c

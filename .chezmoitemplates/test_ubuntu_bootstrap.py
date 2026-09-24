@@ -32,7 +32,9 @@ class UbuntuBootstrapTests(unittest.TestCase):
             hook.write_text(rendered)
             log = temp / "calls"
             if mise:
-                executable = temp / "mise"
+                bin_dir = temp / ".local/bin"
+                bin_dir.mkdir(parents=True)
+                executable = bin_dir / "mise"
                 executable.write_text(
                     "#!/bin/bash\n"
                     'printf "%s|%s|%s\\n" "${MISE_CONFIG_DIR:-}" '
@@ -43,7 +45,8 @@ class UbuntuBootstrapTests(unittest.TestCase):
                 executable.chmod(0o755)
             result = subprocess.run(
                 ["/bin/bash", str(hook)], capture_output=True, text=True,
-                env={"PATH": str(temp), "CALL_LOG": str(log)},
+                env={"PATH": "/usr/bin:/bin", "HOME": str(temp),
+                     "CALL_LOG": str(log)},
             )
             calls = log.read_text().splitlines() if log.exists() else []
             return result, calls
@@ -64,13 +67,13 @@ class UbuntuBootstrapTests(unittest.TestCase):
     def test_missing_mise_is_actionable(self):
         result, calls = self.run_hook(mise=False)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("install mise before applying", result.stderr)
+        self.assertIn("mise install hook", result.stderr)
         self.assertEqual(calls, [])
 
     def test_old_mise_does_not_attempt_provisioning(self):
         result, calls = self.run_hook(help_status=1)
         self.assertNotEqual(result.returncode, 0)
-        self.assertIn("update mise", result.stderr)
+        self.assertIn("raise the mise pin", result.stderr)
         self.assertEqual(len(calls), 1)
         self.assertTrue(calls[0].endswith("--help"))
 
@@ -96,7 +99,9 @@ class UbuntuBootstrapTests(unittest.TestCase):
             declarations = source / "dot_config/mise/conf.d"
             declarations.mkdir(parents=True)
             (source / ".chezmoitemplates").mkdir()
+            (source / ".chezmoidata").mkdir()
             for relative in (
+                ".chezmoidata/versions.yaml",
                 ".chezmoitemplates/mise-config-hashes.tmpl",
                 "run_onchange_after_mise-install.sh.tmpl",
                 "dot_config/mise/mise.lock",
@@ -123,6 +128,12 @@ class UbuntuBootstrapTests(unittest.TestCase):
             self.assertNotEqual(with_addition, render())
             added.unlink()
             self.assertEqual(original, render())
+
+            # A new mise release can resolve or install tools differently.
+            versions = source / ".chezmoidata/versions.yaml"
+            pinned = versions.read_text()
+            versions.write_text(pinned.replace('  version: "', '  version: "0.', 1))
+            self.assertNotEqual(original, render())
 
 
 if __name__ == "__main__":

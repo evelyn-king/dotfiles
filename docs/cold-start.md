@@ -86,8 +86,9 @@ sudo nix run nix-darwin/master#darwin-rebuild -- \
 
 Activation removes the bootstrap Homebrew `chezmoi` formula, because Nix owns
 that command now. Restart the Mac so the system generation, applications and
-fonts are available in a fresh login. The second apply sees the newly installed
-Emacs and mise commands, so it can install Doom and the mise tool set.
+fonts are available in a fresh login. The first apply already installed the
+pinned mise release and its tool set into your home directory. The second apply
+sees the newly installed Emacs, so it can install Doom.
 
 ```bash
 sudo shutdown -r now
@@ -131,7 +132,6 @@ test "$(uname -m)" = x86_64
 command -v omarchy
 omarchy version
 omarchy update system-pkgs
-command -v mise || omarchy pkg add mise
 omarchy pkg add chezmoi
 ```
 
@@ -152,8 +152,9 @@ chezmoi apply --dry-run --refresh-externals=never
 chezmoi apply
 ```
 
-The first apply installs the required pacman packages, then mise tools, Doom,
-and local project trust, then the optional AUR packages. The Doom hook sorts
+The first apply installs the pinned mise release into `~/.local/bin`, then the
+required pacman packages, mise tools, Doom, and local project trust, then the
+optional AUR packages. The Doom hook sorts
 after tool installation so it can use the newly installed runtimes.
 
 Set zsh as the login shell once the package hook has installed it. Without
@@ -215,27 +216,34 @@ sudo apt-get update
 sudo apt-get install --no-install-recommends ca-certificates curl git unzip
 ```
 
-Install mise and chezmoi using their upstream user installers. The managed shell
-files provide mise activation after apply; skip the installer's suggestion to
-append activation lines by hand.
+Install chezmoi with its upstream user installer:
 
 ```bash
-curl -fsSL https://mise.run | sh
 mkdir -p ~/.local/bin
 sh -c "$(curl -fsLS https://get.chezmoi.io)" -- -b ~/.local/bin
 export PATH="$HOME/.local/bin:$PATH"
-mise --version
-mise bootstrap files apply --help
 chezmoi --version
 ```
 
-Initialize the source and inspect both the file changes and the package plan.
-The Ubuntu package declarations require the Ubuntu `universe` component. If the
-package preview reports unavailable entries, check that component and refresh
-APT metadata before proceeding.
+Initialize the source, then run its mise install hook on its own. The hook
+installs the pinned mise release into `~/.local/bin` before any apply, so the
+package preview below uses the same mise as the apply. The managed shell files
+provide mise activation after apply.
 
 ```bash
 chezmoi init https://github.com/evelyn-king/dotfiles.git
+chezmoi execute-template \
+  --file "$(chezmoi source-path)/run_before_00-install-mise.sh.tmpl" | bash
+mise --version
+mise bootstrap files apply --help
+```
+
+Inspect both the file changes and the package plan. The Ubuntu package
+declarations require the Ubuntu `universe` component. If the package preview
+reports unavailable entries, check that component and refresh APT metadata
+before proceeding.
+
+```bash
 chezmoi apply --dry-run --refresh-externals=never
 MISE_CONFIG_DIR="$(chezmoi source-path)/dot_config/mise" \
   MISE_SYSTEM_PACKAGES_MANAGERS=apt \

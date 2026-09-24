@@ -92,16 +92,26 @@ host-scoped refresh drops the other platform's artifacts for every tool it
 moves, and a Linux-scoped one deletes the macOS-only records outright. Review
 and commit the resulting `dot_config/mise/mise.lock` change.
 
-`mup` does not update the mise binary. Omarchy owns it through `mise-bin`, which
-the normal `omarchy update` updates. macOS follows that installed release through
-the explicit version and official archive checksum in `nix/flake.nix`. Nix owns
-the macOS installation and disables self-updates; updating flake inputs does not
-move this pin. After updating Omarchy, check `mise --version` there, update the
-macOS version and checksum to match, and run `nix-switch`. Check `mise --version`
-on both hosts before refreshing the shared tool lock. This pin matches a checked
-Omarchy release; it does not automatically track later Omarchy updates. Ubuntu
-uses the upstream user installation, updated with `mise self-update`. Check
-its version too before refreshing the shared lock.
+`mup` does not update the mise binary. Every host runs the same upstream
+release, pinned by version and per-platform tarball checksum under `mise` in
+[`.chezmoidata/versions.yaml`](../../.chezmoidata/versions.yaml).
+`run_before_00-install-mise.sh.tmpl` runs before every other hook on each
+apply. When `~/.local/bin/mise` reports a different version, it downloads the
+pinned tarball, verifies its checksum, and installs the binary, man page and
+zsh and bash completions. It also installs mise's self-update instructions
+file, which disables `mise self-update` and points at the pin. The other hooks
+call `~/.local/bin/mise` by path.
+
+To update mise, change the version and both checksums, taking the checksums
+from the release's `SHASUMS256.txt`. Then apply on each host, and after that
+run `mup`. The tool installation hook also reruns when the pin changes. A shared version
+means a lock refresh gives the same result whichever host runs it.
+
+Omarchy's `mise-bin` package stays installed, because Omarchy's own scripts
+call mise. `omarchy update` keeps upgrading it, but `~/.local/bin` precedes
+`/usr/bin` on the managed PATH, so the pinned release is the one that runs.
+Both binaries share the same data directory. The drift hook warns when `mise`
+on PATH resolves anywhere other than `~/.local/bin/mise`.
 
 After each apply, `run_after_tool-drift.sh.tmpl` reports duplicate manual
 installs. On Omarchy it ignores audited stock launchers only when their

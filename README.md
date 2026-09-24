@@ -104,23 +104,12 @@ and `mup` and the install script both reach it by setting `MISE_CONFIG_DIR`.
 The applied `conf.d` files still drive the interactive shell's own tool
 resolution.
 
-The platform package manager owns the mise binary on macOS and Omarchy. On macOS, update the Nix
-flake inputs and activate the new generation:
-
-```bash
-nix flake update --flake "$(chezmoi source-path)/nix"
-nix-switch
-```
-
-On Omarchy, the normal system update updates its `mise-bin` package:
-
-```bash
-omarchy update
-```
-
-Ubuntu uses the upstream user installation of mise. Update it with
-`mise self-update`; the bootstrap command requires a release with package
-bootstrap support.
+The mise binary is pinned in `.chezmoidata/versions.yaml` and installed into
+`~/.local/bin` on every host by `run_before_00-install-mise.sh.tmpl`. Bump the
+version and both checksums there, then apply on each host. Omarchy's own
+`mise-bin` package stays installed, but the pinned copy is the one that runs.
+`mise self-update` is disabled. See
+[docs/package-lists/mise.md](docs/package-lists/mise.md#installation-and-updates).
 
 ## Shell
 

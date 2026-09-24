@@ -7,14 +7,15 @@
 
 {{ template "mise-config-hashes.tmpl" . }}
 # lock hash: {{ include "dot_config/mise/mise.lock" | sha256sum }}
-# mise executable: {{ lookPath "mise" | quote }}
+# mise version: {{ .mise.version }}
 
 set -euo pipefail
 
-# mise is yours to install; on a machine without it there is nothing to do.
-# Its resolved path is rendered above so installing it changes this script and
-# makes chezmoi retry on the next apply.
-command -v mise >/dev/null 2>&1 || exit 0
+# run_before_00-install-mise installs the pinned release here. Call it by path:
+# the apply's PATH may predate ~/.local/bin, and Omarchy's /usr/bin/mise is a
+# different release. A host without a pinned release has nothing to do.
+mise="$HOME/.local/bin/mise"
+[ -x "$mise" ] || exit 0
 
 # Read the managed tool declarations and the committed lock from the source
 # tree. Every declared tool is installed on all supported hosts.
@@ -26,4 +27,4 @@ export MISE_CONFIG_DIR
 # mise orders the declared bun/uv installers before their dependent tools.
 # Use only the tools phase: chezmoi owns files and shell activation, and the
 # Ubuntu before-hook has already restored apt packages.
-mise --cd / bootstrap --only tools --locked
+"$mise" --cd / bootstrap --only tools --locked

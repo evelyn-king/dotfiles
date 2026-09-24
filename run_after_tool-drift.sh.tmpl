@@ -19,7 +19,24 @@ is_stock_omarchy_launcher() {
 }
 {{ end }}
 
-if command -v mise >/dev/null 2>&1; then
+# The pinned release from run_before_00-install-mise. Call it by path so an
+# apply from a shell that predates ~/.local/bin still reports against it.
+mise="$HOME/.local/bin/mise"
+
+if [ -x "$mise" ]; then
+  # Omarchy's /usr/bin/mise stays installed, and macOS keeps the Nix copy until
+  # the generation that drops it is active. Both are fine as long as the pinned
+  # binary wins. `type -P` skips the shell function `mise activate` defines.
+  resolved=$(type -P mise 2>/dev/null || true)
+  if [ -n "$resolved" ] && [ "$resolved" != "$mise" ]; then
+    cat >&2 <<EOF
+
+  mise: \`mise\` resolves to $resolved rather than the pinned $mise.
+  Check that ~/.local/bin precedes it on PATH in a fresh login shell.
+
+EOF
+  fi
+
   shims="${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims"
 
   if [ -d "$shims" ]; then
@@ -27,7 +44,7 @@ if command -v mise >/dev/null 2>&1; then
       for shim in "$shims"/*; do
         [ -f "$shim" ] && [ -x "$shim" ] || continue
         name=${shim##*/}
-        managed=$(mise which "$name" 2>/dev/null || true)
+        managed=$("$mise" which "$name" 2>/dev/null || true)
         [ -n "$managed" ] || continue
         for dir in \
           "$HOME/.local/bin" \
@@ -77,7 +94,7 @@ EOF
   # Embed the source lock at render time; it is deliberately not applied home.
   # Balance case patterns inside $(...) for macOS's stock Bash 3.2 parser.
   prunable=$(
-    mise ls --prunable --no-header 2>/dev/null |
+    "$mise" ls --prunable --no-header 2>/dev/null |
       while read -r tool version rest; do
         [ -n "$tool" ] && [ -n "$version" ] || continue
         case "$tool:$version" in
