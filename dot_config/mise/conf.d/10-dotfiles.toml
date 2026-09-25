@@ -25,14 +25,9 @@ npm.package_manager = "bun"
 # This has to live in config rather than in `mup`'s environment: `mise lock`
 # and `mise install` both consult it, and a waiver applied to only the first
 # bumps the lockfile to a version the second (and `chezmoi apply`) refuses.
-minimum_release_age_excludes = [
-  "claude",
-  "codex",
-  "opencode",
-  "pi",
-  "npm:@google/gemini-cli",
-  "npm:@just-every/code",
-]
+minimum_release_age_excludes = ["claude", "codex", "opencode", "pi"]
+
+upgrade.auto_prune = false
 
 [tools]
 
@@ -49,8 +44,6 @@ claude = "latest"
 codex = "latest"
 opencode = "latest"
 pi = "latest"
-"npm:@google/gemini-cli" = "latest"
-"npm:@just-every/code" = "latest"
 
 # --- python tooling ---------------------------------------------------------
 "pipx:black" = "26.5.1"

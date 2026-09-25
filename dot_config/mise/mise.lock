@@ -180,20 +180,10 @@ version = "5.2.1"
 backend = "npm:@doist/todoist-cli"
 specifiers = ["5.2.1"]
 
-[[tools."npm:@google/gemini-cli"]]
-version = "0.61.0"
-backend = "npm:@google/gemini-cli"
-specifiers = ["latest"]
-
 [[tools."npm:@googleworkspace/cli"]]
 version = "0.22.5"
 backend = "npm:@googleworkspace/cli"
 specifiers = ["0.22.5"]
-
-[[tools."npm:@just-every/code"]]
-version = "0.6.192"
-backend = "npm:@just-every/code"
-specifiers = ["latest"]
 
 [[tools."npm:tree-sitter-cli"]]
 version = "0.27.0"
