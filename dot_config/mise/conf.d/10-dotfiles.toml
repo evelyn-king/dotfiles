@@ -66,6 +66,7 @@ pi = "latest"
 # whatever Arch last shipped, which trailed by 5.1.0 to 6.6.1 on usage and
 # 0.26.9 to 0.26.13 on tree-sitter. The system copies stay installed for
 # anything that calls them by absolute path.
+gcloud = "586.0.0"
 gh = "latest"
 herdr = "0.8.2"
 micromamba = "2.9.0-0"
