@@ -37,3 +37,8 @@ darwin-rebuild.sh
 install-omarchy-packages.sh
 .config/hypr/**
 {{- end }}
+
+{{- if ne .chezmoi.os "linux" }}
+.config/systemd/**
+enable-emacs-daemon.sh
+{{- end }}

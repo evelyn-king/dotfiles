@@ -166,6 +166,51 @@ fi
 command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebuild switch --flake {{ printf "%s/nix#macbook" .chezmoi.sourceDir | quote }}'
 {{ end }}
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
+
+{{ if eq .chezmoi.os "linux" -}}
+# Earlier startup files defined `emacs` as an alias. Drop it at top level
+# before the function below is parsed, or re-sourcing this file expands the
+# alias inside the definition.
+unalias emacs 2>/dev/null
+
+# systemd owns the daemon: emacs.service, enabled by
+# run_onchange_after_enable-emacs-daemon.sh. With a local display, frames open
+# graphically so images work, and --no-wait hands the shell back. Over SSH or on
+# a headless host they open in the terminal. --alternate-editor covers a host
+# without a systemd user manager.
+if command -v emacsclient >/dev/null 2>&1; then
+  emacs() {
+    emacsclient -e t >/dev/null 2>&1 ||
+      systemctl --user start emacs.service >/dev/null 2>&1 ||
+      true
+    if [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ] && [ -z "${SSH_CONNECTION:-}" ]; then
+      emacsclient --create-frame --no-wait --alternate-editor="" "$@"
+    else
+      emacsclient --no-window-system --alternate-editor="" "$@"
+    fi
+  }
+
+  # systemd stops Emacs with SIGTERM, which only auto-saves, so modified buffers
+  # are saved first without prompting. A daemon started outside systemd holds
+  # the socket and would make the service fail, so stop that one and wait for
+  # it to release the socket before starting the service.
+  emacs-restart() {
+    local tries=0
+    if systemctl --user is-active --quiet emacs.service; then
+      emacsclient -e '(save-some-buffers t)' >/dev/null 2>&1
+      systemctl --user restart emacs.service
+      return
+    fi
+    if emacsclient -e '(progn (save-some-buffers t) (kill-emacs))' >/dev/null 2>&1; then
+      while emacsclient -e t >/dev/null 2>&1 && [ "$tries" -lt 50 ]; do
+        sleep 0.2
+        tries=$((tries + 1))
+      done
+    fi
+    systemctl --user start emacs.service
+  }
+fi
+{{- else -}}
 command -v emacsclient >/dev/null 2>&1 && alias emacs='emacsclient --no-window-system --alternate-editor=""'
 
 # The daemon has no frame to ask from, so modified buffers are saved without
@@ -183,6 +228,7 @@ if command -v emacsclient >/dev/null 2>&1; then
     command emacs --daemon
   }
 fi
+{{- end }}
 
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza -lh --group-directories-first --icons=auto'
