@@ -360,6 +360,21 @@ url = "https://github.com/astral-sh/uv/releases/download/0.12.10/uv-aarch64-appl
 url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/545034336"
 provenance = "github-attestations"
 
+[[tools.worktrunk]]
+version = "0.79.0"
+backend = "aqua:max-sixty/worktrunk"
+specifiers = ["0.79.0"]
+
+[tools.worktrunk."platforms.linux-x64"]
+checksum = "sha256:b8c190b1d652370ef9f6b8f4694a2d6831b5b22f4b789f047612aad32764c6cf"
+url = "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-x86_64-unknown-linux-musl.tar.xz"
+url_api = "https://api.github.com/repos/max-sixty/worktrunk/releases/assets/577903127"
+
+[tools.worktrunk."platforms.macos-arm64"]
+checksum = "sha256:4d77ec416c3873c1364aa135022303723f9333372f693193537abe74e88aaec1"
+url = "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/max-sixty/worktrunk/releases/assets/577903081"
+
 [[tools.zellij]]
 version = "0.45.1"
 backend = "aqua:zellij-org/zellij"

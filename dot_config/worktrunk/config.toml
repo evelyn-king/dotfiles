@@ -1,0 +1,8 @@
+# Bare clones live at <repo>/.git, so their worktrees go beside it as
+# <repo>/<branch>, main included. Normal clones keep worktrunk's default of a
+# sibling <repo>.<branch> directory.
+#
+# The bare case is detected from repo_path rather than `repo`: a template that
+# reads `repo` makes wt warn on every switch in a bare repo that worktrees will
+# land at <repo>/.git.<branch>, even though this template puts them elsewhere.
+worktree-path = "{{ repo_path }}/../{% if repo_path is not endingwith('/.git') %}{{ repo_path | basename }}.{% endif %}{{ branch | sanitize }}"

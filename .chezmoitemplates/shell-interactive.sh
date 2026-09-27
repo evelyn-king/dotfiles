@@ -73,6 +73,49 @@ if command -v try >/dev/null 2>&1; then
   }
 fi
 
+# worktrunk's `wt` binary cannot change the calling shell's directory, so its
+# init wraps it in a function that follows `wt switch` into the new worktree.
+command -v wt >/dev/null 2>&1 && eval "$(wt config shell init "$__shell")"
+
+# Clone URL as <dir>/.git, bare, and open its default branch as the <dir>/<branch>
+# worktree. A bare clone is set up for serving: it has no fetch refspec, so
+# fetches never move origin/*, and it copies every remote branch as a local
+# branch that nothing updates. Add the refspec, fetch, and keep only the default
+# branch locally, tracking origin; `wt switch` makes others from origin/* fresh.
+if command -v wt >/dev/null 2>&1; then
+  wtclone() {
+    if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+      echo "usage: wtclone <url> [directory]" >&2
+      return 2
+    fi
+    local url="$1" dest="${2:-}" git_dir default branch
+    if [ -z "$dest" ]; then
+      dest="${url%/}"
+      dest="${dest%.git}"
+      dest="${dest##*/}"
+      dest="${dest##*:}"
+    fi
+    if [ -e "$dest" ]; then
+      echo "wtclone: $dest already exists" >&2
+      return 1
+    fi
+    git_dir="$dest/.git"
+
+    git clone --bare "$url" "$git_dir" || return
+    default="$(git --git-dir="$git_dir" symbolic-ref --short HEAD)" || return
+    git --git-dir="$git_dir" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+    git --git-dir="$git_dir" fetch --quiet origin || return
+    git --git-dir="$git_dir" remote set-head origin --auto >/dev/null
+    git --git-dir="$git_dir" for-each-ref --format='%(refname:short)' refs/heads/ |
+      while read -r branch; do
+        [ "$branch" = "$default" ] || git --git-dir="$git_dir" branch --quiet -D "$branch"
+      done
+    git --git-dir="$git_dir" branch --quiet --set-upstream-to="origin/$default" "$default"
+
+    cd "$dest" && wt switch "$default"
+  }
+fi
+
 if command -v fzf >/dev/null 2>&1; then
   # atuin binds Ctrl-R in the prompt block below, so fzf's history widget would
   # be bound here only to be overwritten a few lines later. An empty (but set)
