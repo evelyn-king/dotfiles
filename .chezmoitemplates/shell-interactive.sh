@@ -178,12 +178,41 @@ unalias emacs 2>/dev/null
 # graphically so images work, and --no-wait hands the shell back. Over SSH or on
 # a headless host they open in the terminal. --alternate-editor covers a host
 # without a systemd user manager.
+#
+# The daemon outlives any one shell, so it cannot inherit a usable agent.
+# Each call hands it this shell's SSH_AUTH_SOCK, and the most recent client's
+# agent is the one Magit and TRAMP use.
+#
+# A tmux pane keeps the environment it was created in. tmux refreshes
+# SSH_CONNECTION and SSH_AUTH_SOCK in the session on every attach, so read
+# those instead: a pane made at the desk and reattached over SSH then opens in
+# the terminal with the forwarded agent. "-NAME" means the latest attach
+# removed the variable; an unknown name keeps the pane's own value.
 if command -v emacsclient >/dev/null 2>&1; then
+  __emacs_tmux_env() {
+    local line
+    line=$(tmux show-environment "$1" 2>/dev/null) || return 1
+    case $line in
+    -*) ;;
+    *) printf '%s' "${line#*=}" ;;
+    esac
+  }
+
   emacs() {
-    emacsclient -e t >/dev/null 2>&1 ||
-      systemctl --user start emacs.service >/dev/null 2>&1 ||
-      true
-    if [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ] && [ -z "${SSH_CONNECTION:-}" ]; then
+    local ssh_connection=${SSH_CONNECTION:-} ssh_auth_sock=${SSH_AUTH_SOCK:-} value form=t
+    if [ -n "${TMUX:-}" ]; then
+      value=$(__emacs_tmux_env SSH_CONNECTION) && ssh_connection=$value
+      value=$(__emacs_tmux_env SSH_AUTH_SOCK) && ssh_auth_sock=$value
+    fi
+    if [ -S "$ssh_auth_sock" ]; then
+      value=$(printf '%s' "$ssh_auth_sock" | sed 's/[\\"]/\\&/g')
+      form="(setenv \"SSH_AUTH_SOCK\" \"$value\")"
+    fi
+    emacsclient -e "$form" >/dev/null 2>&1 || {
+      systemctl --user start emacs.service >/dev/null 2>&1 &&
+        emacsclient -e "$form" >/dev/null 2>&1
+    } || true
+    if [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ] && [ -z "$ssh_connection" ]; then
       emacsclient --create-frame --no-wait --alternate-editor="" "$@"
     else
       emacsclient --no-window-system --alternate-editor="" "$@"
