@@ -168,6 +168,22 @@ command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebui
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
 command -v emacsclient >/dev/null 2>&1 && alias emacs='emacsclient --no-window-system --alternate-editor=""'
 
+# The daemon has no frame to ask from, so modified buffers are saved without
+# prompting rather than lost. Wait for the old daemon to release its socket
+# before starting the next, or the new one exits saying one is already running.
+if command -v emacsclient >/dev/null 2>&1; then
+  emacs-restart() {
+    local tries=0
+    if emacsclient -e '(progn (save-some-buffers t) (kill-emacs))' >/dev/null 2>&1; then
+      while emacsclient -e t >/dev/null 2>&1 && [ "$tries" -lt 50 ]; do
+        sleep 0.2
+        tries=$((tries + 1))
+      done
+    fi
+    command emacs --daemon
+  }
+fi
+
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza -lh --group-directories-first --icons=auto'
   alias lsa='ls -a'
