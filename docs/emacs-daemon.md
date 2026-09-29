@@ -43,38 +43,64 @@ calls it first. The Linux changes are all behind
 `.chezmoiignore.tmpl` keeps the systemd files off macOS. Nothing on macOS
 changed.
 
-Test and finish this on a macOS host:
+Probes on a macOS host on 2026-09-27, against the Nix `emacs-macport`
+30.2.50, found:
 
-1. Check that the `emacs-macport` daemon can create GUI frames with images.
-   Start a throwaway daemon so the real one is untouched:
+- The daemon makes GUI frames with images: `(mac t)`. Closing the last GUI
+  frame leaves it running.
+- `emacsclient -c` opens a terminal frame, because macOS has no `DISPLAY`.
+  `--display=Mac` alone works only once a GUI frame exists. `server.el`
+  treats the display as macport only when the selected frame is a `mac`
+  frame, and in a fresh daemon the selected frame is the initial terminal.
+  Passing the window system as a frame parameter works from a fresh daemon:
 
-   ```sh
-   command emacs -Q --fg-daemon=cctest &
-   emacsclient -s cctest -c -n
-   emacsclient -s cctest -e '(list (window-system) (display-images-p))'
-   emacsclient -s cctest -e '(kill-emacs)'
-   ```
+  ```sh
+  emacsclient -c -n --display=Mac -F '((window-system . mac))'
+  ```
 
-   Expect `(mac t)`. Also check that the new frame takes focus and comes to
-   the front, and that closing the last frame leaves the daemon running. If
-   the macport daemon cannot do this reliably, decide whether to keep
-   terminal frames on macOS or change the Emacs package in `nix/flake.nix`.
+- The new frame opens behind the terminal. `select-frame-set-input-focus`
+  does not raise it. Adding `-e '(do-applescript "tell me to activate")'`
+  brought Emacs to the front when only one Emacs was running. With two
+  running, it raised the other one, because it resolves the app by bundle ID.
+  Calling System Events from inside the daemon hung it, probably on an
+  Automation permission prompt, so do not activate that way.
+- `/run/current-system/sw/bin/emacs` is outside the app bundle. A daemon
+  started from it aborts on its first GUI frame with an
+  `NSImageCacheException` from the zero-size app icon. Start it from
+  `/Applications/Nix Apps/Emacs.app/Contents/MacOS/Emacs` instead.
+- That executable restarts itself through `Emacs.sh` and a login shell.
+  `Emacs.sh` does not quote `$0`, so the space in "Nix Apps" prints a
+  harmless `binary operator expected` warning.
+- A launchd job that sources `~/.profile` gets the per-user Darwin `TMPDIR`
+  and the managed PATH. Its socket is under `$TMPDIR/emacs$UID/`, and
+  `emacsclient` finds it with `TMPDIR` inherited or unset. With
+  `TMPDIR=/tmp` it fails, which `shell-env.sh` already corrects in new
+  shells.
+
+Finish this on a macOS host:
+
+1. Recheck focus with a single daemon and nothing else named Emacs running:
+   open a frame with the command above plus the `do-applescript` form, from
+   an unlocked Ghostty window, and confirm Emacs comes to the front. If it
+   does not, decide whether a frame opening behind the terminal is
+   acceptable or keep terminal frames on macOS.
 2. Add a LaunchAgent in place of the systemd unit, for example
    `Library/LaunchAgents/<label>.plist` in the source tree, ignored off
-   macOS. Run `/bin/sh -c '. "$HOME/.profile"; exec emacs --fg-daemon'` for
-   the same reason as the Linux drop-in, with `RunAtLoad` and `KeepAlive`
-   set to restart on failure only. Load it with
+   macOS. Run
+   `/bin/sh -c '. "$HOME/.profile"; exec "/Applications/Nix Apps/Emacs.app/Contents/MacOS/Emacs" --fg-daemon'`,
+   never the `emacs` on PATH. Set `EMACS_REINVOKED_FROM_SHELL=1` in
+   `EnvironmentVariables` so the executable skips its second login shell,
+   and check that the daemon still has the managed PATH; this is untested.
+   Set `RunAtLoad`, and `KeepAlive` to restart on failure only. Load it with
    `launchctl bootstrap gui/$(id -u)` from a `run_onchange_after_` hook, and
    do not kickstart it there.
-3. Confirm that `emacsclient` in a Ghostty shell finds the LaunchAgent's
-   socket. `shell-env.sh` points `TMPDIR` at the per-user Darwin temp
-   directory for this reason. Compare `(expand-file-name server-name
-   server-socket-dir)` in the daemon with where `emacsclient` looks.
-4. Extend the Linux `emacs` function to macOS rather than copying it. macOS
+3. Extend the Linux `emacs` function to macOS rather than copying it. macOS
    has no `DISPLAY`, so treat a session as graphical when `SSH_CONNECTION` is
-   empty. Replace the `systemctl --user` calls with `launchctl kickstart
-   gui/$(id -u)/<label>` for start and `launchctl kickstart -k` for restart.
-   The `SSH_AUTH_SOCK` handoff and the tmux lookup apply unchanged.
-5. Verify from a local Ghostty shell, from a tmux pane reattached over SSH,
+   empty, and open GUI frames with `--display=Mac -F
+   '((window-system . mac))'` and the activation form. Replace the
+   `systemctl --user` calls with `launchctl kickstart gui/$(id -u)/<label>`
+   for start and `launchctl kickstart -k` for restart. The `SSH_AUTH_SOCK`
+   handoff and the tmux lookup apply unchanged.
+4. Verify from a local Ghostty shell, from a tmux pane reattached over SSH,
    and from a plain SSH session. Then update this section to describe macOS
    and remove "pending" from its heading.
