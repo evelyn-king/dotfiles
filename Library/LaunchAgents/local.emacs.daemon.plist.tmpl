@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!--
+  The Emacs daemon, the macOS counterpart of emacs.service on Linux. Loaded by
+  run_onchange_after_load-emacs-agent.sh; the shell's `emacs` and
+  `emacs-restart` start and reload it.
+
+  launchd agents skip shell startup, so the daemon starts through ~/.profile to
+  get the managed PATH and TMPDIR. The profile can end on a false test, so its
+  status must not gate the exec.
+
+  The executable is the one inside the app bundle. The `emacs` on PATH is
+  outside it and aborts on its first GUI frame, loading a zero-size app icon.
+  EMACS_REINVOKED_FROM_SHELL stops the bundle executable from restarting itself
+  through Emacs.sh and a second login shell; ~/.profile already ran.
+
+  KeepAlive restarts it after a crash but not after `kill-emacs`, which exits
+  successfully.
+-->
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>local.emacs.daemon</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/sh</string>
+    <string>-c</string>
+    <string>. "$HOME/.profile"; exec "/Applications/Nix Apps/Emacs.app/Contents/MacOS/Emacs" --fg-daemon</string>
+  </array>
+  <key>EnvironmentVariables</key>
+  <dict>
+    <key>EMACS_REINVOKED_FROM_SHELL</key>
+    <string>1</string>
+  </dict>
+  <key>RunAtLoad</key>
+  <true/>
+  <key>KeepAlive</key>
+  <dict>
+    <key>SuccessfulExit</key>
+    <false/>
+  </dict>
+  <key>ProcessType</key>
+  <string>Interactive</string>
+  <key>StandardOutPath</key>
+  <string>{{ .chezmoi.homeDir }}/Library/Logs/emacs-daemon.log</string>
+  <key>StandardErrorPath</key>
+  <string>{{ .chezmoi.homeDir }}/Library/Logs/emacs-daemon.log</string>
+</dict>
+</plist>

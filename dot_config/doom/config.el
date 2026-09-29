@@ -4,6 +4,12 @@
 
 (setq display-line-numbers-type 'relative)
 
+;; The emoji module's +unicode flag picks the emoji set but leaves emojify
+;; drawing images. Without downloaded images, the first buffer shown in a GUI
+;; frame asks to download them, and the daemon blocks until someone answers.
+;; Draw with the system emoji font instead.
+(setq emojify-display-style 'unicode)
+
 (setq org-directory "~/local-journal/org/")
 
 (add-to-list '+dashboard-menu-sections

@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+# Hand the Emacs daemon to launchd, which starts it at login and restarts it
+# after a crash. Load the agent only when nothing holds the server socket:
+# loading starts the daemon, and a second daemon would exit and be restarted
+# every ten seconds. A loaded agent is never reloaded here, because that would
+# drop open frames. `emacs-restart` saves buffers and switches over.
+#
+# Emacs.app present: {{ if stat "/Applications/Nix Apps/Emacs.app/Contents/MacOS/Emacs" }}yes{{ else }}no{{ end }}
+# agent hash: {{ include "Library/LaunchAgents/local.emacs.daemon.plist.tmpl" | sha256sum }}
+
+set -euo pipefail
+
+label=local.emacs.daemon
+domain=gui/$(id -u)
+plist=$HOME/Library/LaunchAgents/$label.plist
+
+if [ ! -x "/Applications/Nix Apps/Emacs.app/Contents/MacOS/Emacs" ]; then
+  echo "emacs: Emacs.app is not installed yet; not loading $label."
+  exit 0
+fi
+
+if launchctl print "$domain/$label" >/dev/null 2>&1; then
+  echo "emacs: $label is already loaded; run emacs-restart to pick up changes."
+  exit 0
+fi
+
+if command -v emacsclient >/dev/null 2>&1 && emacsclient -e t >/dev/null 2>&1; then
+  echo "emacs: a daemon started outside launchd is running; run emacs-restart to hand it to launchd."
+  exit 0
+fi
+
+launchctl bootstrap "$domain" "$plist"

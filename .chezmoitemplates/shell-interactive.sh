@@ -167,17 +167,25 @@ command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebui
 {{ end }}
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
 
-{{ if eq .chezmoi.os "linux" -}}
 # Earlier startup files defined `emacs` as an alias. Drop it at top level
 # before the function below is parsed, or re-sourcing this file expands the
 # alias inside the definition.
 unalias emacs 2>/dev/null
 
+{{ if eq .chezmoi.os "darwin" -}}
+# launchd owns the daemon: the local.emacs.daemon LaunchAgent, loaded by
+# run_onchange_after_load-emacs-agent.sh. In a local session, frames open
+# graphically so images work, and --no-wait hands the shell back. Over SSH
+# they open in the terminal. macOS has no DISPLAY, so emacsclient must be told
+# the display and window system. The frame opens behind the terminal until
+# Emacs activates itself.
+{{- else -}}
 # systemd owns the daemon: emacs.service, enabled by
 # run_onchange_after_enable-emacs-daemon.sh. With a local display, frames open
 # graphically so images work, and --no-wait hands the shell back. Over SSH or on
 # a headless host they open in the terminal. --alternate-editor covers a host
 # without a systemd user manager.
+{{- end }}
 #
 # The daemon outlives any one shell, so it cannot inherit a usable agent.
 # Each call hands it this shell's SSH_AUTH_SOCK, and the most recent client's
@@ -197,6 +205,51 @@ if command -v emacsclient >/dev/null 2>&1; then
     *) printf '%s' "${line#*=}" ;;
     esac
   }
+{{ if eq .chezmoi.os "darwin" }}
+  # Loading the agent starts it; a loaded agent that has exited needs a
+  # kickstart. launchctl returns before Emacs listens, so wait for the socket.
+  __emacs_start() {
+    local tries=0
+    launchctl bootstrap "gui/$(id -u)" "$HOME/Library/LaunchAgents/local.emacs.daemon.plist" 2>/dev/null ||
+      launchctl kickstart "gui/$(id -u)/local.emacs.daemon" || return
+    until emacsclient -e t >/dev/null 2>&1; do
+      [ "$tries" -lt 150 ] || return 1
+      sleep 0.2
+      tries=$((tries + 1))
+    done
+  }
+
+  __emacs_service_active() {
+    launchctl print "gui/$(id -u)/local.emacs.daemon" >/dev/null 2>&1
+  }
+
+  # Unloading and loading again rereads the plist, which a kickstart does not.
+  # bootout returns before launchd has removed the service, and loading it in
+  # that window fails, so wait until it is gone. Start even if bootout reports
+  # an error, or a hung daemon leaves nothing loaded.
+  __emacs_service_restart() {
+    local tries=0
+    launchctl bootout "gui/$(id -u)/local.emacs.daemon"
+    while { __emacs_service_active || emacsclient -e t >/dev/null 2>&1; } &&
+      [ "$tries" -lt 100 ]; do
+      sleep 0.2
+      tries=$((tries + 1))
+    done
+    __emacs_start
+  }
+{{- else }}
+  __emacs_start() {
+    systemctl --user start emacs.service
+  }
+
+  __emacs_service_active() {
+    systemctl --user is-active --quiet emacs.service
+  }
+
+  __emacs_service_restart() {
+    systemctl --user restart emacs.service
+  }
+{{- end }}
 
   emacs() {
     local ssh_connection=${SSH_CONNECTION:-} ssh_auth_sock=${SSH_AUTH_SOCK:-} value form=t
@@ -209,25 +262,38 @@ if command -v emacsclient >/dev/null 2>&1; then
       form="(setenv \"SSH_AUTH_SOCK\" \"$value\")"
     fi
     emacsclient -e "$form" >/dev/null 2>&1 || {
-      systemctl --user start emacs.service >/dev/null 2>&1 &&
+      __emacs_start >/dev/null 2>&1 &&
         emacsclient -e "$form" >/dev/null 2>&1
     } || true
+{{- if eq .chezmoi.os "darwin" }}
+    # No --alternate-editor: the emacs it would start is the one outside the
+    # app bundle, which cannot open GUI frames.
+    if [ -z "$ssh_connection" ]; then
+      emacsclient --create-frame --no-wait --display=Mac \
+        --frame-parameters='((window-system . mac))' "$@" &&
+        emacsclient -e '(do-applescript "tell me to activate")' >/dev/null
+    else
+      emacsclient --no-window-system "$@"
+    fi
+{{- else }}
     if [ -n "${WAYLAND_DISPLAY:-}${DISPLAY:-}" ] && [ -z "$ssh_connection" ]; then
       emacsclient --create-frame --no-wait --alternate-editor="" "$@"
     else
       emacsclient --no-window-system --alternate-editor="" "$@"
     fi
+{{- end }}
   }
 
-  # systemd stops Emacs with SIGTERM, which only auto-saves, so modified buffers
-  # are saved first without prompting. A daemon started outside systemd holds
-  # the socket and would make the service fail, so stop that one and wait for
-  # it to release the socket before starting the service.
+  # The service manager stops Emacs with SIGTERM, which only auto-saves, so
+  # modified buffers are saved first without prompting. A daemon started
+  # outside the service holds the socket and would make the service fail, so
+  # stop that one and wait for it to release the socket before starting the
+  # service.
   emacs-restart() {
     local tries=0
-    if systemctl --user is-active --quiet emacs.service; then
+    if __emacs_service_active; then
       emacsclient -e '(save-some-buffers t)' >/dev/null 2>&1
-      systemctl --user restart emacs.service
+      __emacs_service_restart
       return
     fi
     if emacsclient -e '(progn (save-some-buffers t) (kill-emacs))' >/dev/null 2>&1; then
@@ -236,28 +302,9 @@ if command -v emacsclient >/dev/null 2>&1; then
         tries=$((tries + 1))
       done
     fi
-    systemctl --user start emacs.service
+    __emacs_start
   }
 fi
-{{- else -}}
-command -v emacsclient >/dev/null 2>&1 && alias emacs='emacsclient --no-window-system --alternate-editor=""'
-
-# The daemon has no frame to ask from, so modified buffers are saved without
-# prompting rather than lost. Wait for the old daemon to release its socket
-# before starting the next, or the new one exits saying one is already running.
-if command -v emacsclient >/dev/null 2>&1; then
-  emacs-restart() {
-    local tries=0
-    if emacsclient -e '(progn (save-some-buffers t) (kill-emacs))' >/dev/null 2>&1; then
-      while emacsclient -e t >/dev/null 2>&1 && [ "$tries" -lt 50 ]; do
-        sleep 0.2
-        tries=$((tries + 1))
-      done
-    fi
-    command emacs --daemon
-  }
-fi
-{{- end }}
 
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza -lh --group-directories-first --icons=auto'

@@ -135,8 +135,8 @@ They share one keymap as far as plain Vim reaches. Neovim is the reference, and
 means changing both files. See [docs/keybindings.md](docs/keybindings.md).
 
 Emacs runs Doom as one daemon. `emacs` opens a GUI frame with a local display
-and a terminal frame over SSH. On Linux systemd owns the daemon, and macOS
-still starts it from the shell. See [docs/emacs-daemon.md](docs/emacs-daemon.md).
+and a terminal frame over SSH. systemd owns the daemon on Linux and launchd on
+macOS. See [docs/emacs-daemon.md](docs/emacs-daemon.md).
 
 Neovim plugin revisions float between hosts. lazy.nvim owns the generated
 `lazy-lock.json`, the repo keeps it untracked, and installations can therefore
