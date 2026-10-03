@@ -17,6 +17,10 @@
 [settings]
 # Project configs can opt into lockfiles; global locks are refreshed explicitly.
 lockfile = true
+# Limit automatic locking and plain `mise lock` to the supported hosts.
+lockfile_platforms = ["linux-x64", "macos-arm64"]
+# Ask gh for keyring-backed credentials instead of only reading hosts.yml.
+github.credential_command = 'gh auth token --hostname "$MISE_CREDENTIAL_HOST"'
 # uv and bun are faster than the pipx/npm defaults.
 npm.package_manager = "bun"
 # mise hides releases younger than a day, which is supply-chain protection

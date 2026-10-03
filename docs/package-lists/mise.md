@@ -19,6 +19,19 @@ declarations to reviewable versions and checksums for `linux-x64` and
 stays `stable`, and rustup resolves that channel when mise installs or updates
 it.
 
+The shared `lockfile_platforms` setting limits automatic locking and plain
+`mise lock` to those targets. `mup` also passes explicit platform flags.
+Mise always includes the current host when using the setting, so running on
+an unsupported host can still add that host's platform.
+
+Mise obtains GitHub credentials through `gh auth token` for the requested host,
+including credentials stored in the system keyring. Sign in on each machine
+with `gh auth login --hostname github.com`. No token is stored in these dotfiles.
+Use `mise token github` to check the selected source with the token masked.
+An existing `MISE_GITHUB_TOKEN`, `GITHUB_API_TOKEN`, or `GITHUB_TOKEN` takes
+precedence over the credential command. Authentication helps with API rate
+limits; connection timeouts may still need separate investigation.
+
 The lock controls the apply hook and `mup` installations. Normal shells read
 the applied declarations without that source-tree lock, so a `latest`
 declaration can select a newer version already installed on the machine. Removing
