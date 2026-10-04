@@ -130,12 +130,11 @@ mdls -name kMDItemAppStoreAdamID -raw /Applications/<name>.app
 
 ## Drift
 
-`run_after_darwin-rebuild.sh.tmpl` compares the running system against the flake
-on every `chezmoi apply` and nags when they differ. It deliberately does not
-activate. `darwin-rebuild switch` requires root, and `chezmoi apply` must never
-escalate.
+Run `dotfiles-doctor` to compare the running system against the flake and
+report differences. Activation remains an explicit `nix-switch` or
+`darwin-rebuild switch` command.
 
-`run_after_tool-drift.sh.tmpl` reports commands that an earlier `PATH` entry
-shadows ahead of `/run/current-system/sw/bin`. It also reports duplicate
-user-installed copies of mise tools, and old mise versions eligible for pruning.
-The check removes nothing.
+The doctor also reports commands that an earlier `PATH` entry shadows ahead
+of `/run/current-system/sw/bin`, duplicate user-installed copies of mise tools,
+and old mise versions eligible for pruning. It removes nothing. Routine
+`chezmoi apply` prints a reminder without running these checks.

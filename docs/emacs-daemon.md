@@ -4,6 +4,11 @@ Every `emacs` command talks to one long-running daemon through `emacsclient`.
 With a local display the frame is graphical, so images, inline plots and PDFs
 work. Over SSH and on headless hosts the frame opens in the terminal.
 
+The shell's `emacs` function delegates to `~/.local/bin/emacs-session open`.
+`emacs-restart` delegates to the same helper's `restart` command. The service
+and client logic lives in `dot_local/bin/executable_emacs-session.tmpl`;
+`command emacs` still invokes the real editor binary.
+
 ## Linux
 
 systemd owns the daemon through the distribution's `emacs.service`. Omarchy's
@@ -16,14 +21,14 @@ Emacs package and Ubuntu's `emacs-common` both install it.
 - `run_onchange_after_enable-emacs-daemon.sh.tmpl` enables the unit. It never
   starts or restarts the daemon, because that would close open frames during
   an apply.
-- The `emacs` function in `.chezmoitemplates/shell-interactive.sh` starts the
-  service if no daemon answers. It opens a GUI frame with `--no-wait` when
+- The `emacs-session` helper starts the service if no daemon answers. It opens
+  a GUI frame with `--no-wait` when
   `WAYLAND_DISPLAY` or `DISPLAY` is set and the session is not SSH, and a
   terminal frame otherwise.
 - The daemon outlives the shells that talk to it, so each `emacs` call sets
   the daemon's `SSH_AUTH_SOCK` to the caller's agent. Magit and TRAMP use the
   agent of the most recent client.
-- Inside tmux, the function reads `SSH_CONNECTION` and `SSH_AUTH_SOCK` from
+- Inside tmux, the helper reads `SSH_CONNECTION` and `SSH_AUTH_SOCK` from
   the tmux session, which tmux updates on every attach, rather than from the
   pane's environment, which keeps the values from when the pane was created.
 - `emacs-restart` saves modified buffers without prompting, then restarts the
@@ -53,12 +58,12 @@ launchd owns the daemon through the `local.emacs.daemon` LaunchAgent,
   the daemon. It skips loading if the agent is already loaded or another
   daemon holds the socket, and prints what to run instead. A second daemon
   would exit and be restarted every ten seconds.
-- The `emacs` function is the Linux one. It treats a session as graphical when
+- The helper also handles macOS. It treats a session as graphical when
   `SSH_CONNECTION` is empty, after the same tmux lookup. macOS has no
   `DISPLAY`, so it passes `--display=Mac -F '((window-system . mac))'`.
   `--display` alone fails on a fresh daemon, because `server.el` recognises
   macport only when the selected frame is already a `mac` frame.
-- A new frame opens behind the terminal, so the function then asks Emacs to
+- A new frame opens behind the terminal, so the helper then asks Emacs to
   activate itself with `(do-applescript "tell me to activate")`. That picks
   the app by bundle ID. If a second Emacs is running, it may raise that one
   instead. Do not use System Events from inside the daemon. It can wait on an

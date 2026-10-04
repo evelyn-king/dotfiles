@@ -23,6 +23,10 @@ per-machine hook in `~/.config/shell`.
 
 Edit the templates, never the rendered files.
 
+`mup`, `emacs-session`, and `emacs-restart` live under `~/.local/bin`.
+The interactive `emacs` function only delegates to `emacs-session open`;
+service management and tool updates run when requested, outside shell startup.
+
 Both interactive shells keep 100,000 history entries. zsh writes to
 `$XDG_STATE_HOME/zsh/history` and appends when a shell exits, so open shells do
 not interleave commands live. Atuin keeps its own searchable database alongside

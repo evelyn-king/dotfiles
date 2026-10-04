@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-# Report tool ownership drift after chezmoi applies. This script only reports;
+# Report tool ownership drift on request. This script only reports;
 # it never removes a tool or changes the active system.
 
 set -u
@@ -20,7 +20,7 @@ is_stock_omarchy_launcher() {
 {{ end }}
 
 # The pinned release from run_before_00-install-mise. Call it by path so an
-# apply from a shell that predates ~/.local/bin still reports against it.
+# command from a shell that predates ~/.local/bin still reports against it.
 mise="$HOME/.local/bin/mise"
 
 if [ -x "$mise" ]; then
@@ -91,20 +91,18 @@ EOF
 
   # Global config can select a newer installed release for "latest" while the
   # apply hook still installs an older locked version. Keep every locked pair.
-  # Embed the source lock at render time; it is deliberately not applied home.
-  # Balance case patterns inside $(...) for macOS's stock Bash 3.2 parser.
+  # Read the current source lock, including updates made by mup since apply.
+  source_dir={{ .chezmoi.sourceDir | quote }}
+  if ! locked=$(chezmoi --source "$source_dir" execute-template \
+    --file "$source_dir/.chezmoitemplates/mise-locked-tools.tmpl"); then
+    echo "dotfiles-doctor: cannot read the source lock; unused versions are unknown." >&2
+    exit 1
+  fi
   prunable=$(
     "$mise" ls --prunable --no-header 2>/dev/null |
       while read -r tool version rest; do
         [ -n "$tool" ] && [ -n "$version" ] || continue
-        case "$tool:$version" in
-{{- $lock := include "dot_config/mise/mise.lock" | fromToml }}
-{{- range $tool, $versions := $lock.tools }}
-{{- range $versions }}
-          ({{ printf "%s:%s" $tool .version | quote }}) continue ;;
-{{- end }}
-{{- end }}
-        esac
+        printf '%s\n' "$locked" | grep -Fxq -- "$tool:$version" && continue
         printf '    %s@%s\n' "$tool" "$version"
       done
   )
@@ -153,4 +151,98 @@ EOF
 fi
 {{- end }}
 
-exit 0
+{{ if eq .chezmoi.os "darwin" }}
+# Compare the active system without activating or installing anything.
+(
+set -euo pipefail
+
+flake={{ printf "%s/nix" .chezmoi.sourceDir | quote }}
+
+command -v darwin-rebuild >/dev/null 2>&1 || exit 0
+
+if [ ! -r /run/current-system/activate ]; then
+  cat >&2 <<EOF
+
+  nix-darwin: no active generation exists yet.
+  Create the first generation with:
+
+    sudo darwin-rebuild switch --flake $flake#macbook
+
+EOF
+  exit 0
+fi
+
+# Compare the independently linked build outputs plus the activation script.
+# Deliberately do not compare `system.outPath`: it embeds
+# system.configurationRevision, the git revision of this whole repo, so every
+# commit would report drift even when nix/ did not change.
+if ! declared=$(nix eval --raw "$flake#darwinConfigurations.macbook" \
+  --apply 'c: let cfg = c.config; in
+    cfg.system.path.outPath + " " +
+    cfg.system.build.etc.outPath + " " +
+    cfg.system.build.applications.outPath + " " +
+    cfg.system.build.fonts.outPath + " " +
+    cfg.system.build.launchd.outPath + " " +
+    cfg.system.build.patches.outPath + " " +
+    builtins.hashString "sha256" cfg.system.activationScripts.script.text'); then
+  echo "nix-darwin: failed to evaluate $flake; drift is unknown." >&2
+  exit 1
+fi
+
+read -r want_sw want_etc want_apps want_fonts want_launchd want_patches want_activate <<<"$declared"
+have_sw=$(readlink /run/current-system/sw || true)
+have_etc=$(readlink /run/current-system/etc || true)
+have_apps=$(readlink /run/current-system/Applications || true)
+have_fonts=$(readlink /run/current-system/Library/Fonts || true)
+have_launchd=$(readlink /run/current-system/Library/LaunchAgents || true)
+have_patches=$(readlink /run/current-system/patches || true)
+
+# The built script replaces @out@ with its own generation path and gains one
+# trailing blank line. Normalize only those generated differences.
+have_activate=$(
+  sed -e 's|^systemConfig=.*$|systemConfig=@out@|' -e '${/^$/d;}' \
+    /run/current-system/activate |
+    shasum -a 256
+)
+have_activate=${have_activate%% *}
+
+drifted=""
+add_drift() {
+  drifted="${drifted:+$drifted, }$1"
+}
+
+if [ "$have_sw" != "$want_sw" ]; then
+  add_drift packages
+fi
+if [ "$have_etc" != "$want_etc/etc" ]; then
+  add_drift /etc
+fi
+if [ "$have_apps" != "$want_apps/Applications" ]; then
+  add_drift applications
+fi
+if [ "$have_fonts" != "$want_fonts/Library/Fonts" ]; then
+  add_drift fonts
+fi
+if [ "$have_launchd" != "$want_launchd/Library/LaunchAgents" ]; then
+  add_drift launchd
+fi
+if [ "$have_patches" != "$want_patches/patches" ]; then
+  add_drift patches
+fi
+if [ "$have_activate" != "$want_activate" ]; then
+  add_drift activation
+fi
+if [ -z "$drifted" ]; then
+  exit 0
+fi
+
+cat >&2 <<EOF
+
+  nix-darwin: the running system differs in $drifted.
+  Activate it when convenient:
+
+    sudo darwin-rebuild switch --flake $flake#macbook
+
+EOF
+)
+{{ end }}

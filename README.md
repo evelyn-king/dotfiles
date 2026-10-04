@@ -41,6 +41,11 @@ cache from a machine you trust. The archive URLs are commit-pinned, and the repo
 relies on HTTPS and GitHub's commit archive endpoint rather than carrying
 checksums for their response bodies.
 
+Run `dotfiles-doctor` after setup or when troubleshooting tool ownership. It
+reports duplicate tools, unused mise versions, and macOS system drift without
+installing or removing anything. Routine applies print a reminder instead of
+running those checks. The doctor reads the current lock from the source tree.
+
 chezmoi renders `~/.config/chezmoi/chezmoi.toml` from `.chezmoi.toml.tmpl` at
 init time, not on every apply. After pulling a change to that template, run
 `chezmoi init` once so the generated config picks it up.
@@ -88,8 +93,9 @@ that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
 mup
 ```
 
-`mup` refreshes the committed `dot_config/mise/mise.lock` for both `linux-x64`
-and `macos-arm64` whichever machine you run it on, then installs what that lock
+`mup`, installed in `~/.local/bin`, refreshes the committed
+`dot_config/mise/mise.lock` for both `linux-x64` and `macos-arm64` whichever
+machine you run it on, then installs what that lock
 holds for the machine you are on. The lock is one shared artifact and
 `mise lock` prunes whatever a run does not resolve, so a refresh scoped to its
 own host would drop the other platform's entries. Review and commit the lockfile

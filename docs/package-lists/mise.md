@@ -123,15 +123,14 @@ means a lock refresh gives the same result whichever host runs it.
 Omarchy's `mise-bin` package stays installed, because Omarchy's own scripts
 call mise. `omarchy update` keeps upgrading it, but `~/.local/bin` precedes
 `/usr/bin` on the managed PATH, so the pinned release is the one that runs.
-Both binaries share the same data directory. The drift hook warns when `mise`
+Both binaries share the same data directory. `dotfiles-doctor` warns when `mise`
 on PATH resolves anywhere other than `~/.local/bin/mise`.
 
-After each apply, `run_after_tool-drift.sh.tmpl` reports duplicate manual
-installs. On Omarchy it ignores audited stock launchers only when their
-location and complete contents match. Modified launchers still produce a
+Run `dotfiles-doctor` to report duplicate manual installs. On Omarchy it ignores
+audited stock launchers only when their location and complete contents match. Modified launchers still produce a
 warning. The managed mise shims precede the stock launchers on PATH.
 
-The hook also reports installed versions that mise considers prunable, excluding
+The doctor also reports installed versions that mise considers prunable, excluding
 every version retained by the source-tree lock. Review those entries and use
 `mise uninstall <tool>@<version>` for each version you choose to remove.
 Avoid blanket `mise prune --tools` cleanup: normal global config can mark a
