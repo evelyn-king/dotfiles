@@ -80,6 +80,8 @@
         llama-cpp
         pandoc
         poppler-utils
+        # Clipboard image paste for Doom's org +dragndrop flag.
+        pngpaste
         tesseract
 
         # --- network and misc ---

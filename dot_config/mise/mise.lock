@@ -264,6 +264,11 @@ version = "0.16.6"
 backend = "pipx:ruff"
 specifiers = ["0.16.6"]
 
+[[tools."pipx:ty"]]
+version = "0.0.84"
+backend = "pipx:ty"
+specifiers = ["0.0.84"]
+
 [[tools."pipx:unidep"]]
 version = "3.4.2"
 backend = "pipx:unidep"

@@ -145,6 +145,12 @@ Emacs runs Doom as one daemon. `emacs` opens a GUI frame with a local display
 and a terminal frame over SSH. systemd owns the daemon on Linux and launchd on
 macOS. See [docs/emacs-daemon.md](docs/emacs-daemon.md).
 
+The daemon never sees a shell's project environment, so Doom reads
+`mise env --json` for each local file buffer instead of using direnv. Python
+buffers then start `ty` through eglot in the project's interpreter, and
+`M-x +format/buffer` formats with Ruff. After changing a project's mise config,
+reopen its buffers to pick up the new environment.
+
 Neovim plugin revisions float between hosts. lazy.nvim owns the generated
 `lazy-lock.json`, the repo keeps it untracked, and installations can therefore
 sit on different plugin revisions.

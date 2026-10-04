@@ -12,7 +12,7 @@ mise:
 
 doom:
   repo: https://github.com/doomemacs/core.git
-  rev: 1404f1bac5a2ae8602b4d861f7805e194c05d28c
+  rev: 01d68aaf6bd7db073365385cd82e1ad7e815295c
 
 plugins:
   vim:
