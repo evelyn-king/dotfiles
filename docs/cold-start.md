@@ -119,8 +119,9 @@ zsh -ic 'bindkey -lL main; printf "KEYTIMEOUT=%s\n" "$KEYTIMEOUT"'
 
 The status and diff commands should print nothing. Excluding scripts checks
 file convergence without listing the hooks that run on every apply. The dry
-run should succeed. `dotfiles-doctor` should print nothing after the activated
-generation matches the flake and any reported tool ownership issues are resolved.
+run should succeed. `dotfiles-doctor` prints progress and an explicit result for each
+check. Resolve any WARN messages and review SKIP messages for checks that could
+not run. Matching configuration should produce OK results.
 
 ## Omarchy 4 x86_64
 

@@ -5,6 +5,13 @@
 
 set -u
 
+printf '%s\n' 'dotfiles-doctor: checking tool ownership and system drift' \
+  'This command reports findings without installing or removing anything.'
+
+check() { printf '\nCHECK %s\n' "$*"; }
+ok() { printf '  OK   %s\n' "$*"; }
+skip() { printf '  SKIP %s\n' "$*"; }
+
 {{- $omarchy := includeTemplate "omarchy-detect.tmpl" . }}
 {{ if $omarchy }}
 is_stock_omarchy_launcher() {
@@ -19,10 +26,11 @@ is_stock_omarchy_launcher() {
 }
 {{ end }}
 
-# The pinned release from run_before_00-install-mise. Call it by path so an
+# The pinned release from run_before_00-install-mise. Call it by path so a
 # command from a shell that predates ~/.local/bin still reports against it.
 mise="$HOME/.local/bin/mise"
 
+check 'Pinned mise on PATH'
 if [ -x "$mise" ]; then
   # Omarchy's /usr/bin/mise stays installed, and macOS keeps the Nix copy until
   # the generation that drops it is active. Both are fine as long as the pinned
@@ -31,12 +39,17 @@ if [ -x "$mise" ]; then
   if [ -n "$resolved" ] && [ "$resolved" != "$mise" ]; then
     cat >&2 <<EOF
 
-  mise: \`mise\` resolves to $resolved rather than the pinned $mise.
+  WARN mise: \`mise\` resolves to $resolved rather than the pinned $mise.
   Check that ~/.local/bin precedes it on PATH in a fresh login shell.
 
 EOF
+  elif [ -z "$resolved" ]; then
+    printf '  WARN mise is installed at %s but is missing from PATH.\n' "$mise" >&2
+  else
+    ok "mise resolves to $mise"
   fi
 
+  check 'Duplicate manual installations of mise tools'
   shims="${XDG_DATA_HOME:-$HOME/.local/share}/mise/shims"
 
   if [ -d "$shims" ]; then
@@ -75,7 +88,7 @@ EOF
     if [ -n "$shadows" ]; then
       cat >&2 <<EOF
 
-  mise: these tools are declared by mise but also installed by hand.
+  WARN mise: these tools are declared by mise but also installed by hand.
   A hand-installed copy can drift from the locked version and may still win
   in shells that do not load the managed PATH.
 
@@ -86,20 +99,29 @@ $shadows
   deleting a symlink by hand.
 
 EOF
+    else
+      ok 'No duplicate manual installations found in the checked tool directories.'
     fi
+  else
+    skip "Shim directory is absent: $shims"
   fi
 
   # Global config can select a newer installed release for "latest" while the
   # apply hook still installs an older locked version. Keep every locked pair.
   # Read the current source lock, including updates made by mup since apply.
+  check 'Unused mise versions, excluding the current source lock'
   source_dir={{ .chezmoi.sourceDir | quote }}
   if ! locked=$(chezmoi --source "$source_dir" execute-template \
     --file "$source_dir/.chezmoitemplates/mise-locked-tools.tmpl"); then
-    echo "dotfiles-doctor: cannot read the source lock; unused versions are unknown." >&2
+    echo "  ERROR cannot read the source lock; unused versions are unknown." >&2
+    exit 1
+  fi
+  if ! installed_prunable=$("$mise" ls --prunable --no-header); then
+    echo '  ERROR mise could not list unused versions; this check is incomplete.' >&2
     exit 1
   fi
   prunable=$(
-    "$mise" ls --prunable --no-header 2>/dev/null |
+    printf '%s\n' "$installed_prunable" |
       while read -r tool version rest; do
         [ -n "$tool" ] && [ -n "$version" ] || continue
         printf '%s\n' "$locked" | grep -Fxq -- "$tool:$version" && continue
@@ -109,7 +131,7 @@ EOF
   if [ -n "$prunable" ]; then
     cat >&2 <<EOF
 
-  mise: these installed versions are unused by tracked config and the source lock:
+  WARN mise: these installed versions are unused by tracked config and the source lock:
 
 $prunable
 
@@ -117,10 +139,16 @@ $prunable
   Avoid a blanket \`mise prune --tools\`: it does not account for the source lock.
 
 EOF
+  else
+    ok 'No unused versions outside the source lock found.'
   fi
+else
+  skip "Pinned mise is absent: $mise. Run chezmoi apply to install it."
+  skip 'Duplicate installation and unused version checks require pinned mise.'
 fi
 
 {{- if eq .chezmoi.os "darwin" }}
+check 'nix-darwin commands shadowed on PATH'
 system_bin=/run/current-system/sw/bin
 if [ -d "$system_bin" ]; then
   system_shadows=$(
@@ -139,7 +167,7 @@ if [ -d "$system_bin" ]; then
   if [ -n "$system_shadows" ]; then
     cat >&2 <<EOF
 
-  nix-darwin: these system commands are shadowed earlier on PATH:
+  WARN nix-darwin: these system commands are shadowed earlier on PATH:
 
 $system_shadows
 
@@ -147,23 +175,31 @@ $system_shadows
   remains available under $system_bin.
 
 EOF
+  else
+    ok 'No nix-darwin commands are shadowed on PATH.'
   fi
+else
+  skip "System command directory is absent: $system_bin"
 fi
 {{- end }}
 
 {{ if eq .chezmoi.os "darwin" }}
 # Compare the active system without activating or installing anything.
+check 'Active nix-darwin generation against the source flake'
 (
 set -euo pipefail
 
 flake={{ printf "%s/nix" .chezmoi.sourceDir | quote }}
 
-command -v darwin-rebuild >/dev/null 2>&1 || exit 0
+if ! command -v darwin-rebuild >/dev/null 2>&1; then
+  skip 'darwin-rebuild is not on PATH; active generation comparison is unavailable.'
+  exit 0
+fi
 
 if [ ! -r /run/current-system/activate ]; then
   cat >&2 <<EOF
 
-  nix-darwin: no active generation exists yet.
+  WARN nix-darwin: no active generation exists yet.
   Create the first generation with:
 
     sudo darwin-rebuild switch --flake $flake#macbook
@@ -185,7 +221,7 @@ if ! declared=$(nix eval --raw "$flake#darwinConfigurations.macbook" \
     cfg.system.build.launchd.outPath + " " +
     cfg.system.build.patches.outPath + " " +
     builtins.hashString "sha256" cfg.system.activationScripts.script.text'); then
-  echo "nix-darwin: failed to evaluate $flake; drift is unknown." >&2
+  echo "  ERROR nix-darwin: failed to evaluate $flake; drift is unknown." >&2
   exit 1
 fi
 
@@ -233,16 +269,25 @@ if [ "$have_activate" != "$want_activate" ]; then
   add_drift activation
 fi
 if [ -z "$drifted" ]; then
+  ok 'The active generation matches the flake across all seven checked components.'
   exit 0
 fi
 
 cat >&2 <<EOF
 
-  nix-darwin: the running system differs in $drifted.
+  WARN nix-darwin: the running system differs in $drifted.
   Activate it when convenient:
 
     sudo darwin-rebuild switch --flake $flake#macbook
 
 EOF
 )
+result=$?
+if [ "$result" -ne 0 ]; then
+  echo 'dotfiles-doctor: system comparison failed; checks are incomplete.' >&2
+  exit "$result"
+fi
+{{ else }}
+skip 'nix-darwin checks apply only to macOS.'
 {{ end }}
+printf '\ndotfiles-doctor: finished. Review any WARN or SKIP messages above.\n'

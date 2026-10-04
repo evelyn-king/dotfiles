@@ -44,7 +44,8 @@ checksums for their response bodies.
 Run `dotfiles-doctor` after setup or when troubleshooting tool ownership. It
 reports duplicate tools, unused mise versions, and macOS system drift without
 installing or removing anything. Routine applies print a reminder instead of
-running those checks. The doctor reads the current lock from the source tree.
+running those checks. The doctor reads the current lock from the source tree
+and prints progress, successful results, warnings, and skipped checks.
 
 chezmoi renders `~/.config/chezmoi/chezmoi.toml` from `.chezmoi.toml.tmpl` at
 init time, not on every apply. After pulling a change to that template, run
