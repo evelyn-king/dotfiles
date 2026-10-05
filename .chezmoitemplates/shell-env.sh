@@ -7,7 +7,8 @@
 # bottom of this file for non-interactive shells that read a managed startup
 # file.
 
-export EDITOR=nvim
+# The first of nvim, vim and vi on PATH; see ~/.local/bin/editor.
+export EDITOR="$HOME/.local/bin/editor"
 export VISUAL=$EDITOR
 
 export XDG_CONFIG_HOME="$HOME/.config"

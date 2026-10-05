@@ -1,0 +1,14 @@
+#!/bin/sh
+# EDITOR, VISUAL and git's core.editor all point here. Picking the editor when
+# one is needed, rather than at shell startup, sees the finished PATH: the env
+# file that sets EDITOR runs before an interactive shell builds PATH, and GUI
+# apps that run git never read shell startup at all.
+
+for editor in nvim vim vi; do
+  if command -v "$editor" >/dev/null 2>&1; then
+    exec "$editor" "$@"
+  fi
+done
+
+echo "editor: none of nvim, vim or vi is installed" >&2
+exit 127
