@@ -37,7 +37,6 @@ unset __use_existing_agent
 
 # --- tool integrations ------------------------------------------------------
 
-command -v direnv >/dev/null 2>&1 && eval "$(direnv hook "$__shell")"
 command -v pixi >/dev/null 2>&1 && eval "$(pixi completion --shell "$__shell")"
 
 # micromamba's shell hook prepends $MAMBA_ROOT_PREFIX/condabin, so it has to run
@@ -196,17 +195,34 @@ if ! command -v open >/dev/null 2>&1 && command -v xdg-open >/dev/null 2>&1; the
   )
 fi
 
-create_direnv_micromamba() {
-  env_name=${1:-${PWD##*/}}
-  env_name_quoted=$(printf '%s' "$env_name" | sed "s/'/'\\\\''/g")
-  printf "layout micromamba '%s'\n" "$env_name_quoted" >.envrc
-  unset env_name env_name_quoted
-  direnv allow .
+# Activate a micromamba environment whenever mise loads this directory. The
+# file is per-machine (globally gitignored), so `mise trust` covers it here.
+create_mise_local_micromamba() {
+  if [ -e mise.local.toml ]; then
+    echo "create_mise_local_micromamba: mise.local.toml already exists" >&2
+    return 1
+  fi
+  environment_name=${1:-${PWD##*/}}
+  cat >mise.local.toml <<EOF
+[env]
+MAMBA_ROOT_PREFIX = "$MAMBA_ROOT_PREFIX"
+MISE_MICROMAMBA_ENV = "$environment_name"
+_.source = "${XDG_CONFIG_HOME:-$HOME/.config}/mise/micromamba-env.sh"
+EOF
+  unset environment_name
+  mise trust mise.local.toml
 }
 
-create_direnv_venv() {
-  echo "source .venv/bin/activate" >.envrc
-  direnv allow .
+create_mise_local_venv() {
+  if [ -e mise.local.toml ]; then
+    echo "create_mise_local_venv: mise.local.toml already exists" >&2
+    return 1
+  fi
+  cat >mise.local.toml <<'EOF'
+[env]
+_.python.venv = ".venv"
+EOF
+  mise trust mise.local.toml
 }
 
 jupyter_remote_load_env() {

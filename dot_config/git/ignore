@@ -1,4 +1,3 @@
-# used for direnv, always ignore
-.envrc
-
 **/.claude/settings.local.json
+**/mise.local.toml
+**/mise.local.lock
