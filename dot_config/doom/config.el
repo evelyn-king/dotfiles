@@ -309,19 +309,6 @@ roam node, fall back to `org-store-link''s link, or nothing."
                :action org-roam-node-find)
              t)
 
-(defun my/dashboard-banner ()
-  "A small banner in place of Doom's full-size logo."
-  (propertize
-   (string-join
-    '("    _"
-      " __| |___  ___ _ __"
-      "/ _` / _ \\/ _ \\ '  \\"
-      "\\__,_\\___/\\___/_|_|_|")
-    "\n")
-   'face '+dashboard-banner))
-
-(setq +dashboard-ascii-banner-fn #'my/dashboard-banner)
-
 ;; Discovery checks exactly DEPTH levels down, and repos here sit at both two
 ;; and three levels (org/repo and org/group/repo), so search both.
 (setq projectile-project-search-path
