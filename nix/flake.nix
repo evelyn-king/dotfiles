@@ -152,7 +152,6 @@
           "notion"
           "obsidian"
           { name = "raindropio"; greedy = true; }
-          "todoist-app"
           "zotero"
 
           # --- communication ---
