@@ -102,7 +102,7 @@
       homebrew = {
         enable = true;
         taps = [ "basnijholt/tap" "nikitabobko/tap" ];
-        # 37 of the 41 casks below set `auto_updates`, so forcing Homebrew to
+        # 35 of the 39 casks below set `auto_updates`, so forcing Homebrew to
         # own every version means fighting each vendor's own updater on a
         # roughly fortnightly cycle, and re-running a pkg installer under sudo
         # for the Microsoft suite, google-drive, onedrive, cloudflare-warp,
@@ -134,7 +134,6 @@
           # --- browsers ---
           "brave-origin"
           "firefox"
-          "google-chrome"
           "zen"
 
           # --- terminals and editors ---
@@ -159,7 +158,6 @@
           # --- communication ---
           "discord"
           "proton-mail"
-          "readdle-spark"
           "signal"
           "zoom"
 
