@@ -1,6 +1,20 @@
 ;;; $DOOMDIR/config.el -*- lexical-binding: t; -*-
 
-(setq doom-theme 'doom-gruvbox)
+;; On Omarchy, follow `omarchy theme set'. themes/doom-omarchy-theme.el builds
+;; its palette from the current Omarchy theme, and
+;; ~/.config/omarchy/hooks/theme-set.d/emacs.sh reloads it in the daemon after
+;; each switch. Elsewhere there is no Omarchy theme to follow.
+(setq doom-theme
+      (if (file-readable-p "~/.local/state/omarchy/current/theme/colors.toml")
+          'doom-omarchy
+        'doom-gruvbox))
+
+(defun +omarchy-reload-theme-h ()
+  "Reload doom-omarchy with the current Omarchy palette.
+Leaves a theme picked by hand with `load-theme' alone. That stacks the new
+theme above doom-omarchy rather than disabling it, so test the topmost one."
+  (when (eq (car custom-enabled-themes) 'doom-omarchy)
+    (load-theme 'doom-omarchy t)))
 
 (setq display-line-numbers-type 'relative)
 
