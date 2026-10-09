@@ -1,0 +1,9 @@
+{{- /* lazy.nvim watches this link's target, so `omarchy theme set` replacing
+       the current theme fires LazyReload and omarchy-theme-hotreload.lua
+       retints running sessions. A plain file here never changes and pins the
+       colorscheme. Shared detection: edit .chezmoitemplates/omarchy-detect.tmpl. */ -}}
+{{- if includeTemplate "omarchy-detect.tmpl" . -}}
+{{ .chezmoi.homeDir }}/.local/state/omarchy/current/theme/neovim.lua
+{{- else -}}
+../themes/gruvbox.lua
+{{- end -}}

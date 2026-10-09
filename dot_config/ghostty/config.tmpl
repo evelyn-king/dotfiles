@@ -3,7 +3,13 @@
 {{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
 # Ghostty config - Evelyn King
 
+{{ if $omarchy -}}
+# Colours follow `omarchy theme set`, which rewrites this file and sends
+# SIGUSR2 to reload it. The `?` keeps a host without a current theme loading.
+config-file = ?"~/.local/state/omarchy/current/theme/ghostty.conf"
+{{- else -}}
 theme = "light:Gruvbox Light,dark:Gruvbox Dark"
+{{- end }}
 
 # First match wins; the rest are fallbacks for hosts missing the primary font.
 # CaskaydiaCove is the macOS primary and is installed by nix/flake.nix. Omarchy

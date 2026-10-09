@@ -38,6 +38,8 @@ load-emacs-agent.sh
 {{- if not $omarchy }}
 install-omarchy-packages.sh
 .config/hypr/**
+# Links into ~/.local/state/omarchy, which only Omarchy writes.
+.config/btop/themes/current.theme
 {{- end }}
 
 {{- if ne .chezmoi.os "linux" }}

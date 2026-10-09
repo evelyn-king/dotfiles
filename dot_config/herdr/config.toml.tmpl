@@ -1,0 +1,22 @@
+{{- /* Shared with .chezmoiignore.tmpl; edit
+       .chezmoitemplates/omarchy-detect.tmpl, not this. */ -}}
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
+# Herdr settings kept explicit across releases.
+onboarding = false
+
+[theme]
+{{- if $omarchy }}
+# Draw with the terminal's palette, which Ghostty takes from the Omarchy theme.
+name = "terminal"
+{{- else }}
+name = "gruvbox"
+{{- end }}
+auto_switch = false
+
+[update]
+channel = "stable"
+version_check = false
+
+[experimental]
+allow_nested = true
+pane_history = false
