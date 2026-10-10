@@ -71,7 +71,7 @@ if (Test-DotfilesCommand claude) {
 }
 
 # Refresh the shared mise lock for every platform, then install what it holds
-# for this machine. Mirrors `mup` in .chezmoitemplates/shell-interactive.sh;
+# for this machine. Mirrors dot_local/bin/executable_mup.tmpl;
 # keep the platform lists in step. The lock lives only in the source tree, which
 # `chezmoi source-path` finds at run time so this file needs no templating.
 if ((Test-DotfilesCommand mise) -and (Test-DotfilesCommand chezmoi)) {

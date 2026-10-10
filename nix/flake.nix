@@ -12,38 +12,7 @@
 
   outputs = inputs@{ self, nix-darwin, ... }:
   let
-    configuration = { pkgs, ... }:
-    let
-      # Follow Omarchy's installed mise release, independently of nixpkgs.
-      # After an Omarchy update, check `mise --version` there and update both
-      # the version and the official macOS archive checksum here.
-      miseOmarchy = pkgs.stdenvNoCC.mkDerivation (finalAttrs: {
-        pname = "mise";
-        version = "2026.9.1";
-        src = pkgs.fetchurl {
-          url = "https://github.com/jdx/mise/releases/download/v${finalAttrs.version}/mise-v${finalAttrs.version}-macos-arm64.tar.gz";
-          hash = "sha256-v+oKtBe0jB6LmUEvyvIM4XQkoyhqh2bX0rAFH+Mh1WU=";
-        };
-        nativeBuildInputs = [ pkgs.installShellFiles ];
-        dontBuild = true;
-        # Preserve the upstream executable and its signature.
-        dontFixup = true;
-        installPhase = ''
-          runHook preInstall
-          install -Dm755 bin/mise "$out/bin/mise"
-          installManPage man/man1/mise.1
-          installShellCompletion --cmd mise \
-            --bash <(bin/mise completion bash) \
-            --fish <(bin/mise completion fish) \
-            --zsh <(bin/mise completion zsh)
-          mkdir -p "$out/lib/mise"
-          touch "$out/lib/mise/.disable-self-update"
-          runHook postInstall
-        '';
-        meta.mainProgram = "mise";
-        meta.platforms = [ "aarch64-darwin" ];
-      });
-    in {
+    configuration = { pkgs, ... }: {
       # Determinate Nix manages the daemon and /etc/nix/nix.conf itself.
       determinateNix.enable = true;
 
@@ -76,10 +45,10 @@
         lazygit
 
         # --- languages, runtimes, package managers ---
-        # Anything managed by mise is deliberately not here
+        # Anything managed by mise is deliberately not here, and neither is
+        # mise itself: run_before_00-install-mise installs the pinned release.
         luarocks
         lua-language-server
-        miseOmarchy
 
         # --- editors ---
         emacs-macport
@@ -110,6 +79,8 @@
         llama-cpp
         pandoc
         poppler-utils
+        # Clipboard image paste for Doom's org +dragndrop flag.
+        pngpaste
         tesseract
 
         # --- network and misc ---
@@ -130,17 +101,17 @@
       # a good fit for the read-only Nix store.
       homebrew = {
         enable = true;
-        taps = [ "nikitabobko/tap" ];
-        # 37 of the 40 casks below set `auto_updates`, so forcing Homebrew to
+        taps = [ "basnijholt/tap" "nikitabobko/tap" ];
+        # 35 of the 39 casks below set `auto_updates`, so forcing Homebrew to
         # own every version means fighting each vendor's own updater on a
         # roughly fortnightly cycle, and re-running a pkg installer under sudo
         # for the Microsoft suite, google-drive, onedrive, cloudflare-warp,
         # tailscale-app, zoom and the Logitech pair. Let the apps update
         # themselves instead, and opt individual casks back in below.
         #
-        # This does not stop `upgrade = true` from upgrading the three casks
-        # that do not self-update (aerospace, basictex, dot); non-greedy
-        # `brew upgrade` already covers those.
+        # This does not stop `upgrade = true` from upgrading the four casks
+        # that do not self-update (aerospace, agent-cli, basictex, dot);
+        # non-greedy `brew upgrade` already covers those.
         #
         # Recount both numbers after adding or removing a cask:
         #   brew info --json=v2 --cask <tokens...> \
@@ -163,7 +134,6 @@
           # --- browsers ---
           "brave-origin"
           "firefox"
-          "google-chrome"
           "zen"
 
           # --- terminals and editors ---
@@ -173,6 +143,7 @@
           "zed"
 
           # --- AI assistants ---
+          "basnijholt/tap/agent-cli"
           "chatgpt"
           "claude"
 
@@ -181,13 +152,11 @@
           "notion"
           "obsidian"
           { name = "raindropio"; greedy = true; }
-          "todoist-app"
           "zotero"
 
           # --- communication ---
           "discord"
           "proton-mail"
-          "readdle-spark"
           "signal"
           "zoom"
 

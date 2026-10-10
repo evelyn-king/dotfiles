@@ -17,6 +17,10 @@
 [settings]
 # Project configs can opt into lockfiles; global locks are refreshed explicitly.
 lockfile = true
+# Limit automatic locking and plain `mise lock` to the supported hosts.
+lockfile_platforms = ["linux-x64", "macos-arm64"]
+# Ask gh for keyring-backed credentials instead of only reading hosts.yml.
+github.credential_command = 'gh auth token --hostname "$MISE_CREDENTIAL_HOST"'
 # uv and bun are faster than the pipx/npm defaults.
 npm.package_manager = "bun"
 # mise hides releases younger than a day, which is supply-chain protection
@@ -25,14 +29,9 @@ npm.package_manager = "bun"
 # This has to live in config rather than in `mup`'s environment: `mise lock`
 # and `mise install` both consult it, and a waiver applied to only the first
 # bumps the lockfile to a version the second (and `chezmoi apply`) refuses.
-minimum_release_age_excludes = [
-  "claude",
-  "codex",
-  "opencode",
-  "pi",
-  "npm:@google/gemini-cli",
-  "npm:@just-every/code",
-]
+minimum_release_age_excludes = ["claude", "codex", "opencode", "pi"]
+
+upgrade.auto_prune = false
 
 [tools]
 
@@ -49,8 +48,6 @@ claude = "latest"
 codex = "latest"
 opencode = "latest"
 pi = "latest"
-"npm:@google/gemini-cli" = "latest"
-"npm:@just-every/code" = "latest"
 
 # --- python tooling ---------------------------------------------------------
 "pipx:black" = "26.5.1"
@@ -58,11 +55,11 @@ pi = "latest"
 "pipx:conda-package-handling" = "2.6.0"
 "pipx:mypy" = "2.3.1"
 "pipx:ruff" = "0.16.6"
+"pipx:ty" = "0.0.84"
 "pipx:unidep" = { version = "3.4.2", uvx_args = "--with unidep[all]" }
 "pipx:pre-commit" = { version = "4.6.2", uvx_args = "--with pre-commit-uv" }
 
 # --- javascript tooling -----------------------------------------------------
-"npm:@doist/todoist-cli" = "5.2.1"
 "npm:@googleworkspace/cli" = "0.22.5"
 "npm:tree-sitter-cli" = "0.27.0"
 
@@ -73,6 +70,7 @@ pi = "latest"
 # whatever Arch last shipped, which trailed by 5.1.0 to 6.6.1 on usage and
 # 0.26.9 to 0.26.13 on tree-sitter. The system copies stay installed for
 # anything that calls them by absolute path.
+gcloud = "586.0.0"
 gh = "latest"
 herdr = "0.8.2"
 micromamba = "2.9.0-0"

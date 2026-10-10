@@ -23,6 +23,7 @@
        (evil +everywhere)
        file-templates
        fold
+       format
        snippets
        (whitespace +guess +trim)
 
@@ -45,6 +46,7 @@
        ein
        (eval +overlay)
        lookup
+       (lsp +eglot)
        magit
 {{ if not (includeTemplate "ubuntu-detect.tmpl" .) }}       pdf
 {{ end }}       tmux
@@ -60,8 +62,8 @@
        javascript
        lua
        markdown
-       org
-       python
+       (org +roam +dragndrop)
+       (python +lsp)
        sh
        yaml
 

@@ -1,0 +1,15 @@
+# agent-cli configuration, managed by chezmoi. Edit the source copy in
+# dot_config/agent-cli/config.toml, not ~/.config/agent-cli/config.toml.
+#
+# Command-line flags override anything set here. `agent-cli config init`
+# writes a fully commented template; copy the keys you need from it rather
+# than letting it overwrite this file.
+
+# [defaults]
+# llm_provider = "ollama"
+# asr_provider = "wyoming"
+# tts_provider = "wyoming"
+
+# [defaults.llm_ollama]
+# model = "gemma3:4b"
+# host = "http://localhost:11434"

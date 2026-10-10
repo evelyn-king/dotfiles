@@ -1,0 +1,5 @@
+{{- range $tool, $versions := (include "dot_config/mise/mise.lock" | fromToml).tools -}}
+{{- range $versions -}}
+{{ printf "%s:%s\n" $tool .version -}}
+{{- end -}}
+{{- end -}}

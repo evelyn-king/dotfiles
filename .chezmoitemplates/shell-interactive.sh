@@ -72,6 +72,49 @@ if command -v try >/dev/null 2>&1; then
   }
 fi
 
+# worktrunk's `wt` binary cannot change the calling shell's directory, so its
+# init wraps it in a function that follows `wt switch` into the new worktree.
+command -v wt >/dev/null 2>&1 && eval "$(wt config shell init "$__shell")"
+
+# Clone URL as <dir>/.git, bare, and open its default branch as the <dir>/<branch>
+# worktree. A bare clone is set up for serving: it has no fetch refspec, so
+# fetches never move origin/*, and it copies every remote branch as a local
+# branch that nothing updates. Add the refspec, fetch, and keep only the default
+# branch locally, tracking origin; `wt switch` makes others from origin/* fresh.
+if command -v wt >/dev/null 2>&1; then
+  wtclone() {
+    if [ $# -lt 1 ] || [ $# -gt 2 ]; then
+      echo "usage: wtclone <url> [directory]" >&2
+      return 2
+    fi
+    local url="$1" dest="${2:-}" git_dir default branch
+    if [ -z "$dest" ]; then
+      dest="${url%/}"
+      dest="${dest%.git}"
+      dest="${dest##*/}"
+      dest="${dest##*:}"
+    fi
+    if [ -e "$dest" ]; then
+      echo "wtclone: $dest already exists" >&2
+      return 1
+    fi
+    git_dir="$dest/.git"
+
+    git clone --bare "$url" "$git_dir" || return
+    default="$(git --git-dir="$git_dir" symbolic-ref --short HEAD)" || return
+    git --git-dir="$git_dir" config remote.origin.fetch '+refs/heads/*:refs/remotes/origin/*'
+    git --git-dir="$git_dir" fetch --quiet origin || return
+    git --git-dir="$git_dir" remote set-head origin --auto >/dev/null
+    git --git-dir="$git_dir" for-each-ref --format='%(refname:short)' refs/heads/ |
+      while read -r branch; do
+        [ "$branch" = "$default" ] || git --git-dir="$git_dir" branch --quiet -D "$branch"
+      done
+    git --git-dir="$git_dir" branch --quiet --set-upstream-to="origin/$default" "$default"
+
+    cd "$dest" && wt switch "$default"
+  }
+fi
+
 if command -v fzf >/dev/null 2>&1; then
   # atuin binds Ctrl-R in the prompt block below, so fzf's history widget would
   # be bound here only to be overwritten a few lines later. An empty (but set)
@@ -91,40 +134,20 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 
-# The coding agents in ~/.config/mise/conf.d/10-dotfiles.toml sit at "latest",
-# but `mise upgrade` skips global config, so `mup` is what moves them. The
-# new-release cooldown is waived for those agents by minimum_release_age_excludes
-# in that file, so the lock and the install agree on which versions exist.
-#
-# The committed lock is one cross-platform artifact and the source tree holds the
-# only copy, so refreshing it is not a per-machine job: every run resolves every
-# declared tool for all three target platforms, whichever machine it runs on.
-# Scoping a run to its own host is what makes it destructive, because `mise lock`
-# prunes whatever that run did not resolve, taking the other platforms' artifacts
-# with it. All supported hosts declare the same tools, so any one can refresh the
-# lock the others install from. Native Windows (the `windows` branch) has its own
-# copy of this function in its PowerShell profile; keep the platform lists in
-# step.
-if command -v mise >/dev/null 2>&1; then
-  mup() {
-    local mise_config_dir={{ printf "%s/dot_config/mise" .chezmoi.sourceDir | quote }}
-
-    MISE_CONFIG_DIR="$mise_config_dir" \
-      mise --cd / lock --global --platform linux-x64 --platform macos-arm64 --platform windows-x64 --bump || return
-
-    MISE_CONFIG_DIR="$mise_config_dir" mise --cd / bootstrap --only tools --locked
-  }
-fi
 {{ if eq .chezmoi.os "darwin" }}
-# The counterpart to the drift check in run_after_darwin-rebuild.sh: that script
-# only nags, because `chezmoi apply` must not escalate. This is the explicit
-# command it tells you to run. The flake path is fixed at apply time from the
-# source tree the alias was rendered from, so it keeps pointing at this repo
-# from any directory.
+# Activate the system explicitly; dotfiles-doctor reports drift on request.
+# The flake path is fixed at apply time so this works from any directory.
 command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebuild switch --flake {{ printf "%s/nix#macbook" .chezmoi.sourceDir | quote }}'
 {{ end }}
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
-command -v emacsclient >/dev/null 2>&1 && alias emacs='emacsclient --no-window-system --alternate-editor=""'
+
+# Keep `command emacs` available for the real editor binary.
+unalias emacs 2>/dev/null
+if command -v emacsclient >/dev/null 2>&1; then
+  emacs() {
+    "$HOME/.local/bin/emacs-session" open "$@"
+  }
+fi
 
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza -lh --group-directories-first --icons=auto'
@@ -171,6 +194,36 @@ if ! command -v open >/dev/null 2>&1 && command -v xdg-open >/dev/null 2>&1; the
     xdg-open "$@" >/dev/null 2>&1 &
   )
 fi
+
+# Activate a micromamba environment whenever mise loads this directory. The
+# file is per-machine (globally gitignored), so `mise trust` covers it here.
+create_mise_local_micromamba() {
+  if [ -e mise.local.toml ]; then
+    echo "create_mise_local_micromamba: mise.local.toml already exists" >&2
+    return 1
+  fi
+  environment_name=${1:-${PWD##*/}}
+  cat >mise.local.toml <<EOF
+[env]
+MAMBA_ROOT_PREFIX = "$MAMBA_ROOT_PREFIX"
+MISE_MICROMAMBA_ENV = "$environment_name"
+_.source = "${XDG_CONFIG_HOME:-$HOME/.config}/mise/micromamba-env.sh"
+EOF
+  unset environment_name
+  mise trust mise.local.toml
+}
+
+create_mise_local_venv() {
+  if [ -e mise.local.toml ]; then
+    echo "create_mise_local_venv: mise.local.toml already exists" >&2
+    return 1
+  fi
+  cat >mise.local.toml <<'EOF'
+[env]
+_.python.venv = ".venv"
+EOF
+  mise trust mise.local.toml
+}
 
 jupyter_remote_load_env() {
   env_file=${1:-$JUPYTER_REMOTE_ENV_FILE}

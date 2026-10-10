@@ -76,44 +76,44 @@ checksum = "sha256:b929c54a9badb104a16dedd23aab6152c86793ae653d4e6b13983ffd0c882
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-windows-x64-baseline.zip"
 
 [[tools.claude]]
-version = "2.1.296"
+version = "2.1.295"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools.claude."platforms.linux-x64"]
-checksum = "sha256:45fe2b33f5cbdd114309618970bcd90b8b163e34252d66cf100d7e068d9b831d"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.296/claude-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/625598991"
+checksum = "sha256:cf9cfb714ded1f27c1d3b7fb274faef50d72312c4b14525a74659188f59bd8b1"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.295/claude-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/622631007"
 
 [tools.claude."platforms.macos-arm64"]
-checksum = "sha256:60f97cde7f7e078b424138e34ecf1ad620bd81ac3866984fb8996623a36a052e"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.296/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/625598716"
+checksum = "sha256:dfbbe96007c69d7bc8631c5f4d7596e960cb0962f8d13efea7d4239f4caa3917"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.295/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/622630668"
 
 [tools.claude."platforms.windows-x64"]
-checksum = "sha256:bfdc634f3de0f1579180f7fcde0477610450420fe9f44d7c836812cf7ae7c0de"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.296/claude-win32-x64.zip"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/625599016"
+checksum = "sha256:3f8ce0f5dcf243d652f57c0ba3aa2da3bceda5c1cab819357c259954dc2fbf18"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.295/claude-win32-x64.zip"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/622631050"
 
 [[tools.codex]]
-version = "0.162.1"
+version = "0.162.0"
 backend = "aqua:openai/codex"
 specifiers = ["latest"]
 
 [tools.codex."platforms.linux-x64"]
-checksum = "sha256:a676f5722aae0d86cbe3764332f08eab1fdd89dc0a300b3ad4ffbf48611fa3e3"
-url = "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/625965833"
+checksum = "sha256:4f573944c1d2059109d75a2f4d0cc9c03697288224a5e407717a9de98fc010c5"
+url = "https://github.com/openai/codex/releases/download/rust-v0.162.0/codex-package-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/622683980"
 
 [tools.codex."platforms.macos-arm64"]
-checksum = "sha256:88e37ccddf5a0f4ea9dc1be13c66a2a94f9c2d1a04f3ace9053d71b3939e885d"
-url = "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/625989262"
+checksum = "sha256:5809ee90a9c3b59d438bb2663aefa0b43d86f825438b65d4504b31f82343628b"
+url = "https://github.com/openai/codex/releases/download/rust-v0.162.0/codex-package-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/622712254"
 
 [tools.codex."platforms.windows-x64"]
-checksum = "sha256:3e993a82ff393f4530558dcaadb36bb4f0fd1ea7243e621348e40b469f900f6a"
-url = "https://github.com/openai/codex/releases/download/rust-v0.162.1/codex-package-x86_64-pc-windows-msvc.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/625969756"
+checksum = "sha256:10450400524611cc28ffe1a0f1fb80c48e675c485a080cfb949592a719f04e42"
+url = "https://github.com/openai/codex/releases/download/rust-v0.162.0/codex-package-x86_64-pc-windows-msvc.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/622689581"
 
 [[tools.fd]]
 version = "10.5.0"
@@ -134,6 +134,20 @@ url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530481346"
 checksum = "sha256:a227701b8551c35a9931d9f6da75503cf86d88e182d71fb849a70864c5d57cd7"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530482901"
+
+[[tools.gcloud]]
+version = "586.0.0"
+backend = "vfox:mise-plugins/vfox-gcloud"
+specifiers = ["586.0.0"]
+
+[tools.gcloud."platforms.linux-x64"]
+url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-linux-x86_64.tar.gz"
+
+[tools.gcloud."platforms.macos-arm64"]
+url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-darwin-arm.tar.gz"
+
+[tools.gcloud."platforms.windows-x64"]
+url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-windows-x86_64-bundled-python.zip"
 
 [[tools.gh]]
 version = "2.102.0"
@@ -232,25 +246,10 @@ url = "https://nodejs.org/dist/v26.8.1/node-v26.8.1-darwin-arm64.tar.gz"
 checksum = "sha256:57693d8e93d1b04e7b7de46aca53ecd63e97564e73de36a68428d7ff08d83587"
 url = "https://nodejs.org/dist/v26.8.1/node-v26.8.1-win-x64.zip"
 
-[[tools."npm:@doist/todoist-cli"]]
-version = "5.2.1"
-backend = "npm:@doist/todoist-cli"
-specifiers = ["5.2.1"]
-
-[[tools."npm:@google/gemini-cli"]]
-version = "0.63.0"
-backend = "npm:@google/gemini-cli"
-specifiers = ["latest"]
-
 [[tools."npm:@googleworkspace/cli"]]
 version = "0.22.5"
 backend = "npm:@googleworkspace/cli"
 specifiers = ["0.22.5"]
-
-[[tools."npm:@just-every/code"]]
-version = "0.6.196"
-backend = "npm:@just-every/code"
-specifiers = ["latest"]
 
 [[tools."npm:tree-sitter-cli"]]
 version = "0.27.0"
@@ -329,6 +328,11 @@ uvx_args = "--with pre-commit-uv"
 version = "0.16.6"
 backend = "pipx:ruff"
 specifiers = ["0.16.6"]
+
+[[tools."pipx:ty"]]
+version = "0.0.84"
+backend = "pipx:ty"
+specifiers = ["0.0.84"]
 
 [[tools."pipx:unidep"]]
 version = "3.4.2"
@@ -452,6 +456,26 @@ checksum = "sha256:f65744f94072152b1f86ba2aace4d01f1124d9a8ecb235805039e3718c36c
 url = "https://github.com/astral-sh/uv/releases/download/0.12.10/uv-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/545034461"
 provenance = "github-attestations"
+
+[[tools.worktrunk]]
+version = "0.79.0"
+backend = "aqua:max-sixty/worktrunk"
+specifiers = ["0.79.0"]
+
+[tools.worktrunk."platforms.linux-x64"]
+checksum = "sha256:b8c190b1d652370ef9f6b8f4694a2d6831b5b22f4b789f047612aad32764c6cf"
+url = "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-x86_64-unknown-linux-musl.tar.xz"
+url_api = "https://api.github.com/repos/max-sixty/worktrunk/releases/assets/577903127"
+
+[tools.worktrunk."platforms.macos-arm64"]
+checksum = "sha256:4d77ec416c3873c1364aa135022303723f9333372f693193537abe74e88aaec1"
+url = "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-aarch64-apple-darwin.tar.xz"
+url_api = "https://api.github.com/repos/max-sixty/worktrunk/releases/assets/577903081"
+
+[tools.worktrunk."platforms.windows-x64"]
+checksum = "sha256:245e14b7e924651adeb6e9a9ff22b83747bd5638f160d99ce9c671282868c9bc"
+url = "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/max-sixty/worktrunk/releases/assets/577903125"
 
 [[tools.zellij]]
 version = "0.45.1"

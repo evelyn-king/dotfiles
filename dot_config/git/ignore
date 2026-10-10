@@ -2,3 +2,5 @@
 .envrc
 
 **/.claude/settings.local.json
+**/mise.local.toml
+**/mise.local.lock

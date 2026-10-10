@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+
+# Hand the Emacs daemon to systemd, which starts it at login and restarts it
+# after a crash. Only enable it: starting it here would race a daemon that a
+# shell already started, and restarting one would drop open frames. The shell's
+# `emacs` starts the service on demand and `emacs-restart` switches over.
+#
+# Emacs executable: {{ lookPath "emacs" | quote }}
+# drop-in hash: {{ include "dot_config/systemd/user/emacs.service.d/shell-environment.conf" | sha256sum }}
+
+set -euo pipefail
+
+if ! command -v systemctl >/dev/null 2>&1 ||
+  ! systemctl --user show-environment >/dev/null 2>&1; then
+  echo "emacs: no systemd user manager; not enabling emacs.service."
+  exit 0
+fi
+
+systemctl --user daemon-reload
+
+if ! systemctl --user cat emacs.service >/dev/null 2>&1; then
+  echo "emacs: emacs.service is not installed; not enabling it."
+  exit 0
+fi
+
+systemctl --user enable emacs.service

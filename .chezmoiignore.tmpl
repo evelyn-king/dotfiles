@@ -30,12 +30,23 @@ nix
 
 {{- if ne .chezmoi.os "darwin" }}
 .config/aerospace
-darwin-rebuild.sh
+.config/agent-cli/config.toml
+Library/LaunchAgents/local.emacs.daemon.plist
+load-emacs-agent.sh
 {{- end }}
 
 {{- if not $omarchy }}
 install-omarchy-packages.sh
 .config/hypr/**
+# Links into ~/.local/state/omarchy, which only Omarchy writes.
+.config/btop/themes/current.theme
+# Hooks `omarchy theme set` and friends run.
+.config/omarchy/**
+{{- end }}
+
+{{- if ne .chezmoi.os "linux" }}
+.config/systemd/**
+enable-emacs-daemon.sh
 {{- end }}
 
 {{- if ne .chezmoi.os "windows" }}
@@ -56,7 +67,8 @@ setup-doom-emacs.sh
 # associated interpreter, so the script fails to fork/exec outright rather
 # than just misbehaving. mise-install.sh has a PowerShell counterpart,
 # run_onchange_after_mise-install.ps1.tmpl; see AGENTS.md.
-tool-drift.sh
+00-install-mise.sh
+dotfiles-doctor-reminder.sh
 mise-install.sh
 trust-local-projects-mise.sh
 10-migrate-retired-configs.sh

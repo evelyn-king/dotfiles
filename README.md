@@ -41,6 +41,12 @@ cache from a machine you trust. The archive URLs are commit-pinned, and the repo
 relies on HTTPS and GitHub's commit archive endpoint rather than carrying
 checksums for their response bodies.
 
+Run `dotfiles-doctor` after setup or when troubleshooting tool ownership. It
+reports duplicate tools, unused mise versions, and macOS system drift without
+installing or removing anything. Routine applies print a reminder instead of
+running those checks. The doctor reads the current lock from the source tree
+and prints progress, successful results, warnings, and skipped checks.
+
 chezmoi renders `~/.config/chezmoi/chezmoi.toml` from `.chezmoi.toml.tmpl` at
 init time, not on every apply. After pulling a change to that template, run
 `chezmoi init` once so the generated config picks it up.
@@ -88,14 +94,14 @@ that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
 mup
 ```
 
-`mup` refreshes the committed `dot_config/mise/mise.lock` for `linux-x64`,
-`macos-arm64` and `windows-x64` whichever machine you run it on, then installs
-what that lock holds for the machine you are on. The lock is one shared artifact
-and `mise lock` prunes whatever a run does not resolve, so a refresh scoped to
-its own host would drop the other platforms' entries. Review and commit the
-lockfile change afterwards. Rust is the one channel-based exception. Its lock
-entry stays `stable`, and rustup resolves that channel when mise installs or
-updates it.
+`mup`, installed in `~/.local/bin`, refreshes the committed
+`dot_config/mise/mise.lock` for `linux-x64`, `macos-arm64` and `windows-x64`
+whichever machine you run it on, then installs what that lock holds for the
+machine you are on. The lock is one shared artifact and `mise lock` prunes
+whatever a run does not resolve, so a refresh scoped to its own host would drop
+the other platforms' entries. Review and commit the lockfile change afterwards.
+Rust is the one channel-based exception. Its lock entry stays `stable`, and
+rustup resolves that channel when mise installs or updates it.
 
 Like `nix/flake.lock`, that lock is repo content rather than a home file. mise
 rewrites a lock in place whenever it installs, so an applied second copy under
@@ -105,23 +111,12 @@ and `mup` and the install script both reach it by setting `MISE_CONFIG_DIR`.
 The applied `conf.d` files still drive the interactive shell's own tool
 resolution.
 
-The platform package manager owns the mise binary on macOS and Omarchy. On macOS, update the Nix
-flake inputs and activate the new generation:
-
-```bash
-nix flake update --flake "$(chezmoi source-path)/nix"
-nix-switch
-```
-
-On Omarchy, the normal system update updates its `mise-bin` package:
-
-```bash
-omarchy update
-```
-
-Ubuntu uses the upstream user installation of mise. Update it with
-`mise self-update`; the bootstrap command requires a release with package
-bootstrap support.
+The mise binary is pinned in `.chezmoidata/versions.yaml` and installed into
+`~/.local/bin` on every host by `run_before_00-install-mise.sh.tmpl`. Bump the
+version and both checksums there, then apply on each host. Omarchy's own
+`mise-bin` package stays installed, but the pinned copy is the one that runs.
+`mise self-update` is disabled. See
+[docs/package-lists/mise.md](docs/package-lists/mise.md#installation-and-updates).
 
 ## Shell
 
@@ -145,6 +140,16 @@ Neovim runs LazyVim; Vim runs a short `.vimrc` plus six pinned pack plugins.
 They share one keymap as far as plain Vim reaches. Neovim is the reference, and
 `dot_vim/plugin/keymaps.vim` mirrors LazyVim's defaults, so changing a binding
 means changing both files. See [docs/keybindings.md](docs/keybindings.md).
+
+Emacs runs Doom as one daemon. `emacs` opens a GUI frame with a local display
+and a terminal frame over SSH. systemd owns the daemon on Linux and launchd on
+macOS. See [docs/emacs-daemon.md](docs/emacs-daemon.md).
+
+The daemon never sees a shell's project environment, so Doom reads
+`mise env --json` for each local file buffer instead of using direnv. Python
+buffers then start `ty` through eglot in the project's interpreter, and
+`M-x +format/buffer` formats with Ruff. After changing a project's mise config,
+reopen its buffers to pick up the new environment.
 
 Neovim plugin revisions float between hosts. lazy.nvim owns the generated
 `lazy-lock.json`, the repo keeps it untracked, and installations can therefore

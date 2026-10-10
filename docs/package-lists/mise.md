@@ -19,6 +19,19 @@ declarations to reviewable versions and checksums for `linux-x64`,
 The Rust entry stays `stable`, and rustup resolves that channel when mise
 installs or updates it.
 
+The shared `lockfile_platforms` setting limits automatic locking and plain
+`mise lock` to those targets. `mup` also passes explicit platform flags.
+Mise always includes the current host when using the setting, so running on
+an unsupported host can still add that host's platform.
+
+Mise obtains GitHub credentials through `gh auth token` for the requested host,
+including credentials stored in the system keyring. Sign in on each machine
+with `gh auth login --hostname github.com`. No token is stored in these dotfiles.
+Use `mise token github` to check the selected source with the token masked.
+An existing `MISE_GITHUB_TOKEN`, `GITHUB_API_TOKEN`, or `GITHUB_TOKEN` takes
+precedence over the credential command. Authentication helps with API rate
+limits; connection timeouts may still need separate investigation.
+
 The lock controls the apply hook and `mup` installations. Normal shells read
 the applied declarations without that source-tree lock, so a `latest`
 declaration can select a newer version already installed on the machine. Removing
@@ -97,23 +110,32 @@ records outright. On native Windows (the `windows` branch), `mup` is a
 PowerShell function in the managed profile with the same platform list. Review
 and commit the resulting `dot_config/mise/mise.lock` change.
 
-`mup` does not update the mise binary. Omarchy owns it through `mise-bin`, which
-the normal `omarchy update` updates. macOS follows that installed release through
-the explicit version and official archive checksum in `nix/flake.nix`. Nix owns
-the macOS installation and disables self-updates; updating flake inputs does not
-move this pin. After updating Omarchy, check `mise --version` there, update the
-macOS version and checksum to match, and run `nix-switch`. Check `mise --version`
-on both hosts before refreshing the shared tool lock. This pin matches a checked
-Omarchy release; it does not automatically track later Omarchy updates. Ubuntu
-uses the upstream user installation, updated with `mise self-update`. Check
-its version too before refreshing the shared lock.
+`mup` does not update the mise binary. Every host runs the same upstream
+release, pinned by version and per-platform tarball checksum under `mise` in
+[`.chezmoidata/versions.yaml`](../../.chezmoidata/versions.yaml).
+`run_before_00-install-mise.sh.tmpl` runs before every other hook on each
+apply. When `~/.local/bin/mise` reports a different version, it downloads the
+pinned tarball, verifies its checksum, and installs the binary, man page and
+zsh and bash completions. It also installs mise's self-update instructions
+file, which disables `mise self-update` and points at the pin. The other hooks
+call `~/.local/bin/mise` by path.
 
-After each apply, `run_after_tool-drift.sh.tmpl` reports duplicate manual
-installs. On Omarchy it ignores audited stock launchers only when their
-location and complete contents match. Modified launchers still produce a
+To update mise, change the version and both checksums, taking the checksums
+from the release's `SHASUMS256.txt`. Then apply on each host, and after that
+run `mup`. The tool installation hook also reruns when the pin changes. A shared version
+means a lock refresh gives the same result whichever host runs it.
+
+Omarchy's `mise-bin` package stays installed, because Omarchy's own scripts
+call mise. `omarchy update` keeps upgrading it, but `~/.local/bin` precedes
+`/usr/bin` on the managed PATH, so the pinned release is the one that runs.
+Both binaries share the same data directory. `dotfiles-doctor` warns when `mise`
+on PATH resolves anywhere other than `~/.local/bin/mise`.
+
+Run `dotfiles-doctor` to report duplicate manual installs. On Omarchy it ignores
+audited stock launchers only when their location and complete contents match. Modified launchers still produce a
 warning. The managed mise shims precede the stock launchers on PATH.
 
-The hook also reports installed versions that mise considers prunable, excluding
+The doctor also reports installed versions that mise considers prunable, excluding
 every version retained by the source-tree lock. Review those entries and use
 `mise uninstall <tool>@<version>` for each version you choose to remove.
 Avoid blanket `mise prune --tools` cleanup: normal global config can mark a

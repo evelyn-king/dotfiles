@@ -1,4 +1,13 @@
+{{- /* Shared with .chezmoiignore.tmpl; edit
+       .chezmoitemplates/omarchy-detect.tmpl, not this. */ -}}
+{{- $omarchy := includeTemplate "omarchy-detect.tmpl" . -}}
+{{ if $omarchy -}}
+# themes/current.theme links to the Omarchy theme; `omarchy theme set` sends
+# SIGUSR2 to reload it.
+color_theme = "current"
+{{- else -}}
 color_theme = "gruvbox_dark_v2.theme"
+{{- end }}
 theme_background = True
 truecolor = True
 force_tty = False

@@ -41,6 +41,10 @@
   in `dot_config/mise/conf.d/20-ubuntu.toml`. Do not declare the same tool in
   mise's `[tools]` and a system package list. Native Python remains an OS
   dependency; mise owns the development interpreter.
+- Pin the mise binary itself under `mise` in `.chezmoidata/versions.yaml`, with
+  a checksum per platform. `run_before_00-install-mise.sh.tmpl` installs it into
+  `~/.local/bin` on every host. Other hooks call `$HOME/.local/bin/mise` by path.
+  Do not add mise to Nix or the Omarchy package list.
 - Ubuntu support targets 26.04 x86_64 headless hosts. Keep distribution
   detection in `.chezmoitemplates/ubuntu-detect.tmpl`. The Ubuntu before-hook
   applies native files/packages, including its APT recommendation policy; the
@@ -61,7 +65,7 @@
   rather than removing the exclusion, as `run_onchange_after_mise-install.ps1.tmpl`
   does for the mise tools install.
 - `mise.lock` covers `linux-x64`, `macos-arm64` and `windows-x64`. `mup` exists
-  twice, in `.chezmoitemplates/shell-interactive.sh` and in the PowerShell
+  twice, in `dot_local/bin/executable_mup.tmpl` and in the PowerShell
   profile on the `windows` branch; keep their `--platform` lists identical,
   since `mise lock` prunes any platform a run omits.
 - The Windows theme switcher is `dot_config/omarchy-windows/theme.ps1`, a port
@@ -78,6 +82,8 @@
   policy.
 - `python3 .chezmoitemplates/test_ubuntu_bootstrap.py` renders and exercises the
   Ubuntu bootstrap hook with a fake mise executable; it makes no system changes.
+- `python3 .chezmoitemplates/test_mise_install.py` renders the mise install hook
+  and runs it against a fake release in a temporary home, offline.
 - For changes that affect installation, run
   `chezmoi apply --dry-run --refresh-externals=never` and verify the rendered
   dotfiles.

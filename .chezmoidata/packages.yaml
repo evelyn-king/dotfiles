@@ -36,6 +36,7 @@ omarchyPackages:
     - tailscale
     - vim
     - visual-studio-code-bin
+    - wl-clipboard
     - zed
     - zoxide
     - zsh
