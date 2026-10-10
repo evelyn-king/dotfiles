@@ -32,7 +32,10 @@
     ],
     "profiles": 
     {
-        "defaults": {},
+        "defaults": 
+        {
+            "colorScheme": "Omarchy"
+        },
         "list": 
         [
             {

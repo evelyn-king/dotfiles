@@ -4,6 +4,9 @@ $env:MISE_CONFIG_DIR = Join-Path $env:XDG_CONFIG_HOME 'mise'
 $env:STARSHIP_CONFIG = Join-Path $env:XDG_CONFIG_HOME 'starship.toml'
 $env:ATUIN_CONFIG_DIR = Join-Path $env:XDG_CONFIG_HOME 'atuin'
 $env:EDITOR = 'nvim'
+# ANSI colours, so bat follows the terminal scheme `theme` sets. It
+# overrides the Gruvbox choice in ~/.config/bat/config.
+$env:BAT_THEME = 'ansi'
 $env:VISUAL = $env:EDITOR
 
 # Check at startup so a partial bootstrap still leaves a usable shell.
@@ -23,6 +26,9 @@ if (Get-Command mise -ErrorAction SilentlyContinue) {
 function Test-DotfilesCommand([string]$Name) {
     [bool](Get-Command $Name -CommandType Application -ErrorAction SilentlyContinue)
 }
+
+# Omarchy-style theme switching; see docs/windows-themes.md.
+function theme { & (Join-Path $HOME '.config/omarchy-windows/theme.ps1') @args }
 
 function .. { Set-Location .. }
 function ... { Set-Location ../.. }

@@ -64,6 +64,12 @@
   twice, in `.chezmoitemplates/shell-interactive.sh` and in the PowerShell
   profile on the `windows` branch; keep their `--platform` lists identical,
   since `mise lock` prunes any platform a run omits.
+- The Windows theme switcher is `dot_config/omarchy-windows/theme.ps1`, a port
+  of Omarchy's theme commands that reads Omarchy's theme format. Keep its
+  colour resolution in step with Omarchy's `omarchy-theme-color`. Pin the
+  stock themes with `omarchy.url` in `.chezmoidata/versions.yaml`; never
+  let the themes external apply outside Windows, where
+  `~/.local/share/omarchy` is Omarchy itself. See docs/windows-themes.md.
 - Doom Emacs is intentionally excluded from native Windows, including its
   configuration and setup hook. It is not a planned Windows bootstrap feature.
 

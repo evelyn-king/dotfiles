@@ -1,0 +1,14 @@
+# Re-render the current theme whenever the switcher, its templates or the
+# pinned Omarchy themes change, and set Gruvbox on a machine with no theme yet.
+# Runs after setup-windows-terminal-settings, so the Terminal's settings.json
+# already names the "Omarchy" scheme this writes.
+
+# switcher hash: {{ include "dot_config/omarchy-windows/theme.ps1" | sha256sum }}
+{{- range (joinPath .chezmoi.sourceDir "dot_config/omarchy-windows/themed/*.tpl" | glob) }}
+# template hash: {{ include . | sha256sum }}
+{{- end }}
+# omarchy: {{ .omarchy.url }}
+
+$ErrorActionPreference = 'Stop'
+
+& '{{ joinPath .chezmoi.homeDir ".config/omarchy-windows/theme.ps1" | replace "'" "''" }}' refresh -IfUnset gruvbox -Wait

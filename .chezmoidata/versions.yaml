@@ -1,5 +1,10 @@
 # Tool and runtime versions live under dot_config/mise/conf.d/. This file pins
 # what chezmoi itself fetches.
+
+# Omarchy's stock themes and colour templates for the Windows theme switcher
+# (docs/windows-themes.md). Bump the commit to pick up new themes.
+omarchy:
+  url: https://github.com/basecamp/omarchy/archive/c5b4db77d68e7fbce5cf11120712ea322557e967.tar.gz
 doom:
   repo: https://github.com/doomemacs/core.git
   rev: 1404f1bac5a2ae8602b4d861f7805e194c05d28c

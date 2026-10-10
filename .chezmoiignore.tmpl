@@ -38,6 +38,16 @@ install-omarchy-packages.sh
 .config/hypr/**
 {{- end }}
 
+{{- if ne .chezmoi.os "windows" }}
+# The Windows theme switcher. On Omarchy, ~/.local/share/omarchy is
+# Omarchy's own checkout and must never receive the themes external.
+.local/share/omarchy
+.local/share/omarchy/**
+.config/omarchy-windows
+.config/omarchy-windows/**
+theme-refresh.ps1
+{{- end }}
+
 {{- if eq .chezmoi.os "windows" }}
 # Doom Emacs is intentionally excluded from native Windows.
 .config/doom/**

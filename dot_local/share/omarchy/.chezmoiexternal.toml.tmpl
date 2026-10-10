@@ -1,0 +1,18 @@
+{{- /* Omarchy's stock themes and colour templates, for the Windows theme
+       switcher in dot_config/omarchy-windows/theme.ps1. Pinned in
+       .chezmoidata/versions.yaml; both entries share one download. Only
+       applied on native Windows: on Omarchy this path is Omarchy's own
+       checkout (see .chezmoiignore.tmpl). */ -}}
+["themes"]
+type = "archive"
+url = "{{ .omarchy.url }}"
+exact = true
+stripComponents = 2
+include = ["*/themes/**"]
+
+["default/themed"]
+type = "archive"
+url = "{{ .omarchy.url }}"
+exact = true
+stripComponents = 3
+include = ["*/default/themed/**"]
