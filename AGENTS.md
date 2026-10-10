@@ -56,6 +56,10 @@
 - The docs under `docs/package-lists/` explain ownership rules and manual steps.
   The declarations themselves are the package list. Do not copy package names,
   versions or counts into the docs, where they go stale.
+- `mise.lock` covers `linux-x64`, `macos-arm64` and `windows-x64`. `mup` exists
+  twice, in `dot_local/bin/executable_mup.tmpl` and in the PowerShell
+  profile on the `windows` branch; keep their `--platform` lists identical,
+  since `mise lock` prunes any platform a run omits.
 
 ## Testing
 - `python3 .chezmoitemplates/test_git_rewrite_policy.py` covers the agent git
