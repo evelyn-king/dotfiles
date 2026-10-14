@@ -57,6 +57,13 @@ theme above doom-omarchy rather than disabling it, so test the topmost one."
   (set-eglot-client! '(python-mode python-ts-mode) '("ty" "server"))
   (set-formatter! 'ruff :modes '(python-mode python-ts-mode)))
 
+;; Advising a primitive makes Emacs compile a native trampoline on the UI
+;; thread. With the Nix Mac port that compile fails to link (-lemutls_w), and
+;; adding the library path only moves the failure: loading the resulting .eln
+;; segfaults the daemon. Without trampolines, native-compiled callers just
+;; bypass advice on primitives.
+(setq native-comp-enable-subr-trampolines nil)
+
 ;; Roughly 2.5x wide and 2x tall compared to Emacs's 80x36 default.
 (add-to-list 'default-frame-alist '(width . 200))
 (add-to-list 'default-frame-alist '(height . 72))
