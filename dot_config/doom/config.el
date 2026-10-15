@@ -16,7 +16,19 @@ theme above doom-omarchy rather than disabling it, so test the topmost one."
   (when (eq (car custom-enabled-themes) 'doom-omarchy)
     (load-theme 'doom-omarchy t)))
 
-(setq display-line-numbers-type 'relative)
+;; Relative numbers redraw the whole margin on every cursor move; at this frame
+;; size they were about half of the per-keystroke cost in org buffers.
+(setq display-line-numbers-type t)
+
+;; Org buffers skip emojify and flycheck, which added about 2ms per keystroke
+;; each and have little to do there.
+;; The global mode enables it after `org-mode-hook' has run, so turn it back
+;; off from its own hook.
+(add-hook 'emojify-mode-hook
+          (defun +emojify-skip-org-h ()
+            (when (and emojify-mode (derived-mode-p 'org-mode))
+              (emojify-mode -1))))
+(setq flycheck-global-modes '(not org-mode))
 
 ;; The emoji module's +unicode flag picks the emoji set but leaves emojify
 ;; drawing images. Without downloaded images, the first buffer shown in a GUI
