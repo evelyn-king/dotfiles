@@ -102,8 +102,8 @@ emacs() {
   # No --alternate-editor: the emacs it would start is the one outside the
   # app bundle, which cannot open GUI frames.
   if [ -z "$ssh_connection" ]; then
-    emacsclient --create-frame --no-wait --display=Mac \
-      --frame-parameters='((window-system . mac))' "$@" &&
+    emacsclient --create-frame --no-wait \
+      --frame-parameters='((window-system . ns))' "$@" &&
       emacsclient -e '(do-applescript "tell me to activate")' >/dev/null
   else
     emacsclient --no-window-system "$@"

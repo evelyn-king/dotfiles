@@ -60,9 +60,8 @@ launchd owns the daemon through the `local.emacs.daemon` LaunchAgent,
   would exit and be restarted every ten seconds.
 - The helper also handles macOS. It treats a session as graphical when
   `SSH_CONNECTION` is empty, after the same tmux lookup. macOS has no
-  `DISPLAY`, so it passes `--display=Mac -F '((window-system . mac))'`.
-  `--display` alone fails on a fresh daemon, because `server.el` recognises
-  macport only when the selected frame is already a `mac` frame.
+  `DISPLAY`, so it passes `-F '((window-system . ns))'`. The window system must
+  be named, because a fresh daemon's only frame is a terminal one.
 - A new frame opens behind the terminal, so the helper then asks Emacs to
   activate itself with `(do-applescript "tell me to activate")`. That picks
   the app by bundle ID. If a second Emacs is running, it may raise that one

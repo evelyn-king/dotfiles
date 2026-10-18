@@ -51,7 +51,7 @@
         lua-language-server
 
         # --- editors ---
-        emacs-macport
+        emacs
         neovim
         vim
 
