@@ -102,7 +102,7 @@
       homebrew = {
         enable = true;
         taps = [ "basnijholt/tap" "nikitabobko/tap" ];
-        # 35 of the 39 casks below set `auto_updates`, so forcing Homebrew to
+        # 36 of the 40 casks below set `auto_updates`, so forcing Homebrew to
         # own every version means fighting each vendor's own updater on a
         # roughly fortnightly cycle, and re-running a pkg installer under sudo
         # for the Microsoft suite, google-drive, onedrive, cloudflare-warp,
@@ -120,6 +120,7 @@
 
         casks = [
           # --- security and credentials ---
+          "1password"
           "bitwarden"
 
           # --- window management and launchers ---
