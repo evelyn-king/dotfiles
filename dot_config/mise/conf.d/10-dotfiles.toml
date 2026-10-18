@@ -60,6 +60,7 @@ pi = "latest"
 "pipx:pre-commit" = { version = "4.6.2", with = "pre-commit-uv" }
 
 # --- javascript tooling -----------------------------------------------------
+"npm:@doist/todoist-cli" = "5.5.2"
 "npm:@googleworkspace/cli" = "0.22.5"
 "npm:tree-sitter-cli" = "0.27.0"
 

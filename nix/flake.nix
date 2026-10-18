@@ -91,6 +91,7 @@
         lima
         pinentry_mac
         prettyping
+        protonmail-bridge
         sshpass
         w3m
         wget
@@ -102,7 +103,7 @@
       homebrew = {
         enable = true;
         taps = [ "basnijholt/tap" "nikitabobko/tap" ];
-        # 36 of the 40 casks below set `auto_updates`, so forcing Homebrew to
+        # 37 of the 41 casks below set `auto_updates`, so forcing Homebrew to
         # own every version means fighting each vendor's own updater on a
         # roughly fortnightly cycle, and re-running a pkg installer under sudo
         # for the Microsoft suite, google-drive, onedrive, cloudflare-warp,
@@ -153,6 +154,7 @@
           "notion"
           "obsidian"
           { name = "raindropio"; greedy = true; }
+          "todoist-app"
           "zotero"
 
           # --- communication ---

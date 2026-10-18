@@ -29,6 +29,7 @@ omarchyPackages:
     - neovim
     - openai-codex-desktop
     - pinentry
+    - protonmail-bridge
     - ripgrep
     - sccache
     - shellcheck
