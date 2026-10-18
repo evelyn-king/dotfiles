@@ -81,13 +81,13 @@ theme above doom-omarchy rather than disabling it, so test the topmost one."
 (add-to-list 'default-frame-alist '(height . 72))
 
 ;; `org-agenda-files' is set by the GTD section below.
-(setq org-directory "~/local-journal/org/"
+(setq org-directory "~/local-journal/org-journal/"
       org-roam-directory org-directory
       org-roam-dailies-directory "journal/"
       ;; %[...] inserts templates/daily.org only when the day's file is created.
       org-roam-dailies-capture-templates
       `(("d" "default" entry "* %?"
-         :target (file+head "%<%Y-%m-%d>.org"
+         :target (file+head "%<%Y>/%<%Y-%m-%d>.org"
                             ,(format "%%[%s]" (expand-file-name "templates/daily.org" doom-user-dir))))))
 
 ;; org-download pastes clipboard images with wl-paste only when
@@ -150,32 +150,37 @@ are not seen."
 
 ;;; GTD
 ;; Tasks live in the roam nodes they belong to, and the agenda collects them.
-;; Projects are nodes tagged :project: (org-roam-capture, then "P"); when one
-;; is finished, swap that tag for :done:.  Quick captures (SPC X i) and open
-;; tasks swept out of the dailies land in the gtd-inbox node.  Everything in
-;; the gtd-someday node inherits its :someday: tag, which keeps it out of the
-;; Engage view until the weekly review.  Agenda dispatcher: "g" is Engage,
-;; "w" is the weekly review.
+;; The tasks/ folder under `org-roam-directory' holds the GTD lists:
+;;   tasks/inbox.org     capture; SPC X i and tasks swept out of the dailies
+;;   tasks/projects/     one node per project, tagged :project: (org-roam-capture,
+;;                       then "P"); when one is finished, swap that tag for :done:
+;;   tasks/someday.org   someday/maybe; inherits :someday:, which keeps it out of
+;;                       the Engage view until the weekly review
+;; Next actions and waiting-for are the NEXT and WAIT keywords on tasks in
+;; those files, not separate files.  Agenda dispatcher: "g" is Engage, "w" is
+;; the weekly review.
 
 (defconst +gtd--open-task-re "^\\*+ (TODO|NEXT|WAIT) "
   "Ripgrep pattern matching a heading with an open task keyword.")
 
-(defun +gtd--node-file (name &optional filetags)
-  "Return the path of the roam node file NAME.org, creating it if missing.
-A new file gets an ID, the title NAME and, if given, FILETAGS."
-  (let ((file (expand-file-name (concat name ".org") org-roam-directory)))
+(defun +gtd--node-file (path title &optional filetags)
+  "Return the path of the roam node file PATH.org, creating it if missing.
+PATH is relative to `org-roam-directory'.  A new file gets an ID, TITLE
+and, if given, FILETAGS."
+  (let ((file (expand-file-name (concat path ".org") org-roam-directory)))
     (unless (file-exists-p file)
       (require 'org-id)
+      (make-directory (file-name-directory file) t)
       (with-temp-file file
         (insert ":PROPERTIES:\n:ID:       " (org-id-new) "\n:END:\n"
-                "#+title: " name "\n"
+                "#+title: " title "\n"
                 (if filetags (format "#+filetags: %s\n" filetags) "")))
       (when (fboundp 'org-roam-db-update-file)
         (org-roam-db-update-file file)))
     file))
 
-(defun +gtd-inbox-file () (+gtd--node-file "gtd-inbox"))
-(defun +gtd-someday-file () (+gtd--node-file "gtd-someday" ":someday:"))
+(defun +gtd-inbox-file () (+gtd--node-file "tasks/inbox" "gtd-inbox"))
+(defun +gtd-someday-file () (+gtd--node-file "tasks/someday" "gtd-someday" ":someday:"))
 
 (defun +gtd--rg (dir &rest patterns)
   "Return the .org files under DIR matching any of PATTERNS (ripgrep syntax)."
@@ -325,7 +330,7 @@ roam node, fall back to `org-store-link''s link, or nothing."
                  (and (ignore-errors (org-back-to-heading t)) (org-get-todo-state))))))
   (add-to-list 'org-roam-capture-templates
                '("P" "project" plain "Outcome: %?\n\n* Tasks\n* Notes\n"
-                 :target (file+head "%<%Y%m%d%H%M%S>-${slug}.org"
+                 :target (file+head "tasks/projects/%<%Y%m%d%H%M%S>-${slug}.org"
                                     "#+title: ${title}\n#+filetags: :project:\n")
                  :unnarrowed t)
                t))
