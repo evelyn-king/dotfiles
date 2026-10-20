@@ -90,24 +90,24 @@ checksum = "sha256:b929c54a9badb104a16dedd23aab6152c86793ae653d4e6b13983ffd0c882
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-windows-x64-baseline.zip"
 
 [[tools.claude]]
-version = "2.1.302"
+version = "2.1.304"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools.claude."platforms.linux-x64"]
-checksum = "sha256:0d865f10fe49f2e731ab9d4f7bdcce082cad4f7bbf71d2cbbf7be47b9d8ae5dc"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.302/claude-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/647956172"
+checksum = "sha256:ea6ae29e6eea7dd35d4b05a5a1db5a040a0b294c5ab7d0f7fa299db9b6e625c0"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.304/claude-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/657250593"
 
 [tools.claude."platforms.macos-arm64"]
-checksum = "sha256:757a3b11dbd1b6881bb513cc50ab7a7fc03d8b77011dde7687152c3b61cc71f3"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.302/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/647955921"
+checksum = "sha256:bb2fb10066e34c67facad46bf94d47e72c4d808a7a23590224544ee4b4aadaea"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.304/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/657250421"
 
 [tools.claude."platforms.windows-x64"]
-checksum = "sha256:021e39dbb17ac890d96a416f923bf5ae0f706a8d3c66c3e2be7ecfdbc9ff6d96"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.302/claude-win32-x64.zip"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/647956183"
+checksum = "sha256:33e63736ab22ac2c29e8ad75554842dc9f5e06f5d12f9e786938c8a80c230e6f"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.304/claude-win32-x64.zip"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/657250615"
 
 [[tools.codex]]
 version = "0.163.0"
@@ -339,31 +339,31 @@ url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/644855
 version = "26.5.1"
 backend = "pipx:black"
 specifiers = ["26.5.1"]
-uv = { path = ".mise/locks/pipx-black/26.5.1", digest = "sha256:139d9d0eb8bef107e18779a91951e5a2c4f0114fdff86040126dcb9b66ff67ff" }
+uv = { path = ".mise/locks/pipx-black/26.5.1", digest = "sha256:3f27f8d4212e0d3b1074762cacc3de36c5cf644546020193b481f7ea30e45c34" }
 
 [[tools."pipx:conda-lock"]]
 version = "4.0.2"
 backend = "pipx:conda-lock"
 specifiers = ["4.0.2"]
-uv = { path = ".mise/locks/pipx-conda-lock/4.0.2", digest = "sha256:3b971d94825ca1135492887e30bd34afff33d6d46e2587e9b923ce53bd42a031" }
+uv = { path = ".mise/locks/pipx-conda-lock/4.0.2", digest = "sha256:12623288cc6593fee238e36a829d086af3f9b2842b5511a66a5f48f771aa1441" }
 
 [[tools."pipx:conda-package-handling"]]
 version = "2.6.0"
 backend = "pipx:conda-package-handling"
 specifiers = ["2.6.0"]
-uv = { path = ".mise/locks/pipx-conda-package-handling/2.6.0", digest = "sha256:bb29048e664e8e501c7fa1ca014c253786fc2ec893f54519909c63be340ce2ac" }
+uv = { path = ".mise/locks/pipx-conda-package-handling/2.6.0", digest = "sha256:0503651958aeebebc5d5d572866067b334162441dcccbfcbb73ebb7fad0e67cf" }
 
 [[tools."pipx:mypy"]]
 version = "2.3.1"
 backend = "pipx:mypy"
 specifiers = ["2.3.1"]
-uv = { path = ".mise/locks/pipx-mypy/2.3.1", digest = "sha256:4d12cfac87033414629721dc037a5469cb766a57629d14fd08bb115a3e4c856d" }
+uv = { path = ".mise/locks/pipx-mypy/2.3.1", digest = "sha256:c563ae99474057d45f3b48a98d6970b5450e35f148154a803373f0c6d7b8c85d" }
 
 [[tools."pipx:pre-commit"]]
 version = "4.6.2"
 backend = "pipx:pre-commit"
 specifiers = ["4.6.2"]
-uv = { path = ".mise/locks/pipx-pre-commit/4.6.2~2899f560", digest = "sha256:fd6001600d2c8036312795cc3ff8095946f09ad653a03e19f40e10f9ff46629c" }
+uv = { path = ".mise/locks/pipx-pre-commit/4.6.2~2899f560", digest = "sha256:a264d7e6a7a39b5222b1bce72f2ba1917798a6c8f936c7bb4e955faf2a9a0c0b" }
 
 [tools."pipx:pre-commit".options]
 with = '["pre-commit-uv"]'
@@ -372,19 +372,19 @@ with = '["pre-commit-uv"]'
 version = "0.16.6"
 backend = "pipx:ruff"
 specifiers = ["0.16.6"]
-uv = { path = ".mise/locks/pipx-ruff/0.16.6", digest = "sha256:72ce261054d95cb6bc3a8b0b9c2c389028eb579dd2491d6a62ffba25ac25e39d" }
+uv = { path = ".mise/locks/pipx-ruff/0.16.6", digest = "sha256:36bccfa82ebac03181b976b6209b7ea002eb69c807d6e7257f5dcaa30e6fd2a3" }
 
 [[tools."pipx:ty"]]
 version = "0.0.84"
 backend = "pipx:ty"
 specifiers = ["0.0.84"]
-uv = { path = ".mise/locks/pipx-ty/0.0.84", digest = "sha256:f5ab1919e0d2919a7dbebc67289172abd146c7d4d9f7b030fea1123327c70398" }
+uv = { path = ".mise/locks/pipx-ty/0.0.84", digest = "sha256:1dff2547eb132c61ba8ab176dbf3376e84b9c89540f9b33b665799c7e697308d" }
 
 [[tools."pipx:unidep"]]
 version = "3.4.2"
 backend = "pipx:unidep"
 specifiers = ["3.4.2"]
-uv = { path = ".mise/locks/pipx-unidep/3.4.2", digest = "sha256:35592803429e470dde620225417a9a7ffada959e44bf9a483e9358239a17e7f9" }
+uv = { path = ".mise/locks/pipx-unidep/3.4.2", digest = "sha256:9627e30d0bd253ab596e0f73fe8033876d0b7e226552c6272df395b70e92b702" }
 
 [[tools.pixi]]
 version = "0.79.0"
@@ -458,23 +458,23 @@ url = "https://github.com/yorukot/superfile/releases/download/v1.6.0/superfile-w
 url_api = "https://api.github.com/repos/yorukot/superfile/releases/assets/441063664"
 
 [[tools.usage]]
-version = "7.0.1"
+version = "7.0.2"
 backend = "packslip:github.com/jdx/usage"
 specifiers = ["latest"]
 
 [tools.usage."platforms.linux-x64"]
-checksum = "sha256:f8e4a3080d5f5447e6265662d7d45522108a080bf60024a56033a289719f9828"
-url = "https://github.com/jdx/usage/releases/download/v7.0.1/usage-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:1006d9659fb0c9620525a8e750b3853177a3bf772454d5984c4d78c4aa130aaa"
+url = "https://github.com/jdx/usage/releases/download/v7.0.2/usage-x86_64-unknown-linux-gnu.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.macos-arm64"]
-checksum = "sha256:0d5c3a199c6fab5ba33e84e2bfb0fa82c937bf851aa03d07693d4eae800ecdc8"
-url = "https://github.com/jdx/usage/releases/download/v7.0.1/usage-universal-apple-darwin.tar.gz"
+checksum = "sha256:13fad4f828a7cb2ddc298f1dea38a3389d2144f63584134b9c3c7489944c3de3"
+url = "https://github.com/jdx/usage/releases/download/v7.0.2/usage-universal-apple-darwin.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.windows-x64"]
-checksum = "sha256:9518804218a48901ac82228618ca58503d7d79166e61df6c04fa8e6a07ef7666"
-url = "https://github.com/jdx/usage/releases/download/v7.0.1/usage-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:91586495a99681b405c62a5c7c8f60dffca0d006834d3526520ced8527818cb5"
+url = "https://github.com/jdx/usage/releases/download/v7.0.2/usage-x86_64-pc-windows-msvc.zip"
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [[tools.uv]]
