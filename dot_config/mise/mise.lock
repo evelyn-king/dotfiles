@@ -90,44 +90,44 @@ checksum = "sha256:b929c54a9badb104a16dedd23aab6152c86793ae653d4e6b13983ffd0c882
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-windows-x64-baseline.zip"
 
 [[tools.claude]]
-version = "2.1.310"
+version = "2.1.316"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
 [tools.claude."platforms.linux-x64"]
-checksum = "sha256:5bea9e13ac07ea6804c24e6263ec7e5b3d13f81d3f681c92f9784c534425fae1"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.310/claude-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/670426847"
+checksum = "sha256:9ca14cd81a7b0d9654d392fc1253773e70f31f470aa98334732744956cd1006b"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.316/claude-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/693882314"
 
 [tools.claude."platforms.macos-arm64"]
-checksum = "sha256:cf47d30004ff26e5cfed6004a29ca94e05ad53d6f890ee1be8bb582e8ce2a5b5"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.310/claude-darwin-arm64.tar.gz"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/670426479"
+checksum = "sha256:e8956064b1c5055c1c79945aa7714faef98b29060a065c6930e8956953d0bace"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.316/claude-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/693882159"
 
 [tools.claude."platforms.windows-x64"]
-checksum = "sha256:a9419b5c4942b919cb048d3f3288e19d2bec55f843615d652636f7cb638abb80"
-url = "https://github.com/anthropics/claude-code/releases/download/v2.1.310/claude-win32-x64.zip"
-url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/670426878"
+checksum = "sha256:c77cb13c50365de63ad3a0e09c915294a9d1657627b82a6fc3c1bdf327e6a346"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.316/claude-win32-x64.zip"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/693882322"
 
 [[tools.codex]]
-version = "0.164.0"
+version = "0.166.0"
 backend = "aqua:openai/codex"
 specifiers = ["latest"]
 
 [tools.codex."platforms.linux-x64"]
-checksum = "sha256:3ec55053109608d5038f7e50750f7d25f768dfd740fef071aa710e2559b63aac"
-url = "https://github.com/openai/codex/releases/download/rust-v0.164.0/codex-package-x86_64-unknown-linux-musl.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/667994796"
+checksum = "sha256:1d44b28bc4ac9937d7d3532264baa68a507ce364956a0d4ebb856f331cdee254"
+url = "https://github.com/openai/codex/releases/download/rust-v0.166.0/codex-package-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/689712510"
 
 [tools.codex."platforms.macos-arm64"]
-checksum = "sha256:dd99e9092270691a67bdde7be04ac283dea9da8e86cbde356c2cc851a79205fa"
-url = "https://github.com/openai/codex/releases/download/rust-v0.164.0/codex-package-aarch64-apple-darwin.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/667983476"
+checksum = "sha256:55a440cb579f970abe7c79ab181e54b0ea4c419be99f333bbd868eebac9c21f0"
+url = "https://github.com/openai/codex/releases/download/rust-v0.166.0/codex-package-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/689703068"
 
 [tools.codex."platforms.windows-x64"]
-checksum = "sha256:700116be3143576d006467af8576f7f4c9dada1feddfdb7f69743bfde0997018"
-url = "https://github.com/openai/codex/releases/download/rust-v0.164.0/codex-package-x86_64-pc-windows-msvc.tar.gz"
-url_api = "https://api.github.com/repos/openai/codex/releases/assets/667993208"
+checksum = "sha256:d559bb88e74d471265857b93b7f19bc250dae527673b9191b33534478093f6bc"
+url = "https://github.com/openai/codex/releases/download/rust-v0.166.0/codex-package-x86_64-pc-windows-msvc.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/689710836"
 
 [[tools.fd]]
 version = "10.5.0"
@@ -164,26 +164,26 @@ url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0
 url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-windows-x86_64-bundled-python.zip"
 
 [[tools.gh]]
-version = "2.103.2"
+version = "2.103.3"
 backend = "aqua:cli/cli"
 specifiers = ["latest"]
 
 [tools.gh."platforms.linux-x64"]
-checksum = "sha256:62ccf747115ddc61237efffdde66a3c8f70ba249433dc64f70801089b59c59c8"
-url = "https://github.com/cli/cli/releases/download/v2.103.2/gh_2.103.2_linux_amd64.tar.gz"
-url_api = "https://api.github.com/repos/cli/cli/releases/assets/670305062"
+checksum = "sha256:4c806978ffce1cec70853302a56d70ac6da4f19bae7adca4e1a8ab00633dd91d"
+url = "https://github.com/cli/cli/releases/download/v2.103.3/gh_2.103.3_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/679195621"
 provenance = "github-attestations"
 
 [tools.gh."platforms.macos-arm64"]
-checksum = "sha256:5416000f5d17580a187339e0c4068a01ca5c87f7d4fe6ca64933696f967bc418"
-url = "https://github.com/cli/cli/releases/download/v2.103.2/gh_2.103.2_macOS_arm64.zip"
-url_api = "https://api.github.com/repos/cli/cli/releases/assets/670305145"
+checksum = "sha256:d700207eae9ae98fe2b89535c2c087c07823d4628c56364695a5a07ef311c062"
+url = "https://github.com/cli/cli/releases/download/v2.103.3/gh_2.103.3_macOS_arm64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/679195704"
 provenance = "github-attestations"
 
 [tools.gh."platforms.windows-x64"]
-checksum = "sha256:fef9fcdd8fdabd0501ab8b3d99eac976f504ab55d01bef9e8ef428a5d900ddda"
-url = "https://github.com/cli/cli/releases/download/v2.103.2/gh_2.103.2_windows_amd64.zip"
-url_api = "https://api.github.com/repos/cli/cli/releases/assets/670305204"
+checksum = "sha256:98d0cfa794721665d7973dd728c78aff7bd836d58f10f6d7a03568eccb0a22e0"
+url = "https://github.com/cli/cli/releases/download/v2.103.3/gh_2.103.3_windows_amd64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/679195750"
 provenance = "github-attestations"
 
 [[tools.go]]
@@ -296,24 +296,24 @@ backend = "npm:tree-sitter-cli"
 specifiers = ["0.27.0"]
 
 [[tools.opencode]]
-version = "1.19.4"
+version = "1.19.5"
 backend = "aqua:anomalyco/opencode"
 specifiers = ["latest"]
 
 [tools.opencode."platforms.linux-x64"]
-checksum = "sha256:849bd6b3d959a1d2ef200ed1634a51c79a45ca236aa26665d75debd694805cce"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.19.4/opencode-linux-x64.tar.gz"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/665821750"
+checksum = "sha256:588310a336fa3b9df36b3f0225b26f679d453efaad0cf3d66c3651ef3ec1647a"
+url = "https://github.com/anomalyco/opencode/releases/download/v1.19.5/opencode-linux-x64.tar.gz"
+url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/683986986"
 
 [tools.opencode."platforms.macos-arm64"]
-checksum = "sha256:c400a2f8c8ab7e99478a7f4dd1a466b57bf33888e520d85c55780a5464c4b689"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.19.4/opencode-darwin-arm64.zip"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/665836811"
+checksum = "sha256:c1c9e62521192192ef4c3ed1355ada2144055bddb61682217e997b03c55203c1"
+url = "https://github.com/anomalyco/opencode/releases/download/v1.19.5/opencode-darwin-arm64.zip"
+url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/683994920"
 
 [tools.opencode."platforms.windows-x64"]
-checksum = "sha256:93b899277bd6f68803009e32bf71772ce43c34b18adf1e93b9b4d8780fdf62e5"
-url = "https://github.com/anomalyco/opencode/releases/download/v1.19.4/opencode-windows-x64.zip"
-url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/665834171"
+checksum = "sha256:09a6e693157f0887e504f2cf4357a8cbddc5ead5d0dffb9a269dcc47c48640f5"
+url = "https://github.com/anomalyco/opencode/releases/download/v1.19.5/opencode-windows-x64.zip"
+url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/683997723"
 
 [[tools.pi]]
 version = "1.4.0"
@@ -339,31 +339,31 @@ url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/663978
 version = "26.5.1"
 backend = "pipx:black"
 specifiers = ["26.5.1"]
-uv = { path = ".mise/locks/pipx-black/26.5.1", digest = "sha256:97f1a4e387372a61f98eac12060e528bb56b6eeaa4cd963538f3073f25db04af" }
+uv = { path = ".mise/locks/pipx-black/26.5.1", digest = "sha256:9ed9463413c4839af5ae3676999055366a88bd946a0d300b02a7396dc09983b7" }
 
 [[tools."pipx:conda-lock"]]
 version = "4.0.2"
 backend = "pipx:conda-lock"
 specifiers = ["4.0.2"]
-uv = { path = ".mise/locks/pipx-conda-lock/4.0.2", digest = "sha256:42a5d76514889ad8e9d064ab53f3ea42f692c68e9259917cc67f3ade711a4167" }
+uv = { path = ".mise/locks/pipx-conda-lock/4.0.2", digest = "sha256:752cb76782292ac96e287aeab9b3339d681f8abb8b600ca753b0d3f12ce90efc" }
 
 [[tools."pipx:conda-package-handling"]]
 version = "2.6.0"
 backend = "pipx:conda-package-handling"
 specifiers = ["2.6.0"]
-uv = { path = ".mise/locks/pipx-conda-package-handling/2.6.0", digest = "sha256:dd6da31f07aae5e080a0713c57df68c2e4f0664865968d0b8ea7a910bc6605fc" }
+uv = { path = ".mise/locks/pipx-conda-package-handling/2.6.0", digest = "sha256:0612684eabd6e06471878cbb6e42f9a665acdccd97e2caf08e45853c24878d05" }
 
 [[tools."pipx:mypy"]]
 version = "2.3.1"
 backend = "pipx:mypy"
 specifiers = ["2.3.1"]
-uv = { path = ".mise/locks/pipx-mypy/2.3.1", digest = "sha256:393b5ec3c933396c560626c7c0d3d4356678db7c552b51cf0df6e18c3e2cccf2" }
+uv = { path = ".mise/locks/pipx-mypy/2.3.1", digest = "sha256:499056c49ab97495178051f231cf43550c1adcc12c91d09c46b1528d2cf37519" }
 
 [[tools."pipx:pre-commit"]]
 version = "4.6.2"
 backend = "pipx:pre-commit"
 specifiers = ["4.6.2"]
-uv = { path = ".mise/locks/pipx-pre-commit/4.6.2~2899f560", digest = "sha256:dd5101bfcea39b3fce53eabcda9ce98f6443322136e5b842789ca4c2df926499" }
+uv = { path = ".mise/locks/pipx-pre-commit/4.6.2~2899f560", digest = "sha256:30e95119d2a470ac01ae92121fbf5bb80109bc84bb19713530f2ee8fe08bc15b" }
 
 [tools."pipx:pre-commit".options]
 with = '["pre-commit-uv"]'
@@ -372,19 +372,19 @@ with = '["pre-commit-uv"]'
 version = "0.16.6"
 backend = "pipx:ruff"
 specifiers = ["0.16.6"]
-uv = { path = ".mise/locks/pipx-ruff/0.16.6", digest = "sha256:8aa5aabbe1eaa0732b95b6705f8f137c2e105f4dce670f8e17a24128b3b569c0" }
+uv = { path = ".mise/locks/pipx-ruff/0.16.6", digest = "sha256:2fb2e68f53feca60283962e6bfd049444b16b377610c9e166514b92d94a6c74e" }
 
 [[tools."pipx:ty"]]
 version = "0.0.84"
 backend = "pipx:ty"
 specifiers = ["0.0.84"]
-uv = { path = ".mise/locks/pipx-ty/0.0.84", digest = "sha256:a5e47446d41162f5564c18a5733b6a1ff1aed12faeff6090fa7f931e94c48959" }
+uv = { path = ".mise/locks/pipx-ty/0.0.84", digest = "sha256:29db4bbb8cced8b33f6f656a6e30a6ecaf357ce8b90a04c6e54ad960778e2207" }
 
 [[tools."pipx:unidep"]]
 version = "3.4.2"
 backend = "pipx:unidep"
 specifiers = ["3.4.2"]
-uv = { path = ".mise/locks/pipx-unidep/3.4.2", digest = "sha256:b2437d6ec10c3ddea39ff72369917417f81406f9ca2667f1bbe45b826c71d213" }
+uv = { path = ".mise/locks/pipx-unidep/3.4.2", digest = "sha256:2c3096ab3f776f1c83da80f72c65cdb734e2503977e2ea16ec1e9dd56e114427" }
 
 [[tools.pixi]]
 version = "0.79.0"
@@ -458,23 +458,23 @@ url = "https://github.com/yorukot/superfile/releases/download/v1.6.0/superfile-w
 url_api = "https://api.github.com/repos/yorukot/superfile/releases/assets/441063664"
 
 [[tools.usage]]
-version = "7.1.1"
+version = "7.1.4"
 backend = "packslip:github.com/jdx/usage"
 specifiers = ["latest"]
 
 [tools.usage."platforms.linux-x64"]
-checksum = "sha256:dcc37cb5fb59088bab82e6f5f752c002a526dd9b35909be76d8459f46b4c30ca"
-url = "https://github.com/jdx/usage/releases/download/v7.1.1/usage-x86_64-unknown-linux-gnu.tar.gz"
+checksum = "sha256:eb213eb6c1cbc6896d7f8b627af984a9c1734d67bdf703788038bc50c326c676"
+url = "https://github.com/jdx/usage/releases/download/v7.1.4/usage-x86_64-unknown-linux-gnu.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.macos-arm64"]
-checksum = "sha256:50234db60947885bf87cda5ce28ee9c13924b6694528737bf6a7327e980f3bcd"
-url = "https://github.com/jdx/usage/releases/download/v7.1.1/usage-universal-apple-darwin.tar.gz"
+checksum = "sha256:cae1865b2bb4eb8c22087381d4fbc29344837960c71dbf865dc55296c19d535d"
+url = "https://github.com/jdx/usage/releases/download/v7.1.4/usage-universal-apple-darwin.tar.gz"
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [tools.usage."platforms.windows-x64"]
-checksum = "sha256:75659545f16f84474c32cebb6ee3e304aedf63286c31ec73c3cab695fb56a6aa"
-url = "https://github.com/jdx/usage/releases/download/v7.1.1/usage-x86_64-pc-windows-msvc.zip"
+checksum = "sha256:3254065ef86acb0131be75909ee9010cd41de22e10bcbbc1c1829494b9c7a23f"
+url = "https://github.com/jdx/usage/releases/download/v7.1.4/usage-x86_64-pc-windows-msvc.zip"
 signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
 
 [[tools.uv]]
