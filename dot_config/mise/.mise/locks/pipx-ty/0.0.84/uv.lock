@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.8"
 
 [options]
-exclude-newer = "2026-10-30T16:27:07.450276479Z"
+exclude-newer = "2026-11-04T18:11:32.675372999Z"
 
 [[package]]
 name = "mise-pypi-tool-environment"
