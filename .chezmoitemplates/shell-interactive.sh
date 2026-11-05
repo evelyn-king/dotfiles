@@ -141,14 +141,6 @@ command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebui
 {{ end }}
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
 
-# Keep `command emacs` available for the real editor binary.
-unalias emacs 2>/dev/null
-if command -v emacsclient >/dev/null 2>&1; then
-  emacs() {
-    "$HOME/.local/bin/emacs-session" open "$@"
-  }
-fi
-
 if command -v eza >/dev/null 2>&1; then
   alias ls='eza -lh --group-directories-first --icons=auto'
   alias lsa='ls -a'

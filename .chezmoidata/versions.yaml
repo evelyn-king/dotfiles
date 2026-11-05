@@ -10,10 +10,6 @@ mise:
     linux-x64: b4058dece685259910d3aba5782445996eea79dbdb3cf952a6eb81aadf0373ff
     macos-arm64: 0f1c7f3e74d8c9ae82976e6990058f2bc68821acc6b4c37a68c206c836692419
 
-doom:
-  repo: https://github.com/doomemacs/core.git
-  rev: 01d68aaf6bd7db073365385cd82e1ad7e815295c
-
 plugins:
   vim:
     gruvbox:

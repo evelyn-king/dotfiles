@@ -87,8 +87,7 @@ sudo nix run nix-darwin/master#darwin-rebuild -- \
 Activation removes the bootstrap Homebrew `chezmoi` formula, because Nix owns
 that command now. Restart the Mac so the system generation, applications and
 fonts are available in a fresh login. The first apply already installed the
-pinned mise release and its tool set into your home directory. The second apply
-sees the newly installed Emacs, so it can install Doom.
+pinned mise release and its tool set into your home directory.
 
 ```bash
 sudo shutdown -r now
@@ -155,9 +154,8 @@ chezmoi apply
 ```
 
 The first apply installs the pinned mise release into `~/.local/bin`, then the
-required pacman packages, mise tools, Doom, and local project trust, then the
-optional AUR packages. The Doom hook sorts
-after tool installation so it can use the newly installed runtimes.
+required pacman packages, mise tools, and local project trust, then the
+optional AUR packages.
 
 Set zsh as the login shell once the package hook has installed it. Without
 this, non-interactive SSH commands never see the managed environment. Log out of
@@ -255,12 +253,8 @@ chezmoi apply
 
 The Ubuntu before-hook disables APT recommendations globally, then restores
 native packages with their required dependencies. After writing dotfiles,
-chezmoi installs the locked mise tools, sets up Doom, and trusts the managed
-project-root environment. Ubuntu skips the desktop configs and Doom's graphical
-PDF module. Vterm remains enabled.
-
-Doom's first native compilation can take tens of minutes on a small host.
-Let that apply finish before starting another one.
+chezmoi installs the locked mise tools and trusts the managed project-root
+environment. Ubuntu skips the desktop configs.
 
 Set the login shell, then reconnect so SSH starts the managed zsh environment:
 
@@ -289,9 +283,7 @@ ssh <host> 'command -v node python bun uv fd bat; printf "%s\n" "$LANG"'
 ssh <host> 'command -v jupyter-remote-lab; infocmp "$TERM" >/dev/null'
 ```
 
-Check Neovim with `:checkhealth`, Doom with `doom doctor`, and open a vterm buffer.
-Accept vterm's first-use prompt to compile its native module; the bootstrap
-installs its build dependencies.
+Check Neovim with `:checkhealth`.
 The Jupyter launcher needs the environments described in the README before it
 can start a notebook server. SSH keys and Git signing remain manual setup below.
 See [Ubuntu package ownership](package-lists/ubuntu-linux.md) for update behavior.

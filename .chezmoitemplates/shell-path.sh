@@ -43,7 +43,6 @@ for __dir in \
   "$HOME/.cargo/bin" \
   "$BUN_INSTALL/bin" \
   "$HOME/.rd/bin" \
-  "$HOME/.config/emacs/bin" \
   "$HOME/.nix-profile/bin" \
   /run/current-system/sw/bin \
   /nix/var/nix/profiles/default/bin \

@@ -1,6 +1,0 @@
-#+title: %<%Y-%m-%d>
-
-* Plan
-** Agenda
-* Log
-* Notes

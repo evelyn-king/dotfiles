@@ -78,10 +78,8 @@ fi
 unset -f __locale_is_available
 export LANG
 
-# Emacs on macOS starts its daemon in the per-user Darwin temp directory.
-# emacsclient searches under TMPDIR, so a generic /tmp value makes the two
-# processes disagree about the server socket. Preserve deliberate custom paths,
-# but replace generic or missing values with the native per-user directory.
+# On macOS, replace a generic or missing TMPDIR with the native per-user
+# directory, preserving deliberate custom paths.
 {{ if eq .chezmoi.os "darwin" }}
 case "${TMPDIR:-}" in
 "" | /tmp | /tmp/ | /private/tmp | /private/tmp/)

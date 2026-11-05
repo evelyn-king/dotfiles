@@ -51,7 +51,6 @@
         lua-language-server
 
         # --- editors ---
-        emacs
         neovim
         vim
 
@@ -75,12 +74,9 @@
         sqlite
 
         # --- documents, data and ML ---
-        (aspellWithDicts (dicts: with dicts; [ en ]))
         llama-cpp
         pandoc
         poppler-utils
-        # Clipboard image paste for Doom's org +dragndrop flag.
-        pngpaste
         tesseract
 
         # --- network and misc ---

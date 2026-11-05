@@ -2,8 +2,6 @@
 # additive: it restores missing entries but never removes unlisted packages.
 omarchyPackages:
   pacman:
-    - aspell
-    - aspell-en
     - atuin
     - aws-cli-v2
     - bitwarden
@@ -15,7 +13,6 @@ omarchyPackages:
     - dropbox-cli
     - duf
     - dust
-    - emacs-wayland
     - eza
     - firefox
     - fzf
