@@ -3,8 +3,10 @@
     "commit": "",
     "pr": ""
   },
+  "permissions": {
+    "defaultMode": "auto"
+  },
   "model": "opus",
-  "theme": "auto",
   "hooks": {
     "PreToolUse": [
       {
@@ -30,13 +32,8 @@
       }
     ]
   },
-  "alwaysThinkingEnabled": true,
-  "effortLevel": "high",
-  "autoUpdatesChannel": "stable",
-  "tui": "fullscreen",
-  "editorMode": "vim",
-  "permissions": {
-    "defaultMode": "auto"
+  "enabledPlugins": {
+    "skill-creator@claude-plugins-official": true
   },
   "extraKnownMarketplaces": {
     "anthropic-agent-skills": {
@@ -46,7 +43,15 @@
       }
     }
   },
-  "enabledPlugins": {
-    "skill-creator@claude-plugins-official": true
-  }
+  "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "autoUpdatesChannel": "stable",
+  "tui": "fullscreen",
+  "theme": "auto",
+  "editorMode": "vim"
 }
