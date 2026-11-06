@@ -18,6 +18,7 @@ Account and hardware checks belong to each host's deployment sign-off.
 | Omarchy 4.0.2 VM, `563cd9b` | Three applies, packages, reboot, SSH environment, editors, Hyprland recovery and monitor-file preservation passed. Ghostty and Zed opened with software rendering. See the follow-up below for current lock and drift-hook coverage. |
 | Omarchy follow-up, `a78adca` | Current locked tools installed from stock; incremental fixes, Doom, reboot, SSH environment, file convergence and dry run passed. Drift warnings were accurate; apply became quiet after removing unused stock Node. Notebook and monitor probes passed as detailed below. |
 | macOS source review, `48ad9b1` | macOS dry run and file status are empty. Locked Nix evaluation, both platform shell renderings, lock artifact coverage and nine Git-policy tests passed. No live installation or activation ran. |
+| macOS nix-darwin migration, `7e42d85` | The owner migrated their own Mac from nix-darwin to the Brewfile in place. On 2026-11-06, `/nix` and `/run/current-system` were gone, and `dotfiles-doctor` found no Nix and no Brewfile drift. The three hook test suites passed. A fresh macOS install and an injected-drift doctor check were not run. |
 
 ## Ubuntu support validation, 2026-09-13
 
@@ -138,9 +139,14 @@ scripts alongside it. No personal account credentials were copied into the VM.
 Floating shell-selected mise versions, Neovim plugins, notebook dependencies,
 Vim archive trust and advisory agent hooks remain documented policy choices.
 Watch the mise Herdr pin after Omarchy updates for client/server incompatibility.
-The macOS evidence above predates the move from nix-darwin to Homebrew. A
-fresh macOS install, the nix-darwin migration and the doctor's Brewfile drift
-checks remain untested.
+Apart from the migration row, the macOS evidence above predates the move from
+nix-darwin to Homebrew. The in-place migration has been done on one host, and
+the doctor passed there. Still untested: a fresh macOS install, a migration
+from a disposable copy, and whether the doctor reports undeclared or missing
+Homebrew packages. On that host, `~/.config/git/config` kept the Nix `gpg`
+path until a later apply, so step 5 of the
+[migration](package-lists/macos.md#migrate-from-nix-darwin) now re-applies the
+dotfiles.
 
 This page replaces the review plan, topology and individual reports. Their
 findings and transcript locations remain in Git at `48ad9b1` under

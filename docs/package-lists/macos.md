@@ -191,9 +191,16 @@ before Nix is removed, so follow these steps in order.
    sudo /nix/nix-installer uninstall
    ```
 
-5. Restart, start Proton Mail Bridge from `/Applications`, re-enable it as a
+5. Restart, then apply the dotfiles once more. Templates that resolve tools at
+   apply time, such as `gpg.program` in the Git config, may still point at Nix
+   paths. Start Proton Mail Bridge from `/Applications`, re-enable it as a
    login item if it was one, and run `dotfiles-doctor` again. It should report
    no Nix or Homebrew warnings.
+
+   ```bash
+   chezmoi apply
+   dotfiles-doctor
+   ```
 
 Before step 4, checking out an older commit and activating the flake from it
 still restores the previous system. After step 4, the Brewfile is the only
