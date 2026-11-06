@@ -98,16 +98,17 @@
       # a good fit for the read-only Nix store.
       homebrew = {
         enable = true;
-        taps = [ "basnijholt/tap" "nikitabobko/tap" ];
-        # 37 of the 41 casks below set `auto_updates`, so forcing Homebrew to
+        taps = [ "basnijholt/tap" "nikitabobko/tap" "omacom/mac" ];
+        # 37 of the 42 casks below set `auto_updates`, so forcing Homebrew to
         # own every version means fighting each vendor's own updater on a
         # roughly fortnightly cycle, and re-running a pkg installer under sudo
         # for the Microsoft suite, google-drive, onedrive, cloudflare-warp,
         # tailscale-app, zoom and the Logitech pair. Let the apps update
         # themselves instead, and opt individual casks back in below.
         #
-        # This does not stop `upgrade = true` from upgrading the four casks
-        # that do not self-update (aerospace, agent-cli, basictex, dot);
+        # This does not stop `upgrade = true` from upgrading the five casks
+        # that do not self-update (aerospace, agent-cli, basictex, dot,
+        # omarchy);
         # non-greedy `brew upgrade` already covers those.
         #
         # Recount both numbers after adding or removing a cask:
@@ -181,6 +182,11 @@
 
           # --- containers ---
           "rancher"
+
+          # --- operating systems ---
+          # Installs Omarchy alongside macOS; the cask opens the installer app
+          # after every install or upgrade.
+          "omacom/mac/omarchy"
 
           # --- media and games ---
           "spotify"
