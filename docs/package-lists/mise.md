@@ -56,8 +56,8 @@ one with an older wire protocol, and this declaration puts it back. If an
 Omarchy update ever moves the herdr protocol, either bump the pin here in the
 same session or drop the `herdr` line and let the package own it again.
 
-Pixi is managed only by mise on every supported host. Do not add it to pacman or Nix
-package lists. `~/.pixi/bin` stays on PATH for tools installed through Pixi
+Pixi is managed only by mise on every supported host. Do not add it to pacman or
+Homebrew package lists. `~/.pixi/bin` stays on PATH for tools installed through Pixi
 itself.
 
 ## Conflicting mise configs
@@ -86,7 +86,7 @@ those dependencies before their consumers, including on a fresh host with no
 system copies. The terminal tool declarations also replace explicit native
 package declarations. Existing Omarchy copies may remain as distribution
 packages; mise's PATH takes precedence. On macOS, apply the tool installation
-before activating the Nix generation that removes the old native declarations.
+before a `brew-switch` that removes the old native declarations.
 
 After editing a declaration, refresh the lock without bumping unrelated tools:
 

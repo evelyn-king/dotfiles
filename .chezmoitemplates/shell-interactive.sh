@@ -134,11 +134,6 @@ alias ..='cd ..'
 alias ...='cd ../..'
 alias ....='cd ../../..'
 
-{{ if eq .chezmoi.os "darwin" }}
-# Activate the system explicitly; dotfiles-doctor reports drift on request.
-# The flake path is fixed at apply time so this works from any directory.
-command -v darwin-rebuild >/dev/null 2>&1 && alias nix-switch='sudo darwin-rebuild switch --flake {{ printf "%s/nix#macbook" .chezmoi.sourceDir | quote }}'
-{{ end }}
 command -v bun >/dev/null 2>&1 && alias bunx='bun x'
 
 if command -v eza >/dev/null 2>&1; then

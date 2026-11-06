@@ -4,7 +4,7 @@ Reviewed 2026-09-06 against `48ad9b1`. Omarchy follow-up on 2026-09-07
 covered the lock at `92afe3f`, code fixes through `a78adca`, and the notebook
 runbook correction at `08330ca`.
 Supported targets are Apple Silicon macOS with account
-`evelynking` and flake `macbook`, Omarchy 4 on x86_64, and Ubuntu 26.04 x86_64
+`evelynking`, Omarchy 4 on x86_64, and Ubuntu 26.04 x86_64
 headless hosts. The older reviews below predate Ubuntu support.
 
 **Ready to open a PR into `main`; merge validation remains incomplete.** No
@@ -68,9 +68,10 @@ This does not replace a live macOS or Omarchy deployment of these changes.
   Homebrew can reject mismatched app versions, and package installers still
   execute. Verify app bundles as well as receipts,
   interrupted-install recovery, and removal of undeclared Homebrew packages.
-  Only bootstrap-formula cleanup has VM coverage. The flake owns the entire
-  prefix. Resolve preserved legacy Git, mise and AeroSpace configs
-  before relying on their replacements; migration warnings do not fail apply.
+  Only bootstrap-formula cleanup has VM coverage, and it predates the move from
+  nix-darwin to `homebrew/Brewfile`, which owns the entire prefix. Resolve
+  preserved legacy Git, mise and AeroSpace configs before relying on their
+  replacements; migration warnings do not fail apply.
 
 ## Validate on hosts that use these workflows
 
@@ -137,7 +138,9 @@ scripts alongside it. No personal account credentials were copied into the VM.
 Floating shell-selected mise versions, Neovim plugins, notebook dependencies,
 Vim archive trust and advisory agent hooks remain documented policy choices.
 Watch the mise Herdr pin after Omarchy updates for client/server incompatibility.
-The complete nix-darwin drift state matrix remains untested.
+The macOS evidence above predates the move from nix-darwin to Homebrew. A
+fresh macOS install, the nix-darwin migration and the doctor's Brewfile drift
+checks remain untested.
 
 This page replaces the review plan, topology and individual reports. Their
 findings and transcript locations remain in Git at `48ad9b1` under

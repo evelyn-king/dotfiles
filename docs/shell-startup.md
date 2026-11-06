@@ -38,20 +38,18 @@ preference, then both fall back to a portable UTF-8 locale.
 ## Why PATH is built twice
 
 Interactive shells build PATH in the rc file. macOS runs `path_helper` from
-`/etc/profile` for login sh and bash. Stock `/etc/zprofile` also runs it for
-login zsh, but nix-darwin replaces that file. Because `path_helper` reorders
-anything an earlier stage prepended, the interactive rc file is the first point
-where the managed order sticks.
+`/etc/profile` for login sh and bash, and from `/etc/zprofile` for login zsh.
+Because `path_helper` reorders anything an earlier stage prepended, the
+interactive rc file is the first point where the managed order sticks.
 
 Non-interactive zsh reads `~/.zshenv`, and sshd makes a remote bash command read
 `~/.bashrc`. Without a second build those commands inherit a bare PATH with no
-`~/.local/bin`, nix profiles or mise shims, which is how `ssh host some-command`
+`~/.local/bin`, Homebrew or mise shims, which is how `ssh host some-command`
 fails with "command not found" while the same command works interactively.
 `shell-env.sh` therefore runs the same body behind a non-interactive guard.
 
-Before the first nix-darwin activation, `zsh -lc` is one narrow exception.
-Stock `/etc/zprofile` runs `path_helper` after `~/.zshenv` and can reorder the
-managed PATH. Cron jobs, launchd jobs, systemd units and directly executed Git
+On macOS, `zsh -lc` is one narrow exception. `/etc/zprofile` runs
+`path_helper` after `~/.zshenv` and can reorder the managed PATH. Cron jobs, launchd jobs, systemd units and directly executed Git
 hooks do not read these startup files at all. They need their own PATH setting,
 such as `PATH=` in a crontab, `EnvironmentVariables` in a launchd plist,
 `Environment=` in a systemd unit, or an absolute command path in a Git hook.
@@ -63,17 +61,20 @@ reaches both copies still ends up with the same order.
 
 - The mise shims lead, ahead of `~/.local/bin`, so a hand-installed binary
   cannot outrank a pinned version for non-interactive shells.
-- Homebrew ranks below the nix profiles. A later stage deliberately never calls
-  `brew shellenv`. It prepends unconditionally and would shadow every
-  mise-managed runtime.
+- Homebrew ranks below the mise shims and user directories. A later stage
+  deliberately never calls `brew shellenv`. It prepends unconditionally and
+  would shadow every mise-managed runtime.
+- The Homebrew `gnubin` directories for coreutils and gawk, and the unlinked
+  sqlite and libxml2 bins, rank just ahead of `/opt/homebrew/bin`, so the GNU
+  and current versions win over the copies in `/usr/bin`.
 - micromamba's shell hook runs *before* `mise activate`, because it prepends
   `$MAMBA_ROOT_PREFIX/condabin` and would otherwise sit ahead of every mise tool
   path. micromamba is itself a mise tool, so it is resolved with `mise which`.
 - The rc file brings up completions before it includes
   `shell-interactive.sh`. The tool hooks in there register completions, so
   `compinit` and `bashcompinit` have to have run already.
-- nix-darwin's global `compinit` is disabled. `~/.zshrc` owns the single
-  completion initialization after adding user site-functions to `fpath`.
+- `~/.zshrc` owns the single completion initialization, after adding user
+  site-functions to `fpath`.
 - The prompt block (starship, zoxide, atuin) stays last.
 - bash gets its preexec/precmd hooks from atuin, and nothing else in
   `~/.bashrc` provides them. `atuin init bash` carries its own bash-preexec and

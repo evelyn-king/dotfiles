@@ -57,7 +57,7 @@ Package ownership depends on the host.
 
 | Host | System packages | GUI apps | Runtimes and CLI tools |
 | --- | --- | --- | --- |
-| Apple Silicon macOS | nix-darwin | Homebrew casks, declared in the flake | mise |
+| Apple Silicon macOS | Homebrew, declared in `homebrew/Brewfile` | Homebrew casks and App Store apps | mise |
 | Omarchy 4 x86_64 | pacman and the AUR, via Omarchy | Omarchy | mise |
 | Ubuntu 26.04 x86_64 | APT, via mise bootstrap | Headless | mise |
 
@@ -103,7 +103,7 @@ the other platforms' entries. Review and commit the lockfile change afterwards.
 Rust is the one channel-based exception. Its lock entry stays `stable`, and
 rustup resolves that channel when mise installs or updates it.
 
-Like `nix/flake.lock`, that lock is repo content rather than a home file. mise
+That lock is repo content rather than a home file. mise
 rewrites a lock in place whenever it installs, so an applied second copy under
 `~/.config/mise` would diverge from the source tree after every install and
 leave `chezmoi status` permanently dirty. The source tree holds the only copy,

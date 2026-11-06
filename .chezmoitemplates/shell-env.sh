@@ -147,7 +147,7 @@ unset __dir
 #
 # zsh reads ~/.zshenv for every invocation, and sshd makes remote bash commands
 # read ~/.bashrc. Without this block those commands inherit whatever bare PATH
-# their parent handed over: no ~/.local/bin, no nix profiles, no ~/.cargo/bin.
+# their parent handed over: no ~/.local/bin, no Homebrew, no ~/.cargo/bin.
 # That is what made
 # `ssh host jupyter-remote-lab` fail with "command not found" while the same
 # command worked interactively. Cron, launchd, systemd units and directly

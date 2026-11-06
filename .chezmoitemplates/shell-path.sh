@@ -1,9 +1,9 @@
 # PATH, built in the interactive rc rather than in the env file.
 #
-# macOS runs path_helper from /etc/profile for login sh and bash. Stock
-# /etc/zprofile does the same for login zsh, but nix-darwin replaces that file.
-# Building PATH in the interactive rc preserves this order after either login
-# path setup and costs nothing on Linux.
+# macOS runs path_helper from /etc/profile for login sh and bash, and from
+# /etc/zprofile for login zsh. path_helper reorders anything an earlier stage
+# prepended, so building PATH in the interactive rc preserves this order after
+# either login path setup and costs nothing on Linux.
 #
 # Two callers include this body, and only one is the interactive rc.
 # shell-env.sh also runs it when a non-interactive shell reads .zshenv, .profile
@@ -18,14 +18,19 @@
 # zsh-only version: the list below is built first, then whatever PATH already
 # held is appended minus anything already claimed. Listing a directory here is
 # therefore what fixes its position, rather than inheriting wherever /etc put
-# it. That matters for the nix profiles, since a system /etc/zshrc may well have
-# added them somewhere else already.
+# it. That matters for Homebrew, since path_helper and /etc/paths.d entries may
+# well have added its directories somewhere else already.
 #
-# Homebrew is listed for the same reason, and ranks below the nix profiles: it
-# is the escape hatch for casks, not the primary source of CLI tools. Do not
-# call `brew shellenv` from a later stage instead. It prepends unconditionally,
-# so it would land ahead of the tool paths `mise activate` adds later in the
+# Homebrew ranks below the user and mise directories. Do not call
+# `brew shellenv` from a later stage instead. It prepends unconditionally, so it
+# would land ahead of the tool paths `mise activate` adds later in the
 # interactive rc and quietly shadow every mise-managed runtime.
+#
+# The four Homebrew opt directories ahead of /opt/homebrew/bin keep what Nix
+# used to provide: GNU coreutils and awk under their plain names (ls, date,
+# awk), ahead of the BSD tools in /usr/bin, and current sqlite3 and xmllint
+# rather than the older copies macOS ships. Homebrew links none of these by
+# default. Drop a line to fall back to the macOS command.
 
 # $GOPATH/bin leads and is deliberately not existence-checked: the first
 # `go install` creates it, and by then the shell has long since started.
@@ -43,9 +48,10 @@ for __dir in \
   "$HOME/.cargo/bin" \
   "$BUN_INSTALL/bin" \
   "$HOME/.rd/bin" \
-  "$HOME/.nix-profile/bin" \
-  /run/current-system/sw/bin \
-  /nix/var/nix/profiles/default/bin \
+  /opt/homebrew/opt/coreutils/libexec/gnubin \
+  /opt/homebrew/opt/gawk/libexec/gnubin \
+  /opt/homebrew/opt/sqlite/bin \
+  /opt/homebrew/opt/libxml2/bin \
   /opt/homebrew/bin \
   /opt/homebrew/sbin; do
   [ -d "$__dir" ] || continue

@@ -91,7 +91,7 @@ Three rules constrain what goes in the manifest:
 The desktop platforms use different fonts. Ghostty's
 font chain names `JetBrainsMono Nerd Font`, which Omarchy already ships, so the
 manifest does not list it. The preferred CaskaydiaCove face has no Omarchy
-package and is macOS only, from `nix/flake.nix`.
+package and is macOS only, from `homebrew/Brewfile`.
 
 Web apps and Omarchy desktop defaults are not tracked here. Omarchy manages
 them. Theming is not wired to Omarchy either. Every config names Gruvbox

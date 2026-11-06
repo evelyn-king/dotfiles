@@ -5,7 +5,7 @@
 - The repo root is the chezmoi source state for files under `$HOME`.
 - `.chezmoidata/` carries template data; `.chezmoitemplates/` carries bodies shared
   between several rendered files.
-- `nix/`, `docs/` and the top-level Markdown are repo content. `.chezmoiignore`
+- `homebrew/`, `docs/` and the top-level Markdown are repo content. `.chezmoiignore`
   lists them and they are never applied to `$HOME`.
 
 ## Branching
@@ -37,22 +37,23 @@
   `dot_config/ghostty/config.tmpl` that include it.
 - Declare runtimes and global CLI tools in `dot_config/mise/conf.d/`, Omarchy
   system packages in `.chezmoidata/packages.yaml`, and macOS system packages
-  in `nix/flake.nix`. Ubuntu native packages belong in `[bootstrap.packages]`
+  in `homebrew/Brewfile`. Ubuntu native packages belong in `[bootstrap.packages]`
   in `dot_config/mise/conf.d/20-ubuntu.toml`. Do not declare the same tool in
   mise's `[tools]` and a system package list. Native Python remains an OS
   dependency; mise owns the development interpreter.
 - Pin the mise binary itself under `mise` in `.chezmoidata/versions.yaml`, with
   a checksum per platform. `run_before_00-install-mise.sh.tmpl` installs it into
   `~/.local/bin` on every host. Other hooks call `$HOME/.local/bin/mise` by path.
-  Do not add mise to Nix or the Omarchy package list.
+  Do not add mise to the Brewfile or the Omarchy package list.
 - Ubuntu support targets 26.04 x86_64 headless hosts. Keep distribution
   detection in `.chezmoitemplates/ubuntu-detect.tmpl`. The Ubuntu before-hook
   applies native files/packages, including its APT recommendation policy; the
   shared tool hook applies tools only. Chezmoi owns dotfiles and shell startup.
 - Keep mise declarations as plain TOML: installation and locking read the
   source files directly, without chezmoi rendering.
-- `dot_config/mise/mise.lock` and `nix/flake.lock` are repo content. Never apply
-  them to `$HOME`; mise rewrites its lock in place and a second copy diverges.
+- `dot_config/mise/mise.lock` and `homebrew/Brewfile` are repo content. Never
+  apply them to `$HOME`; mise rewrites its lock in place and a second copy
+  diverges. `brew-switch` reads the Brewfile from the source tree.
 - The docs under `docs/package-lists/` explain ownership rules and manual steps.
   The declarations themselves are the package list. Do not copy package names,
   versions or counts into the docs, where they go stale.

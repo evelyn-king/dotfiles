@@ -12,7 +12,6 @@ README.md
 .mailmap
 docs/**
 homebrew
-nix
 # mise rewrites its lock in place on every install. Applying a second copy to
 # $HOME gives the two copies a way to diverge and leaves `chezmoi status`
 # permanently dirty, so the source tree keeps the only copy and the locked mise
@@ -32,6 +31,7 @@ nix
 {{- if ne .chezmoi.os "darwin" }}
 .config/aerospace
 .config/agent-cli/config.toml
+.local/bin/brew-switch
 {{- end }}
 
 {{- if not $omarchy }}

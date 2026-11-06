@@ -1,12 +1,14 @@
 # macOS packages, applied with `brew bundle`.
 #
-# Ported from nix/flake.nix. This file is repository content, listed in
-# .chezmoiignore, and is read from the source tree:
+# This file is repository content, listed in .chezmoiignore, and is read from
+# the source tree. Apply it with `brew-switch` (dot_local/bin), which installs
+# and upgrades everything here, then removes any formula, cask or tap this file
+# does not declare: it owns the Homebrew prefix. `dotfiles-doctor` reports
+# drift without changing anything.
 #
-#   brew bundle --file "$(chezmoi source-path)/homebrew/Brewfile" --cleanup
-#
-# --cleanup keeps the old `cleanup = "uninstall"` behaviour: this file owns
-# the Homebrew prefix, and anything it does not declare is removed.
+# Third-party casks need `trusted: true` and their full tap name. Homebrew
+# refuses to load a cask from an untrusted tap, and brew-switch resets the
+# trust store to the entries declared here.
 #
 # Anything managed by mise is deliberately not here, and neither is mise
 # itself: run_before_00-install-mise installs the pinned release.
@@ -28,8 +30,7 @@ brew "eza"
 brew "fzf"
 brew "jq"
 brew "ripgrep"
-# The Rust client the tldr project now maintains. It installs the `tldr`
-# command, as nixpkgs `tldr` did.
+# The Rust client the tldr project maintains. It installs the `tldr` command.
 brew "tlrc"
 
 # --- git --------------------------------------------------------------------
@@ -55,15 +56,14 @@ brew "pv"
 # --- build and toolchain ----------------------------------------------------
 brew "cmake"
 # Homebrew installs coreutils and gawk with a "g" prefix (gls, gdate, gawk).
-# Nix put the unprefixed GNU names on PATH, ahead of the BSD tools. Add
-# $HOMEBREW_PREFIX/opt/{coreutils,gawk}/libexec/gnubin to PATH to keep that.
+# shell-path.sh puts their gnubin directories on PATH, so the plain GNU names
+# win over the BSD tools.
 brew "coreutils"
 brew "gawk"
 brew "graphicsmagick"
 brew "graphviz"
-# libxml2 and sqlite are keg-only, because macOS ships older copies. Unlike
-# under Nix, /usr/bin/xmllint and /usr/bin/sqlite3 win unless
-# $HOMEBREW_PREFIX/opt/{libxml2,sqlite}/bin are added to PATH.
+# libxml2 and sqlite are keg-only, because macOS ships older copies.
+# shell-path.sh puts their opt bin directories ahead of /usr/bin.
 brew "libxml2"
 brew "pkgconf"
 brew "portaudio"
@@ -92,8 +92,7 @@ brew "sshpass"
 brew "w3m"
 brew "wget"
 
-# Installs the App Store apps below. nix-darwin put it on the activation PATH;
-# Homebrew Bundle needs it declared.
+# Installs the App Store apps declared at the end of this file.
 brew "mas"
 
 # --- fonts ------------------------------------------------------------------
@@ -127,7 +126,7 @@ cask "bitwarden"
 # date while installed by hand, despite both advertising `auto_updates`.
 # Non-greedy would recreate the conditions they rotted under, so Homebrew
 # forces these two.
-cask "nikitabobko/tap/aerospace"
+cask "nikitabobko/tap/aerospace", trusted: true
 cask "bartender", greedy: true
 cask "raycast"
 
@@ -156,7 +155,6 @@ cask "zotero"
 
 # --- communication ---
 cask "discord"
-# Was nixpkgs `protonmail-bridge`; Homebrew ships it as a cask.
 cask "proton-mail-bridge"
 cask "proton-mail"
 cask "signal"
@@ -188,7 +186,7 @@ cask "rancher"
 # --- operating systems ---
 # Installs Omarchy alongside macOS; the cask opens the installer app after
 # every install or upgrade.
-cask "omacom/mac/omarchy"
+cask "omacom/mac/omarchy", trusted: true
 
 # --- media and games ---
 cask "spotify"
@@ -198,8 +196,8 @@ cask "steam"
 # Two caveats from the Homebrew Bundle implementation:
 #   * the App Store account that owns these must be signed in, or
 #     `brew bundle` cannot install or upgrade them;
-#   * removing an entry here does NOT uninstall the app, even with
-#     --cleanup. Delete those by hand.
+#   * removing an entry here does NOT uninstall the app: brew-switch limits
+#     cleanup to formulae, casks and taps. Delete those by hand.
 #
 # Ids come from `kMDItemAppStoreAdamID` on the installed bundle.
 mas "Amazon Kindle", id: 302584613

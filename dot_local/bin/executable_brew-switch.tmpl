@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+# Bring the Homebrew prefix in line with the source Brewfile: install what is
+# missing, upgrade what is outdated, then remove undeclared formulae, casks and
+# taps. Run it explicitly. `chezmoi apply` never does, and dotfiles-doctor
+# reports drift on request.
+#
+# Cleanup names its types on purpose. `brew bundle install --force-cleanup`
+# also uninstalls every Mac App Store app and every cargo, go, npm and uv
+# package that the Brewfile does not declare. Naming formulae, casks and taps
+# leaves those alone, so an App Store purchase or a `cargo install` survives.
+# Forced cleanup still resets Homebrew's trust store to the `trusted:` entries
+# in the Brewfile.
+#
+# Cleanup runs only after a successful install, so a failed download never
+# leaves the prefix with packages removed and their replacements missing.
+set -euo pipefail
+
+brewfile={{ printf "%s/homebrew/Brewfile" .chezmoi.sourceDir | quote }}
+
+brew update
+brew bundle install --file "$brewfile"
+brew bundle cleanup --file "$brewfile" --formulae --casks --taps --force

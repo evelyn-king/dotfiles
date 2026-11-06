@@ -14,8 +14,9 @@ the tested commit with `git -C "$(chezmoi source-path)" rev-parse HEAD`.
 
 ## Apple Silicon macOS
 
-This configuration is named `macbook`, targets `aarch64-darwin`, and sets the
-primary account to `evelynking`. Confirm the machine before changing it:
+Homebrew owns the macOS packages, declared in `homebrew/Brewfile`. The
+procedure expects the primary account `evelynking`. Confirm the machine before
+changing it:
 
 ```bash
 test "$(uname -m)" = arm64
@@ -23,18 +24,9 @@ test "$(id -un)" = evelynking
 xcode-select --install
 ```
 
-Wait for the Command Line Tools installation to finish. Install Determinate
-Nix, then open a new terminal and verify it:
-
-```bash
-curl --proto '=https' --tlsv1.2 -sSf -L \
-  https://install.determinate.systems/nix | sh -s -- install
-nix --version
-```
-
-Install Homebrew and use its path for this terminal only. Do not append
-`brew shellenv` to `~/.zprofile`; this repo manages that file and builds the
-Homebrew paths itself.
+Wait for the Command Line Tools installation to finish. Install Homebrew and
+use its path for this terminal only. Do not append `brew shellenv` to
+`~/.zprofile`; this repo manages that file and builds the Homebrew paths itself.
 
 ```bash
 /bin/bash -c "$(curl -fsSL \
@@ -44,8 +36,12 @@ brew --version
 brew install chezmoi
 ```
 
+The Brewfile declares `chezmoi` too, so Homebrew keeps managing this bootstrap
+copy.
+
 Initialize the public source repo without applying it, then inspect the first
-apply:
+apply. The apply installs the pinned mise release and its tool set into your
+home directory, and puts `brew-switch` in `~/.local/bin`.
 
 ```bash
 chezmoi init https://github.com/evelyn-king/dotfiles.git
@@ -55,43 +51,21 @@ chezmoi apply
 ```
 
 If this is an existing Mac, complete the cask adoption procedure in
-[package-lists/macos.md](package-lists/macos.md) before activation.
+[package-lists/macos.md](package-lists/macos.md) first. A Mac that ran the
+former nix-darwin flake follows the migration steps on that page instead of the
+rest of this section.
 
 Sign in to the App Store through the App Store application, using the account
-that owns the declared `masApps`. Activation cannot install or upgrade them
+that owns the Brewfile's `mas` entries. Homebrew cannot install or upgrade them
 otherwise. Xcode is one of them, so expect a multi-gigabyte download during the
-activation below, and launch it once afterwards to accept its license.
+step below, and launch it once afterwards to accept its license.
 
-Prepare the first activation by preserving Determinate's comments-only
-`/etc/nix/nix.custom.conf`. Otherwise nix-darwin rejects that existing file.
-The helper checks its exact audited checksum, keeps the original as
-`nix.custom.conf.before-nix-darwin`, and refuses to replace an existing backup
-or move unrecognized content. It leaves symlinks and absent files alone.
+Install everything the Brewfile declares, then apply again. Some templates
+render differently once their tools are installed. Open a new terminal
+afterwards so the shell picks up the Homebrew paths.
 
 ```bash
-sudo /bin/sh "$(chezmoi source-path)/nix/prepare-first-activation.sh"
-```
-
-Continue only if this succeeds. If it reports unrecognized content, review
-those settings and incorporate the required values into the Nix configuration
-before deciding how to preserve the old file.
-
-The first activation must use `nix run` because `darwin-rebuild` is not on
-`PATH` yet:
-
-```bash
-sudo nix run nix-darwin/master#darwin-rebuild -- \
-  switch --flake "$(chezmoi source-path)/nix#macbook"
-```
-
-Activation removes the bootstrap Homebrew `chezmoi` formula, because Nix owns
-that command now. Restart the Mac so the system generation, applications and
-fonts are available in a fresh login. The first apply already installed the
-pinned mise release and its tool set into your home directory.
-
-```bash
-sudo shutdown -r now
-# Run after logging back in.
+"$HOME/.local/bin/brew-switch"
 chezmoi apply
 ```
 
@@ -109,7 +83,6 @@ chezmoi status --exclude=scripts
 chezmoi diff --exclude=scripts
 chezmoi apply --dry-run --refresh-externals=never
 dotfiles-doctor
-sudo darwin-rebuild --list-generations
 brew list --cask
 mise doctor
 aerospace list-workspaces --all
