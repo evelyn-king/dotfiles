@@ -7,7 +7,7 @@ resolution-markers = [
 ]
 
 [options]
-exclude-newer = "2026-11-04T18:11:32.675372999Z"
+exclude-newer = "2026-11-05T18:30:32.868039Z"
 
 [[package]]
 name = "ast-serialize"
