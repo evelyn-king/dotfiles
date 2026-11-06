@@ -1,0 +1,211 @@
+# macOS packages, applied with `brew bundle`.
+#
+# Ported from nix/flake.nix. This file is repository content, listed in
+# .chezmoiignore, and is read from the source tree:
+#
+#   brew bundle --file "$(chezmoi source-path)/homebrew/Brewfile" --cleanup
+#
+# --cleanup keeps the old `cleanup = "uninstall"` behaviour: this file owns
+# the Homebrew prefix, and anything it does not declare is removed.
+#
+# Anything managed by mise is deliberately not here, and neither is mise
+# itself: run_before_00-install-mise installs the pinned release.
+
+tap "nikitabobko/tap"
+tap "omacom/mac"
+
+# --- shell and terminal -----------------------------------------------------
+brew "atuin"
+brew "keychain"
+brew "starship"
+brew "tmux"
+brew "zoxide"
+
+# --- search and file tools --------------------------------------------------
+brew "dust"
+brew "duf"
+brew "eza"
+brew "fzf"
+brew "jq"
+brew "ripgrep"
+# The Rust client the tldr project now maintains. It installs the `tldr`
+# command, as nixpkgs `tldr` did.
+brew "tlrc"
+
+# --- git --------------------------------------------------------------------
+brew "git"
+brew "git-delta"
+brew "git-lfs"
+brew "lazygit"
+
+# --- languages, runtimes, package managers ----------------------------------
+brew "lua-language-server"
+brew "luarocks"
+
+# --- editors ----------------------------------------------------------------
+brew "neovim"
+brew "vim"
+
+# --- system and monitoring --------------------------------------------------
+brew "btop"
+brew "htop"
+brew "hyperfine"
+brew "pv"
+
+# --- build and toolchain ----------------------------------------------------
+brew "cmake"
+# Homebrew installs coreutils and gawk with a "g" prefix (gls, gdate, gawk).
+# Nix put the unprefixed GNU names on PATH, ahead of the BSD tools. Add
+# $HOMEBREW_PREFIX/opt/{coreutils,gawk}/libexec/gnubin to PATH to keep that.
+brew "coreutils"
+brew "gawk"
+brew "graphicsmagick"
+brew "graphviz"
+# libxml2 and sqlite are keg-only, because macOS ships older copies. Unlike
+# under Nix, /usr/bin/xmllint and /usr/bin/sqlite3 win unless
+# $HOMEBREW_PREFIX/opt/{libxml2,sqlite}/bin are added to PATH.
+brew "libxml2"
+brew "pkgconf"
+brew "portaudio"
+brew "sccache"
+brew "shellcheck"
+brew "sqlite"
+
+# --- documents, data and ML -------------------------------------------------
+brew "llama.cpp"
+brew "pandoc"
+brew "poppler"
+brew "tesseract"
+
+# --- network and misc -------------------------------------------------------
+brew "awscli"
+brew "chezmoi"
+brew "cloudflared"
+# Homebrew's gnupg defaults to the curses pinentry. GUI signing needs
+#   pinentry-program /opt/homebrew/bin/pinentry-mac
+# in ~/.gnupg/gpg-agent.conf.
+brew "gnupg"
+brew "lima"
+brew "pinentry-mac"
+brew "prettyping"
+brew "sshpass"
+brew "w3m"
+brew "wget"
+
+# Installs the App Store apps below. nix-darwin put it on the activation PATH;
+# Homebrew Bundle needs it declared.
+brew "mas"
+
+# --- fonts ------------------------------------------------------------------
+cask "font-caskaydia-cove-nerd-font"
+cask "font-fira-code-nerd-font"
+cask "font-hack-nerd-font"
+
+# --- casks ------------------------------------------------------------------
+# Casks are non-greedy, the `brew bundle` default. 36 of the 41 casks below
+# set `auto_updates`. Forcing Homebrew to own every version would mean
+# fighting each vendor's own updater on a roughly fortnightly cycle, and
+# re-running a pkg installer under sudo for the Microsoft suite, google-drive,
+# onedrive, cloudflare-warp, tailscale-app, zoom and the Logitech pair. Let
+# the apps update themselves, and opt individual casks back in with
+# `greedy: true`.
+#
+# Non-greedy upgrades still cover the five casks that do not self-update
+# (aerospace, basictex, dot, omarchy). The font casks above also lack
+# `auto_updates`, so ordinary upgrades cover them as well.
+#
+# Recount both numbers after adding or removing a cask:
+#   brew info --json=v2 --cask <tokens...> \
+#     | jq '[.casks[].auto_updates] | {total: length, self: map(select(.)) | length}'
+
+# --- security and credentials ---
+cask "1password"
+cask "bitwarden"
+
+# --- window management and launchers ---
+# bartender and raindropio each sat between seven months and two years out of
+# date while installed by hand, despite both advertising `auto_updates`.
+# Non-greedy would recreate the conditions they rotted under, so Homebrew
+# forces these two.
+cask "nikitabobko/tap/aerospace"
+cask "bartender", greedy: true
+cask "raycast"
+
+# --- browsers ---
+cask "brave-origin"
+cask "firefox"
+cask "zen"
+
+# --- terminals and editors ---
+cask "ghostty"
+cask "iterm2"
+cask "visual-studio-code"
+cask "zed"
+
+# --- AI assistants ---
+cask "chatgpt"
+cask "claude"
+
+# --- notes, tasks and reference ---
+cask "dot"
+cask "notion"
+cask "obsidian"
+cask "raindropio", greedy: true
+cask "todoist-app"
+cask "zotero"
+
+# --- communication ---
+cask "discord"
+# Was nixpkgs `protonmail-bridge`; Homebrew ships it as a cask.
+cask "proton-mail-bridge"
+cask "proton-mail"
+cask "signal"
+cask "zoom"
+
+# --- office and documents ---
+cask "basictex"
+cask "microsoft-excel"
+cask "microsoft-powerpoint"
+cask "microsoft-word"
+
+# --- cloud storage and sync ---
+cask "dropbox"
+cask "google-drive"
+cask "onedrive"
+cask "proton-drive"
+
+# --- networking ---
+cask "cloudflare-warp"
+cask "tailscale-app"
+
+# --- hardware ---
+cask "logi-options+"
+cask "logitune"
+
+# --- containers ---
+cask "rancher"
+
+# --- operating systems ---
+# Installs Omarchy alongside macOS; the cask opens the installer app after
+# every install or upgrade.
+cask "omacom/mac/omarchy"
+
+# --- media and games ---
+cask "spotify"
+cask "steam"
+
+# --- Mac App Store ----------------------------------------------------------
+# Two caveats from the Homebrew Bundle implementation:
+#   * the App Store account that owns these must be signed in, or
+#     `brew bundle` cannot install or upgrade them;
+#   * removing an entry here does NOT uninstall the app, even with
+#     --cleanup. Delete those by hand.
+#
+# Ids come from `kMDItemAppStoreAdamID` on the installed bundle.
+mas "Amazon Kindle", id: 302584613
+mas "DaisyDisk", id: 411643860
+mas "Keynote", id: 409183694
+mas "Magnet", id: 441258766
+mas "Slack", id: 803453959
+mas "WireGuard", id: 1451685025
+mas "Xcode", id: 497799835
