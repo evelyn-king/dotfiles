@@ -14,7 +14,6 @@
 # itself: run_before_00-install-mise installs the pinned release.
 
 tap "nikitabobko/tap"
-tap "omacom/mac"
 
 # --- shell and terminal -----------------------------------------------------
 brew "atuin"
@@ -110,7 +109,7 @@ cask "font-hack-nerd-font"
 # `greedy: true`.
 #
 # Non-greedy upgrades still cover the five casks that do not self-update
-# (aerospace, basictex, dot, omarchy). The font casks above also lack
+# (aerospace, basictex, dot). The font casks above also lack
 # `auto_updates`, so ordinary upgrades cover them as well.
 #
 # Recount both numbers after adding or removing a cask:
@@ -182,11 +181,6 @@ cask "logitune"
 
 # --- containers ---
 cask "rancher"
-
-# --- operating systems ---
-# Installs Omarchy alongside macOS; the cask opens the installer app after
-# every install or upgrade.
-cask "omacom/mac/omarchy", trusted: true
 
 # --- media and games ---
 cask "spotify"
