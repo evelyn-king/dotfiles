@@ -29,7 +29,6 @@ omarchyPackages:
     - protonmail-bridge
     - ripgrep
     - sccache
-    - shellcheck
     - starship
     - tailscale
     - vim
@@ -40,4 +39,5 @@ omarchyPackages:
     - zsh
   aur:
     - proton-mail-bin
+    - shellcheck-bin
     - slack-desktop

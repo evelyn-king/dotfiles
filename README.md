@@ -12,8 +12,8 @@ Dotfiles managed directly with `chezmoi`.
 
 ## Supported platforms
 
-Apple Silicon macOS, Omarchy 4 on x86_64 Linux, and Ubuntu 26.04 on x86_64
-headless development hosts. Native Windows lives on the separate `windows` branch.
+Apple Silicon macOS, Omarchy 4 on x86_64 and aarch64 (Asahi) Linux, and Ubuntu
+26.04 on x86_64 headless development hosts. Native Windows lives on the separate `windows` branch.
 
 ## Cold start
 
@@ -58,7 +58,7 @@ Package ownership depends on the host.
 | Host | System packages | GUI apps | Runtimes and CLI tools |
 | --- | --- | --- | --- |
 | Apple Silicon macOS | Homebrew, declared in `homebrew/Brewfile` | Homebrew casks and App Store apps | mise |
-| Omarchy 4 x86_64 | pacman and the AUR, via Omarchy | Omarchy | mise |
+| Omarchy 4 x86_64 / aarch64 | pacman and the AUR, via Omarchy | Omarchy | mise |
 | Ubuntu 26.04 x86_64 | APT, via mise bootstrap | Headless | mise |
 
 mise installs the shared versioned tools on every supported host. Linux apply
@@ -95,8 +95,8 @@ mup
 ```
 
 `mup`, installed in `~/.local/bin`, refreshes the committed
-`dot_config/mise/mise.lock` for `linux-x64`, `macos-arm64` and `windows-x64`
-whichever machine you run it on, then installs what that lock holds for the
+`dot_config/mise/mise.lock` for `linux-x64`, `linux-arm64`, `macos-arm64` and
+`windows-x64` whichever machine you run it on, then installs what that lock holds for the
 machine you are on. The lock is one shared artifact and `mise lock` prunes
 whatever a run does not resolve, so a refresh scoped to its own host would drop
 the other platforms' entries. Review and commit the lockfile change afterwards.

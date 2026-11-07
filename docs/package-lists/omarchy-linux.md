@@ -1,6 +1,7 @@
 # Omarchy Linux package list
 
-This repo supports Omarchy 4 on x86_64 Linux.
+This repo supports Omarchy 4 on x86_64 Linux and on aarch64 (Asahi Linux on
+Apple Silicon).
 [`../../.chezmoidata/packages.yaml`](../../.chezmoidata/packages.yaml) is the
 source of truth for the required pacman and AUR packages. Read that file for the
 list. This page covers how the hooks treat it and which desktop files the repo
@@ -220,3 +221,16 @@ ls ~/.config/hypr/*.bak.*
 Use `omarchy refresh config hypr/<file>` to refresh only `.luarc.json`,
 `input.lua`, or `autostart.lua` when you want their packaged defaults without
 overwriting the repo configuration or monitor layout.
+
+## aarch64 hosts
+
+On Asahi Linux, Omarchy's repository supplies aarch64 builds of the packages in
+the manifest, so one manifest serves both architectures. Arch Linux ARM does not
+ship `shellcheck`; the manifest takes `shellcheck-bin` from the AUR instead,
+which provides the same command on both architectures. Before adding a package
+to the manifest, check that `pacman -Si <name>` lists `aarch64` or `any`.
+
+Omarchy 4.5 declares its own tools in `/etc/mise/conf.d`. Plain `mise lock
+--global` picks them up and fails on artifacts some platforms lack, so `mup`
+points `MISE_SYSTEM_CONFIG_DIR` at an empty directory for the lock step. Do the
+same when refreshing the lock by hand.

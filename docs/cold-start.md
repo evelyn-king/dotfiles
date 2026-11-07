@@ -5,7 +5,7 @@ system changes. The first dry run downloads pinned externals when the chezmoi
 cache is empty, even with `--refresh-externals=never`.
 
 The supported deployment targets are Apple Silicon macOS, Omarchy 4 on
-x86_64 Linux, and Ubuntu 26.04 x86_64 headless hosts. Native Windows lives on the
+x86_64 and aarch64 Linux, and Ubuntu 26.04 x86_64 headless hosts. Native Windows lives on the
 `windows` branch.
 
 When validating a PR before merge, add `--branch <candidate-branch>` to each
@@ -95,14 +95,14 @@ run should succeed. `dotfiles-doctor` prints progress and an explicit result for
 check. Resolve any WARN messages and review SKIP messages for checks that could
 not run. Matching configuration should produce OK results.
 
-## Omarchy 4 x86_64
+## Omarchy 4 x86_64 or aarch64
 
 Start from a working Omarchy desktop. The package and shell hooks need the
-Omarchy 4 dispatcher, and the committed mise lock targets x86-64. Check both
-first:
+Omarchy 4 dispatcher, and the committed mise lock targets x86-64 and aarch64.
+Check both first:
 
 ```bash
-test "$(uname -m)" = x86_64
+case "$(uname -m)" in x86_64|aarch64) ;; *) false ;; esac
 command -v omarchy
 omarchy version
 omarchy update system-pkgs

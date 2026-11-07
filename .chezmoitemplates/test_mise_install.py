@@ -67,7 +67,8 @@ class MiseInstallTests(unittest.TestCase):
         data = {
             "chezmoi": {"os": os, "arch": arch},
             "mise": {"version": VERSION,
-                     "sha256": {"linux-x64": digest, "macos-arm64": digest}},
+                     "sha256": {"linux-x64": digest, "linux-arm64": digest,
+                                "macos-arm64": digest}},
         }
         rendered = subprocess.run(
             [CHEZMOI, "--config", str(config), "--source", str(SOURCE),
@@ -127,6 +128,12 @@ class MiseInstallTests(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertTrue(calls[0].endswith(f"mise-v{VERSION}-macos-arm64.tar.gz"))
 
+    def test_linux_arm64_downloads_arm64_archive(self):
+        result, calls = self.run_hook(os="linux", arch="arm64")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertEqual(len(calls), 1)
+        self.assertTrue(calls[0].endswith(f"mise-v{VERSION}-linux-arm64.tar.gz"))
+
     def test_checksum_mismatch_installs_nothing(self):
         result, calls = self.run_hook(sha256="0" * 64)
         self.assertNotEqual(result.returncode, 0)
@@ -135,7 +142,7 @@ class MiseInstallTests(unittest.TestCase):
         self.assertFalse(self.mise.exists())
 
     def test_unpinned_platform_does_nothing(self):
-        result, calls = self.run_hook(arch="arm64")
+        result, calls = self.run_hook(arch="riscv64")
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertIn("no pinned release", result.stderr)
         self.assertEqual(calls, [])

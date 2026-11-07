@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.10"
 
 [options]
-exclude-newer = "2026-11-05T18:30:32.868039Z"
+exclude-newer = "2026-11-06T03:09:18.97067003Z"
 
 [[package]]
 name = "backports-zstd"

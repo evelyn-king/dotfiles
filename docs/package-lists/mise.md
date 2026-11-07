@@ -15,7 +15,7 @@ Most tools carry exact pins. The coding agents, `gh` and `usage` track `latest`
 by design, and Rust tracks the stable release channel. On every supported host,
 [`dot_config/mise/mise.lock`](../../dot_config/mise/mise.lock) resolves the
 declarations to reviewable versions and checksums for `linux-x64`,
-`macos-arm64` and `windows-x64` wherever the backend exposes a fixed artifact.
+`linux-arm64`, `macos-arm64` and `windows-x64` wherever the backend exposes a fixed artifact.
 The Rust entry stays `stable`, and rustup resolves that channel when mise
 installs or updates it.
 
@@ -91,9 +91,10 @@ before a `brew-switch` that removes the old native declarations.
 After editing a declaration, refresh the lock without bumping unrelated tools:
 
 ```bash
+MISE_SYSTEM_CONFIG_DIR="$(mktemp -d)" \
 MISE_CONFIG_DIR="$(chezmoi source-path)/dot_config/mise" \
-  mise --cd / lock --global --platform linux-x64 --platform macos-arm64 \
-    --platform windows-x64
+  mise --cd / lock --global --platform linux-x64 --platform linux-arm64 \
+    --platform macos-arm64 --platform windows-x64
 chezmoi apply
 ```
 
@@ -101,7 +102,8 @@ The install hook and `mup` use `/` as the working directory so a project's local
 mise config cannot add tools or change the versions selected for this operation.
 
 Run `mup` to update the floating tools. It resolves every declared tool for
-`linux-x64`, `macos-arm64` and `windows-x64` no matter which machine runs it,
+`linux-x64`, `linux-arm64`, `macos-arm64` and `windows-x64` no matter which
+machine runs it,
 then installs what the lock holds for that machine. Refreshing the lock is
 deliberately not a per-machine job. `mise lock` prunes the entries a run does
 not resolve, so a host-scoped refresh drops the other platforms' artifacts for

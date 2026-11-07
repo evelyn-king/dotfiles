@@ -13,6 +13,8 @@
 {{-   $platform = "macos-arm64" }}
 {{- else if and (eq .chezmoi.os "linux") (eq .chezmoi.arch "amd64") }}
 {{-   $platform = "linux-x64" }}
+{{- else if and (eq .chezmoi.os "linux") (eq .chezmoi.arch "arm64") }}
+{{-   $platform = "linux-arm64" }}
 {{- end }}
 
 set -euo pipefail

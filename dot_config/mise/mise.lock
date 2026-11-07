@@ -7,19 +7,31 @@ version = "2.41.0"
 backend = "aqua:1password/cli"
 specifiers = ["2.41.0"]
 
+[tools."aqua:1password/cli"."platforms.linux-arm64"]
+checksum = "sha256:bc4ac99201909f96f67e7a89601dbf5388f991aca53120db6fc3f1666dff706b"
+url = "https://cache.agilebits.com/dist/1P/op2/pkg/v2.41.0/op_linux_arm64_v2.41.0.zip"
+
 [tools."aqua:1password/cli"."platforms.linux-x64"]
+checksum = "sha256:498bbaa154f0d90749325a14e04488fcd84930a426ae92ebf421d2a7d793a80a"
 url = "https://cache.agilebits.com/dist/1P/op2/pkg/v2.41.0/op_linux_amd64_v2.41.0.zip"
 
 [tools."aqua:1password/cli"."platforms.macos-arm64"]
+checksum = "sha256:83da93b6d90726ac5111ce4f6993a9504ee420b7a299b9d145041886cd13c6ca"
 url = "https://cache.agilebits.com/dist/1P/op2/pkg/v2.41.0/op_darwin_arm64_v2.41.0.zip"
 
 [tools."aqua:1password/cli"."platforms.windows-x64"]
+checksum = "sha256:1338a6799ef9f66d1b7d526fcf195a37675e80171c557ded01afebb159e3490b"
 url = "https://cache.agilebits.com/dist/1P/op2/pkg/v2.41.0/op_windows_amd64_v2.41.0.zip"
 
 [[tools.ast-grep]]
 version = "0.45.3"
 backend = "aqua:ast-grep/ast-grep"
 specifiers = ["0.45.3"]
+
+[tools.ast-grep."platforms.linux-arm64"]
+checksum = "sha256:b39cfbc58da4b869a88b8a4bc57bd5deb0d24541e704cf7c257da7b53ec81c8f"
+url = "https://github.com/ast-grep/ast-grep/releases/download/0.45.3/app-aarch64-unknown-linux-gnu.zip"
+url_api = "https://api.github.com/repos/ast-grep/ast-grep/releases/assets/537333400"
 
 [tools.ast-grep."platforms.linux-x64"]
 checksum = "sha256:f8ac830881339d1edee6b2652f54798c0f4da5a827f2db38a08ee31117783ce8"
@@ -41,6 +53,11 @@ version = "0.26.1"
 backend = "aqua:sharkdp/bat"
 specifiers = ["0.26.1"]
 
+[tools.bat."platforms.linux-arm64"]
+checksum = "sha256:422eb73e11c854fddd99f5ca8461c2f1d6e6dce0a2a8c3d5daade5ffcb6564aa"
+url = "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat-v0.26.1-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/sharkdp/bat/releases/assets/323548647"
+
 [tools.bat."platforms.linux-x64"]
 checksum = "sha256:726f04c8f576a7fd18b7634f1bbf2f915c43494c1c0f013baa3287edb0d5a2a3"
 url = "https://github.com/sharkdp/bat/releases/download/v0.26.1/bat-v0.26.1-x86_64-unknown-linux-gnu.tar.gz"
@@ -60,6 +77,14 @@ url_api = "https://api.github.com/repos/sharkdp/bat/releases/assets/323549116"
 version = "1.4.0"
 backend = "core:bun"
 specifiers = ["1.4.0"]
+
+[tools.bun."platforms.linux-arm64"]
+checksum = "sha256:4b1a332ee861983eb93bcfe6f770fff94e3e31b2c388bdaea3c8ed35e58eed0e"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-aarch64.zip"
+
+[tools.bun."platforms.linux-arm64-musl"]
+checksum = "sha256:576300ce33ff16ffcd455bf178c2f095f9df845c6cc3d0284ba1c96ca0e80473"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.4.0/bun-linux-aarch64-musl.zip"
 
 [tools.bun."platforms.linux-x64"]
 checksum = "sha256:2d03fb5fb83ac8b567aca0a281b2ce1a1a19d488f56c2968d88c3f25e92fe452"
@@ -94,6 +119,11 @@ version = "2.1.319"
 backend = "aqua:anthropics/claude-code"
 specifiers = ["latest"]
 
+[tools.claude."platforms.linux-arm64"]
+checksum = "sha256:2e7348ffc96d52ccb20e34c81240ebc92505edc84d7bf29182d62c29bf6fa066"
+url = "https://github.com/anthropics/claude-code/releases/download/v2.1.319/claude-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/715418861"
+
 [tools.claude."platforms.linux-x64"]
 checksum = "sha256:8cf226393c8eca446d6ca60fa6bbe3fa7b5fa4de82a7b410d1edbd48689cd776"
 url = "https://github.com/anthropics/claude-code/releases/download/v2.1.319/claude-linux-x64.tar.gz"
@@ -113,6 +143,11 @@ url_api = "https://api.github.com/repos/anthropics/claude-code/releases/assets/7
 version = "0.167.0"
 backend = "aqua:openai/codex"
 specifiers = ["latest"]
+
+[tools.codex."platforms.linux-arm64"]
+checksum = "sha256:0de261ecf1e7f3028a7952f03fca2093f749277d38590b78bb32f8567756bbb7"
+url = "https://github.com/openai/codex/releases/download/rust-v0.167.0/codex-package-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/openai/codex/releases/assets/715502609"
 
 [tools.codex."platforms.linux-x64"]
 checksum = "sha256:3bbf75e83de6b58aed28f2cf6e33ad423ec31fd4700a1457b94be557ea5a7c6e"
@@ -134,6 +169,11 @@ version = "10.5.0"
 backend = "aqua:sharkdp/fd"
 specifiers = ["10.5.0"]
 
+[tools.fd."platforms.linux-arm64"]
+checksum = "sha256:c0ee43802e3313a317c5af2f4eabd6ba13eeedd595af9775f05e18a13ac4f52c"
+url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/sharkdp/fd/releases/assets/530482307"
+
 [tools.fd."platforms.linux-x64"]
 checksum = "sha256:a1259cd129636efbc3fef123525c1b49e88fe5088c012630983c310e52fdfa95"
 url = "https://github.com/sharkdp/fd/releases/download/v10.5.0/fd-v10.5.0-x86_64-unknown-linux-gnu.tar.gz"
@@ -154,19 +194,32 @@ version = "586.0.0"
 backend = "vfox:mise-plugins/vfox-gcloud"
 specifiers = ["586.0.0"]
 
+[tools.gcloud."platforms.linux-arm64"]
+checksum = "sha256:5e67bd4399c0e4b71998e7bfe1d72dbb46721726610974696b1db94859113c3f"
+url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-linux-arm.tar.gz"
+
 [tools.gcloud."platforms.linux-x64"]
+checksum = "sha256:99a78f20d6b9335393c3022be682fc67e5f46af3e63c852a1e3c50be948f7d99"
 url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-linux-x86_64.tar.gz"
 
 [tools.gcloud."platforms.macos-arm64"]
+checksum = "sha256:078509d7742a65c17d17c6c2a899de752af99a94bfbd5446a013140d43550828"
 url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-darwin-arm.tar.gz"
 
 [tools.gcloud."platforms.windows-x64"]
+checksum = "sha256:5fecb9af0f178331b2333c167e57a2676ac286029fb16e328aef911f9d2df2a8"
 url = "https://storage.googleapis.com/cloud-sdk-release/google-cloud-sdk-586.0.0-windows-x86_64-bundled-python.zip"
 
 [[tools.gh]]
 version = "2.103.3"
 backend = "aqua:cli/cli"
 specifiers = ["latest"]
+
+[tools.gh."platforms.linux-arm64"]
+checksum = "sha256:ee32df2323c8847f5fac6cb6b4b69ca75828e9329a8f22f677021f7b3306ce63"
+url = "https://github.com/cli/cli/releases/download/v2.103.3/gh_2.103.3_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/679195636"
+provenance = "github-attestations"
 
 [tools.gh."platforms.linux-x64"]
 checksum = "sha256:4c806978ffce1cec70853302a56d70ac6da4f19bae7adca4e1a8ab00633dd91d"
@@ -191,6 +244,10 @@ version = "1.27.1"
 backend = "core:go"
 specifiers = ["1.27.1"]
 
+[tools.go."platforms.linux-arm64"]
+checksum = "sha256:3450b45a3f9ee8568792736a5c5e70a1f2e9b36c35a8f74958c03e51d7d92bec"
+url = "https://dl.google.com/go/go1.27.1.linux-arm64.tar.gz"
+
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:63d339f0da5ab53635a56f2490a7984dfe12dfcff22ad749f63edaf590168445"
 url = "https://dl.google.com/go/go1.27.1.linux-amd64.tar.gz"
@@ -207,6 +264,11 @@ url = "https://dl.google.com/go/go1.27.1.windows-amd64.zip"
 version = "0.8.2"
 backend = "aqua:herdrdev/herdr"
 specifiers = ["0.8.2"]
+
+[tools.herdr."platforms.linux-arm64"]
+checksum = "sha256:f55610658e1c2e0d2aaef730b4b2ab885f7f8ba00285ab372bfb14f2e3d5b40d"
+url = "https://github.com/herdrdev/herdr/releases/download/v0.8.2/herdr-linux-aarch64"
+url_api = "https://api.github.com/repos/herdrdev/herdr/releases/assets/521169113"
 
 [tools.herdr."platforms.linux-x64"]
 checksum = "sha256:976150a14d490c94b243ea2e1a7eb2dfb67f12e36b182db90936f6728e6aecf4"
@@ -228,6 +290,11 @@ version = "0.46.0"
 backend = "aqua:jj-vcs/jj"
 specifiers = ["0.46.0"]
 
+[tools.jj."platforms.linux-arm64"]
+checksum = "sha256:80e28f7501c11e50e0ca06cd6a1fa1d982cff9cc59bfe4411a9d36aa501d867e"
+url = "https://github.com/jj-vcs/jj/releases/download/v0.46.0/jj-v0.46.0-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/jj-vcs/jj/releases/assets/619871804"
+
 [tools.jj."platforms.linux-x64"]
 checksum = "sha256:fce0271158e665ceb82dc66c5eb95b1728649094e9133074f3b5baece345fc08"
 url = "https://github.com/jj-vcs/jj/releases/download/v0.46.0/jj-v0.46.0-x86_64-unknown-linux-musl.tar.gz"
@@ -248,6 +315,11 @@ version = "2.9.0-0"
 backend = "github:mamba-org/micromamba-releases"
 specifiers = ["2.9.0-0"]
 
+[tools.micromamba."platforms.linux-arm64"]
+checksum = "sha256:e705ffeed90ce0659eb546e4b1e1028c9eaf0bc9cc854867b19ac5ce0ba5852f"
+url = "https://github.com/mamba-org/micromamba-releases/releases/download/2.9.0-0/micromamba-linux-aarch64.tar.bz2"
+url_api = "https://api.github.com/repos/mamba-org/micromamba-releases/releases/assets/505526151"
+
 [tools.micromamba."platforms.linux-x64"]
 checksum = "sha256:8761c382127e6363bd9e0a2451aa3ef90d071a79133f736e2f759a3bf13040dd"
 url = "https://github.com/mamba-org/micromamba-releases/releases/download/2.9.0-0/micromamba-linux-64.tar.bz2"
@@ -267,6 +339,10 @@ url_api = "https://api.github.com/repos/mamba-org/micromamba-releases/releases/a
 version = "26.8.1"
 backend = "core:node"
 specifiers = ["26.8.1"]
+
+[tools.node."platforms.linux-arm64"]
+checksum = "sha256:d5f973ce975e4bd03e6c2038260f7e9201615aa8e1ee293c72f8dcc2a6d9fddb"
+url = "https://nodejs.org/dist/v26.8.1/node-v26.8.1-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-x64"]
 checksum = "sha256:b2b76660fa4ded4e0b2a41ee3c0c651cd52ea8170ead91ebac1e147ac3d55643"
@@ -300,6 +376,11 @@ version = "1.19.5"
 backend = "aqua:anomalyco/opencode"
 specifiers = ["latest"]
 
+[tools.opencode."platforms.linux-arm64"]
+checksum = "sha256:fae5be262d693b7c5e562856cc473e59e741772936db0c0600ac0d5ed5bd088b"
+url = "https://github.com/anomalyco/opencode/releases/download/v1.19.5/opencode-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/anomalyco/opencode/releases/assets/683987812"
+
 [tools.opencode."platforms.linux-x64"]
 checksum = "sha256:588310a336fa3b9df36b3f0225b26f679d453efaad0cf3d66c3651ef3ec1647a"
 url = "https://github.com/anomalyco/opencode/releases/download/v1.19.5/opencode-linux-x64.tar.gz"
@@ -320,6 +401,11 @@ version = "1.5.0"
 backend = "aqua:earendil-works/pi"
 specifiers = ["latest"]
 
+[tools.pi."platforms.linux-arm64"]
+checksum = "sha256:5d5711b48600756473682e86360b026b11abf7591e5d112eb411d4da2c100d9a"
+url = "https://github.com/earendil-works/pi/releases/download/v1.5.0/pi-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/701404874"
+
 [tools.pi."platforms.linux-x64"]
 checksum = "sha256:df870ba0e344cb7b3358d8d8f19397b8b8d225a8669784736ad68a5c2169d53b"
 url = "https://github.com/earendil-works/pi/releases/download/v1.5.0/pi-linux-x64.tar.gz"
@@ -339,31 +425,31 @@ url_api = "https://api.github.com/repos/earendil-works/pi/releases/assets/701404
 version = "26.5.1"
 backend = "pipx:black"
 specifiers = ["26.5.1"]
-uv = { path = ".mise/locks/pipx-black/26.5.1", digest = "sha256:4ba518f7c958b8fa548109c7977356f11019164a5cc8c888dac85d43f260d65f" }
+uv = { path = ".mise/locks/pipx-black/26.5.1", digest = "sha256:62be3ac95a96be3b1d50eaff02c035e14742074996f573fb34c89ba0f36b1539" }
 
 [[tools."pipx:conda-lock"]]
 version = "4.0.2"
 backend = "pipx:conda-lock"
 specifiers = ["4.0.2"]
-uv = { path = ".mise/locks/pipx-conda-lock/4.0.2", digest = "sha256:51c67f967ad37108bcd1829b44857a89bcc4fb3524d562a4d4acfa96a08c5e51" }
+uv = { path = ".mise/locks/pipx-conda-lock/4.0.2", digest = "sha256:ff25ff817597b50321567efb7069fdfbe548d79c69996027935f742299c4516b" }
 
 [[tools."pipx:conda-package-handling"]]
 version = "2.6.0"
 backend = "pipx:conda-package-handling"
 specifiers = ["2.6.0"]
-uv = { path = ".mise/locks/pipx-conda-package-handling/2.6.0", digest = "sha256:6f21bc48856a75bb47dc76730774ca18abb7988881d5f02dafd6e235cc835271" }
+uv = { path = ".mise/locks/pipx-conda-package-handling/2.6.0", digest = "sha256:fff4f0a4abc6f584a2b4aad6f0d3c2567afc6b1912777fdff30639e9adb90a10" }
 
 [[tools."pipx:mypy"]]
 version = "2.3.1"
 backend = "pipx:mypy"
 specifiers = ["2.3.1"]
-uv = { path = ".mise/locks/pipx-mypy/2.3.1", digest = "sha256:b6eb97b7d93050a12f96d4f2df75a03680a36dabbcfc19fd28b20bb209db2b62" }
+uv = { path = ".mise/locks/pipx-mypy/2.3.1", digest = "sha256:666aec208144b47190e9e26d8605ad4320568d52210a93cd8d6801c872d3896f" }
 
 [[tools."pipx:pre-commit"]]
 version = "4.6.2"
 backend = "pipx:pre-commit"
 specifiers = ["4.6.2"]
-uv = { path = ".mise/locks/pipx-pre-commit/4.6.2~2899f560", digest = "sha256:f319c4fcacaa105a544b424b39aede7f7414dc437d3aad85f7ec4ae87ff26486" }
+uv = { path = ".mise/locks/pipx-pre-commit/4.6.2~2899f560", digest = "sha256:1c935a0f221b9992d989ab45cbdf03d7863a8d8b3c770eb68bfb4e1e52aabe62" }
 
 [tools."pipx:pre-commit".options]
 with = '["pre-commit-uv"]'
@@ -372,24 +458,30 @@ with = '["pre-commit-uv"]'
 version = "0.16.6"
 backend = "pipx:ruff"
 specifiers = ["0.16.6"]
-uv = { path = ".mise/locks/pipx-ruff/0.16.6", digest = "sha256:d064d45b3d4f1efe4d3e5f45b7ac699f1236b72be117f8ce459fd0097a937c22" }
+uv = { path = ".mise/locks/pipx-ruff/0.16.6", digest = "sha256:19af1485f75ce9d379cc1a19d3e6a8766b8c41ef01f75ea6a5755c9fe42d33de" }
 
 [[tools."pipx:ty"]]
 version = "0.0.84"
 backend = "pipx:ty"
 specifiers = ["0.0.84"]
-uv = { path = ".mise/locks/pipx-ty/0.0.84", digest = "sha256:7828d67711a942c28455ec14c8e00e0f4d9f482cccb4bd4bb64ae1004f45a449" }
+uv = { path = ".mise/locks/pipx-ty/0.0.84", digest = "sha256:5a7297631495d14160cbfca3adacf1bd9e09d8e7f40e23e10ea28d1e24937f24" }
 
 [[tools."pipx:unidep"]]
 version = "3.4.2"
 backend = "pipx:unidep"
 specifiers = ["3.4.2"]
-uv = { path = ".mise/locks/pipx-unidep/3.4.2", digest = "sha256:25890232e0093a857c74a65b7542bcc0c32f296912607ec7c9635db4f953cc9e" }
+uv = { path = ".mise/locks/pipx-unidep/3.4.2", digest = "sha256:f3bd04ddad526db674cdbaeec8508ba314aded04cf60a607700b1b7869e7459a" }
 
 [[tools.pixi]]
 version = "0.79.0"
 backend = "github:prefix-dev/pixi"
 specifiers = ["0.79.0"]
+
+[tools.pixi."platforms.linux-arm64"]
+checksum = "sha256:a402a2a3e2c785b7855c482db46d65a915c0ac04fdf041410f218980a5247290"
+url = "https://github.com/prefix-dev/pixi/releases/download/v0.79.0/pixi-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/prefix-dev/pixi/releases/assets/542944739"
+provenance = "github-attestations"
 
 [tools.pixi."platforms.linux-x64"]
 checksum = "sha256:b9b6dd2bdf4e0043c2c0cd6d15334a26c6851121bf5ae16c39b69add598bafdc"
@@ -413,6 +505,11 @@ provenance = "github-attestations"
 version = "3.14.7"
 backend = "core:python"
 specifiers = ["3.14.7"]
+
+[tools.python."platforms.linux-arm64"]
+checksum = "sha256:9b8bd45d06fc3fcdc56f2713a62535fe1c019816461ae87c170dd56184dd3f4d"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260929/cpython-3.14.7+20260929-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64"]
 checksum = "sha256:da5357f47b1d9c8d4c439004d463d893ef688a44c27438a62b47073d26d1377e"
@@ -442,6 +539,11 @@ version = "1.6.0"
 backend = "aqua:yorukot/superfile"
 specifiers = ["1.6.0"]
 
+[tools.superfile."platforms.linux-arm64"]
+checksum = "sha256:2e8150dab1a139e3a081bd74a9c775155e8d0241c34ae3f8d30817a3df1b8f06"
+url = "https://github.com/yorukot/superfile/releases/download/v1.6.0/superfile-linux-v1.6.0-arm64.tar.gz"
+url_api = "https://api.github.com/repos/yorukot/superfile/releases/assets/441063678"
+
 [tools.superfile."platforms.linux-x64"]
 checksum = "sha256:d45b0e95072629a6aa7983a84eedca9cd7a98861e67ef91be1415496e3dda309"
 url = "https://github.com/yorukot/superfile/releases/download/v1.6.0/superfile-linux-v1.6.0-amd64.tar.gz"
@@ -462,6 +564,11 @@ version = "7.2.0"
 backend = "packslip:github.com/jdx/usage"
 specifiers = ["latest"]
 
+[tools.usage."platforms.linux-arm64"]
+checksum = "sha256:a618ab5e634ed485cea7ea49575da720cf1cc92c8619e3a6c2a008aff81035f9"
+url = "https://github.com/jdx/usage/releases/download/v7.2.0/usage-aarch64-unknown-linux-gnu.tar.gz"
+signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-cli.yml"
+
 [tools.usage."platforms.linux-x64"]
 checksum = "sha256:32d475f22d8c5a637a61b0d6caa076ed4c5d1de3cde61efcf509e07478208340"
 url = "https://github.com/jdx/usage/releases/download/v7.2.0/usage-x86_64-unknown-linux-gnu.tar.gz"
@@ -481,6 +588,12 @@ signer = "sigstore-oidc:https://github.com/jdx/usage/.github/workflows/publish-c
 version = "0.12.10"
 backend = "aqua:astral-sh/uv"
 specifiers = ["0.12.10"]
+
+[tools.uv."platforms.linux-arm64"]
+checksum = "sha256:9ff6b9d4665edcdd3a88dcc73cd1eb641754deb927f14e8c62ebfde6bf4f5f5e"
+url = "https://github.com/astral-sh/uv/releases/download/0.12.10/uv-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/astral-sh/uv/releases/assets/545034356"
+provenance = "github-attestations"
 
 [tools.uv."platforms.linux-x64"]
 checksum = "sha256:173d95a0c32d18c896c46ba6fafbf3cf9c14ab74b033f81b76c883ef492a976b"
@@ -505,6 +618,11 @@ version = "0.79.0"
 backend = "aqua:max-sixty/worktrunk"
 specifiers = ["0.79.0"]
 
+[tools.worktrunk."platforms.linux-arm64"]
+checksum = "sha256:6bb148471c4f4e5e616a3d703a00f0095b2d0025d86658f8d610c95a7756e3e7"
+url = "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-aarch64-unknown-linux-musl.tar.xz"
+url_api = "https://api.github.com/repos/max-sixty/worktrunk/releases/assets/577903092"
+
 [tools.worktrunk."platforms.linux-x64"]
 checksum = "sha256:b8c190b1d652370ef9f6b8f4694a2d6831b5b22f4b789f047612aad32764c6cf"
 url = "https://github.com/max-sixty/worktrunk/releases/download/v0.79.0/worktrunk-x86_64-unknown-linux-musl.tar.xz"
@@ -524,6 +642,11 @@ url_api = "https://api.github.com/repos/max-sixty/worktrunk/releases/assets/5779
 version = "0.45.1"
 backend = "aqua:zellij-org/zellij"
 specifiers = ["0.45.1"]
+
+[tools.zellij."platforms.linux-arm64"]
+checksum = "sha256:05f0802afadd53f8db9514e7cae53c9ae8432fed1b35b8294aa816ee3044a16b"
+url = "https://github.com/zellij-org/zellij/releases/download/v0.45.1/zellij-aarch64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/zellij-org/zellij/releases/assets/533540067"
 
 [tools.zellij."platforms.linux-x64"]
 checksum = "sha256:40bcc2e03f5d5ae8e054e39f676081fe12ab70871506996ba595834c3718eefc"
