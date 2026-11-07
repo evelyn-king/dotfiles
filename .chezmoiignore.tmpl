@@ -15,7 +15,9 @@ homebrew
 # mise rewrites its lock in place on every install. Applying a second copy to
 # $HOME gives the two copies a way to diverge and leaves `chezmoi status`
 # permanently dirty, so the source tree keeps the only copy and the locked mise
-# commands point at it with MISE_CONFIG_DIR.
+# commands point at it with MISE_CONFIG_DIR. Interactive mise still needs a lock
+# at ~/.config/mise to find locked pipx installs, so
+# run_after_mise-lock-link.sh links it to the source copy instead.
 .config/mise/mise.lock
 
 {{- if not $ubuntu }}

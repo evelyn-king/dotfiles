@@ -19,6 +19,12 @@ declarations to reviewable versions and checksums for `linux-x64`,
 The Rust entry stays `stable`, and rustup resolves that channel when mise
 installs or updates it.
 
+The lock is never copied into `$HOME`. An apply symlinks
+`~/.config/mise/mise.lock` to the source copy instead, because mise names locked
+pipx installs after their `uv.lock` sidecar. Without that link, interactive
+`mise` cannot find them, reports them missing and reinstalls them each time
+they run.
+
 The shared `lockfile_platforms` setting limits automatic locking and plain
 `mise lock` to those targets. `mup` also passes explicit platform flags.
 Mise always includes the current host when using the setting, so running on

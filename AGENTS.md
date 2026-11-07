@@ -54,6 +54,9 @@
 - `dot_config/mise/mise.lock` and `homebrew/Brewfile` are repo content. Never
   apply them to `$HOME`; mise rewrites its lock in place and a second copy
   diverges. `brew-switch` reads the Brewfile from the source tree.
+  `run_after_mise-lock-link.sh.tmpl` symlinks `~/.config/mise/mise.lock` to the
+  source lock: without it, interactive mise cannot find the `~uv~<hash>`
+  installs of locked pipx tools and reinstalls them on every run.
 - The docs under `docs/package-lists/` explain ownership rules and manual steps.
   The declarations themselves are the package list. Do not copy package names,
   versions or counts into the docs, where they go stale.

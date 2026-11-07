@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Link ~/.config/mise/mise.lock to the committed lock in the source tree.
+#
+# mise names each locked pipx/pypi install after the uv.lock sidecar its lock
+# entry records (`0.16.6~uv~<hash>`). An interactive `mise` reads
+# ~/.config/mise, so without a lock there it computes a different name, calls
+# every locked Python tool missing, and reinstalls it each time its shim runs.
+#
+# A symlink rather than a copy: mise resolves sidecar paths relative to the
+# link's target and writes any rewrite through it, so the source tree still
+# holds the only lock (see .chezmoiignore.tmpl). chezmoi cannot manage this as
+# a symlink_ entry because dot_config/mise/mise.lock already names that target.
+
+set -euo pipefail
+
+src={{ printf "%s/dot_config/mise/mise.lock" .chezmoi.sourceDir | quote }}
+dst="$HOME/.config/mise/mise.lock"
+
+[ -f "$src" ] || exit 0
+[ "$(readlink "$dst" 2>/dev/null)" = "$src" ] && exit 0
+
+# A regular file here is a lock mise wrote on its own. Keep it for review
+# instead of replacing it silently.
+if [ -e "$dst" ] && [ ! -L "$dst" ]; then
+  backup="$dst.bak.$(date +%Y%m%d%H%M%S)"
+  mv -- "$dst" "$backup"
+  printf 'mise-lock-link: moved existing %s to %s\n' "$dst" "$backup" >&2
+fi
+
+mkdir -p "$(dirname "$dst")"
+ln -sfn -- "$src" "$dst"
