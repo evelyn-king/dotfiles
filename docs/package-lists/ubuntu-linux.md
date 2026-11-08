@@ -30,7 +30,7 @@ native package lists. Native Python is an OS dependency; the development
 interpreter comes from mise. Do not replace Ubuntu's `/usr/bin/python3`.
 
 Ubuntu's managed configuration is headless. Chezmoi excludes the desktop
-configuration and the Omarchy-specific agent skill. Fonts and clipboard behavior
+configuration. Fonts and clipboard behavior
 over SSH belong to the local terminal. The remote host supplies the standard
 terminal descriptions, including `xterm-256color` and `tmux-256color`. The local
 Ghostty configuration enables `ssh-env`, which uses the xterm fallback for SSH.

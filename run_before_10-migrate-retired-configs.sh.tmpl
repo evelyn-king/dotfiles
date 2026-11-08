@@ -68,3 +68,19 @@ for retired_config in \
       "$retired_config" >&2
   fi
 done
+
+# The repo used to install its own copy of Omarchy's agent skill. That real
+# directory stops Omarchy's provisioning from linking the packaged skill, which
+# Omarchy keeps current. Replace an unmodified copy with that link.
+skill_dir="$destination/.claude/skills/omarchy"
+packaged_skill="${OMARCHY_PATH:-/usr/share/omarchy}/default/agents/skills/omarchy"
+if [ -d "$packaged_skill" ] && [ -d "$skill_dir" ] && [ ! -L "$skill_dir" ]; then
+  if [ "$(ls -A "$skill_dir")" = SKILL.md ] &&
+    [ "$(file_sha256 "$skill_dir/SKILL.md")" = 14e7d49ec177c7ff28b7ad3051c78acfa5fac8f1fc4f7b4e096bfa8e07f4d6f3 ]; then
+    rm -f "$skill_dir/SKILL.md" && rmdir "$skill_dir" &&
+      ln -s "$packaged_skill" "$skill_dir" &&
+      printf 'migration: replaced the retired ~/.claude/skills/omarchy copy with a link to Omarchy'"'"'s skill\n'
+  else
+    printf 'migration: preserving modified ~/.claude/skills/omarchy; Omarchy cannot link its skill there\n' >&2
+  fi
+fi
