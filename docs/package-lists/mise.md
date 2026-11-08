@@ -143,9 +143,13 @@ Run `dotfiles-doctor` to report duplicate manual installs. On Omarchy it ignores
 audited stock launchers only when their location and complete contents match. Modified launchers still produce a
 warning. The managed mise shims precede the stock launchers on PATH.
 
-The doctor also reports installed versions that mise considers prunable, excluding
-every version retained by the source-tree lock. Review those entries and use
-`mise uninstall <tool>@<version>` for each version you choose to remove.
+The doctor also reports untracked installs: versions that mise considers
+prunable, excluding every version retained by the source-tree lock. It gets
+them from `mise-untracked`, which prints one `<tool>@<version>` per line and
+changes nothing by default. Review the list, then run `mise-untracked --remove`
+to uninstall all of it after a confirmation prompt (`--yes` skips the prompt and
+is required without a terminal), or use `mise uninstall <tool>@<version>` for
+only the versions you choose.
 Avoid blanket `mise prune --tools` cleanup: normal global config can mark a
 locked version as unused when a floating declaration selects a newer installed
 version. The next apply that runs the install hook would install the locked

@@ -72,6 +72,8 @@
   Ubuntu bootstrap hook with a fake mise executable; it makes no system changes.
 - `python3 .chezmoitemplates/test_mise_install.py` renders the mise install hook
   and runs it against a fake release in a temporary home, offline.
+- `python3 .chezmoitemplates/test_mise_untracked.py` renders `mise-untracked` and
+  runs it against a fake mise and lock, offline.
 - For changes that affect installation, run
   `chezmoi apply --dry-run --refresh-externals=never` and verify the rendered
   dotfiles.

@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 # Report tool ownership drift on request. This script only reports;
-# it never removes a tool or changes the active system.
+# it never removes a tool or changes the active system. Removal belongs to the
+# commands it points at, such as mise-untracked --remove.
 
 set -u
 
@@ -105,41 +106,28 @@ EOF
     skip "Shim directory is absent: $shims"
   fi
 
-  # Global config can select a newer installed release for "latest" while the
-  # apply hook still installs an older locked version. Keep every locked pair.
-  # Read the current source lock, including updates made by mup since apply.
-  check 'Unused mise versions, excluding the current source lock'
-  source_dir={{ .chezmoi.sourceDir | quote }}
-  if ! locked=$(chezmoi --source "$source_dir" execute-template \
-    --file "$source_dir/.chezmoitemplates/mise-locked-tools.tmpl"); then
-    echo "  ERROR cannot read the source lock; unused versions are unknown." >&2
+  # mise-untracked owns the comparison against the source lock, so the doctor
+  # and the removal command agree on what counts as untracked.
+  check 'Untracked mise versions, excluding the current source lock'
+  if ! untracked=$("$HOME/.local/bin/mise-untracked"); then
+    echo '  ERROR mise-untracked failed; this check is incomplete.' >&2
     exit 1
   fi
-  if ! installed_prunable=$("$mise" ls --prunable --no-header); then
-    echo '  ERROR mise could not list unused versions; this check is incomplete.' >&2
-    exit 1
-  fi
-  prunable=$(
-    printf '%s\n' "$installed_prunable" |
-      while read -r tool version rest; do
-        [ -n "$tool" ] && [ -n "$version" ] || continue
-        printf '%s\n' "$locked" | grep -Fxq -- "$tool:$version" && continue
-        printf '    %s@%s\n' "$tool" "$version"
-      done
-  )
-  if [ -n "$prunable" ]; then
+  if [ -n "$untracked" ]; then
+    untracked=$(printf '%s\n' "$untracked" | sed 's/^/    /')
     cat >&2 <<EOF
 
   WARN mise: these installed versions are unused by tracked config and the source lock:
 
-$prunable
+$untracked
 
-  Review them, then remove individual entries with \`mise uninstall <tool>@<version>\`.
+  Review them, then remove them all with \`mise-untracked --remove\`, or
+  individual entries with \`mise uninstall <tool>@<version>\`.
   Avoid a blanket \`mise prune --tools\`: it does not account for the source lock.
 
 EOF
   else
-    ok 'No unused versions outside the source lock found.'
+    ok 'No untracked versions outside the source lock found.'
   fi
 else
   skip "Pinned mise is absent: $mise. Run chezmoi apply to install it."

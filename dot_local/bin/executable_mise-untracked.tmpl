@@ -1,0 +1,111 @@
+#!/usr/bin/env bash
+
+# List installed mise tool versions that nothing tracks, and optionally remove
+# them. "Tracked" means selected by the applied config (anything `mise ls
+# --prunable` does not report) or retained by the source-tree lock.
+#
+# The lock is the reason this is not `mise prune --tools`. Global config can
+# select a newer installed release for a "latest" tool while the apply hook
+# still installs the older locked one, so mise calls the locked version unused
+# and a blanket prune would delete it until the next apply reinstalls it. The
+# source lock is read at run time, not render time, so a lock `mup` has updated
+# since the last apply counts. dotfiles-doctor reports through this script.
+set -euo pipefail
+
+SCRIPT_NAME="mise-untracked"
+
+usage() {
+  cat <<EOF
+Usage: ${SCRIPT_NAME} [--remove] [--yes]
+
+List installed mise tool versions that neither the tracked config nor the
+source lock retains, one <tool>@<version> per line on stdout.
+
+Options:
+  -r, --remove  Uninstall the listed versions after confirming.
+  -y, --yes     Skip the confirmation prompt. Required without a terminal.
+  -h, --help    Show this help.
+
+Without --remove nothing is changed.
+EOF
+}
+
+die() {
+  printf '%s: %s\n' "${SCRIPT_NAME}" "$*" >&2
+  exit 1
+}
+
+remove=""
+assume_yes=""
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -r | --remove) remove=1 ;;
+    -y | --yes) assume_yes=1 ;;
+    -h | --help)
+      usage
+      exit 0
+      ;;
+    *)
+      usage >&2
+      exit 2
+      ;;
+  esac
+  shift
+done
+
+# The pinned release from run_before_00-install-mise. Call it by path so a
+# shell that predates ~/.local/bin still acts on it.
+mise="${MISE:-$HOME/.local/bin/mise}"
+[ -x "$mise" ] || die "pinned mise is absent: $mise. Run chezmoi apply to install it."
+
+source_dir={{ .chezmoi.sourceDir | quote }}
+locked=$(chezmoi --source "$source_dir" execute-template \
+  --file "$source_dir/.chezmoitemplates/mise-locked-tools.tmpl") ||
+  die "cannot read the source lock; untracked versions are unknown."
+installed_prunable=$("$mise" ls --prunable --no-header) ||
+  die "mise could not list unused versions."
+
+untracked=$(
+  printf '%s\n' "$installed_prunable" |
+    while read -r tool version _; do
+      [ -n "$tool" ] && [ -n "$version" ] || continue
+      printf '%s\n' "$locked" | grep -Fxq -- "$tool:$version" && continue
+      printf '%s@%s\n' "$tool" "$version"
+    done
+)
+
+if [ -z "$untracked" ]; then
+  printf '%s: no untracked installs.\n' "$SCRIPT_NAME" >&2
+  exit 0
+fi
+
+printf '%s\n' "$untracked"
+[ -n "$remove" ] || exit 0
+
+if [ -z "$assume_yes" ]; then
+  [ -t 0 ] && [ -t 2 ] || die "refusing to remove without a terminal; pass --yes."
+  count=$(printf '%s\n' "$untracked" | wc -l)
+  printf '%s: remove the %d version(s) above? [y/N] ' "$SCRIPT_NAME" "$count" >&2
+  read -r reply
+  case "$reply" in
+    y | Y | yes | YES) ;;
+    *)
+      printf '%s: nothing removed.\n' "$SCRIPT_NAME" >&2
+      exit 0
+      ;;
+  esac
+fi
+
+# Keep going after a failure so one stuck tool does not hide the rest, then
+# report it through the exit status.
+failed=0
+while read -r spec; do
+  printf '%s: removing %s\n' "$SCRIPT_NAME" "$spec" >&2
+  "$mise" uninstall --yes "$spec" || {
+    printf '%s: could not remove %s\n' "$SCRIPT_NAME" "$spec" >&2
+    failed=1
+  }
+done <<EOF
+$untracked
+EOF
+exit "$failed"
