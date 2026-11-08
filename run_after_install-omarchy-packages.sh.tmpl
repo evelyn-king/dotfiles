@@ -18,6 +18,10 @@ pacman_packages=(
 {{- range .omarchyPackages.pacman }}
   {{ . | quote }}
 {{- end }}
+{{- /* Arch Linux ARM lacks shellcheck, so aarch64 takes shellcheck-bin from the AUR. */}}
+{{- if eq .chezmoi.arch "amd64" }}
+  "shellcheck"
+{{- end }}
 )
 
 if ((${#pacman_packages[@]})); then

@@ -226,8 +226,9 @@ overwriting the repo configuration or monitor layout.
 
 On Asahi Linux, Omarchy's repository supplies aarch64 builds of the packages in
 the manifest, so one manifest serves both architectures. Arch Linux ARM does not
-ship `shellcheck`; the manifest takes `shellcheck-bin` from the AUR instead,
-which provides the same command on both architectures. Before adding a package
+ship `shellcheck`, so the hooks install `shellcheck-bin` from the AUR there and
+the official `shellcheck` package on x86_64. The two packages conflict, so a
+host must never receive both. Before adding a package
 to the manifest, check that `pacman -Si <name>` lists `aarch64` or `any`.
 
 Omarchy 4.5 declares its own tools in `/etc/mise/conf.d`. Plain `mise lock

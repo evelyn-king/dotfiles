@@ -18,6 +18,9 @@ aur_packages=(
 {{- range .omarchyPackages.aur }}
   {{ . | quote }}
 {{- end }}
+{{- if ne .chezmoi.arch "amd64" }}
+  "shellcheck-bin"
+{{- end }}
 )
 
 if ((${#aur_packages[@]})); then

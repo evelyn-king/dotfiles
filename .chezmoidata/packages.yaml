@@ -39,5 +39,4 @@ omarchyPackages:
     - zsh
   aur:
     - proton-mail-bin
-    - shellcheck-bin
     - slack-desktop
