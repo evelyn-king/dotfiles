@@ -57,7 +57,7 @@ paths itself; [shell-startup.md](../shell-startup.md) explains why.
 
 Homebrew refuses to load a cask or formula from an untrusted tap. Declare each
 third-party entry with its full tap name and `trusted: true`, as the AeroSpace
-and Omarchy casks are. `brew-switch` records that trust before it installs
+cask is. `brew-switch` records that trust before it installs
 anything, and its cleanup resets Homebrew's trust store to exactly the entries
 the Brewfile declares.
 

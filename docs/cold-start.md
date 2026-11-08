@@ -2,15 +2,14 @@
 
 These procedures require an internet connection and an account that can approve
 system changes. The first dry run downloads pinned externals when the chezmoi
-cache is empty, even with `--refresh-externals=never`.
+cache is empty, even with `--refresh-externals=never`. Those are the Vim plugin
+archives, fetched by commit over HTTPS without checksums of their own. To run
+that first command offline, copy a populated chezmoi cache from a machine you
+trust.
 
 The supported deployment targets are Apple Silicon macOS, Omarchy 4 on
 x86_64 and aarch64 Linux, and Ubuntu 26.04 x86_64 headless hosts. Native Windows lives on the
 `windows` branch.
-
-When validating a PR before merge, add `--branch <candidate-branch>` to each
-`chezmoi init` below. Otherwise init selects the public default branch. Record
-the tested commit with `git -C "$(chezmoi source-path)" rev-parse HEAD`.
 
 ## Apple Silicon macOS
 
@@ -73,7 +72,7 @@ Open AeroSpace once. In System Settings, go to Privacy & Security >
 Accessibility, enable AeroSpace, then restart it. Its managed configuration
 starts it at login from then on. Launch the other managed applications that need
 first-use approval or an account login. If this host will run notebooks,
-complete the Jupyter environment setup in the main README.
+build the [Jupyter environments](jupyter.md).
 
 Run a third apply and the final checks:
 
@@ -142,8 +141,8 @@ sudo systemctl reboot
 After logging back in, run the second apply to resolve executable paths in
 templates against the installed tools. Then complete the
 interactive Tailscale and Dropbox steps in
-[package-lists/omarchy-linux.md](package-lists/omarchy-linux.md), and the Jupyter
-environment setup in the main README if this host will run notebooks.
+[package-lists/omarchy-linux.md](package-lists/omarchy-linux.md), and build the
+[Jupyter environments](jupyter.md) if this host will run notebooks.
 
 ```bash
 chezmoi apply
@@ -257,7 +256,7 @@ ssh <host> 'command -v jupyter-remote-lab; infocmp "$TERM" >/dev/null'
 ```
 
 Check Neovim with `:checkhealth`.
-The Jupyter launcher needs the environments described in the README before it
+The Jupyter launcher needs the [managed environments](jupyter.md) before it
 can start a notebook server. SSH keys and Git signing remain manual setup below.
 See [Ubuntu package ownership](package-lists/ubuntu-linux.md) for update behavior.
 
@@ -322,3 +321,24 @@ commit and the next commit from each GUI Git client, then check them with
 `git log --show-signature -1`. Run
 `git config --file ~/.config/git/config.local --unset-all commit.gpgsign` to
 return the host to unsigned commits.
+
+## Not yet validated
+
+The procedures above passed in VMs, except where listed here. Check these on
+the first host that relies on them.
+
+- macOS: a fresh install since the move from nix-darwin to the Brewfile, the
+  [existing-application adoption](package-lists/macos.md#adopt-existing-applications)
+  on a disposable copy, and whether `dotfiles-doctor` reports undeclared and
+  missing Homebrew packages.
+- macOS GUI: AeroSpace Accessibility and login startup, its window shortcuts,
+  PATH in GUI editor subprocesses, and Shift+Enter in the terminal through tmux.
+- Rancher Desktop container run and build. `shell-env.sh` sets
+  `DOCKER_DEFAULT_PLATFORM=linux/amd64`; confirm that is the intended
+  architecture.
+- Jupyter on macOS. The notebook installer's rollback has not been tested
+  against power loss on any platform.
+- Omarchy: a cold start at the current commit, and on physical displays GPU
+  acceleration, scaling, rotation, docking and the single-window aspect limit.
+- Every platform: service and browser sign-in, real SSH agent forwarding, and
+  GPG with pinentry.

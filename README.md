@@ -19,10 +19,8 @@ Apple Silicon macOS, Omarchy 4 on x86_64 and aarch64 (Asahi) Linux, and Ubuntu
 
 [docs/cold-start.md](docs/cold-start.md) takes a fresh supported host from
 platform prerequisites through source initialization, activation, the repeated
-applies, the manual service setup, and the final checks.
-
-[Deployment readiness](docs/deployment-review-summary.md) records the remaining
-validation before merging and deploying this branch.
+applies, the manual service setup, and the final checks. It ends with the
+workflows that have not been validated yet.
 
 ## Apply
 
@@ -31,15 +29,8 @@ chezmoi apply
 ```
 
 `chezmoi apply --dry-run --refresh-externals=never` previews changes without
-updating pinned externals.
-
-`--refresh-externals=never` skips refreshing bodies chezmoi has already cached.
-It does not make a cold-cache run offline. The first dry run or apply still
-downloads the six commit-pinned Vim plugin archives before it writes any
-destination file, so give that first command network access or copy a populated
-cache from a machine you trust. The archive URLs are commit-pinned, and the repo
-relies on HTTPS and GitHub's commit archive endpoint rather than carrying
-checksums for their response bodies.
+updating pinned externals. On an empty cache it still downloads them; see
+[cold start](docs/cold-start.md).
 
 Run `dotfiles-doctor` after setup or when troubleshooting tool ownership. It
 reports duplicate tools, unused mise versions, and macOS system drift without
@@ -70,53 +61,16 @@ ownership, and [mise tools](docs/package-lists/mise.md) for versioned tools.
 
 ### mise
 
-Language runtimes and global CLI tools are declared in
-[`dot_config/mise/conf.d/`](dot_config/mise/conf.d/). They live under `conf.d`
-rather than at `~/.config/mise/config.toml` so repo-managed tools stay separate
-from mise's interactive global state. The migration removes audited versions of
-`~/.config/mise/config.toml` and preserves unfamiliar content with a warning;
-resolve that conflict and declare every global tool in `conf.d`. All supported
-hosts install the shared `[tools]` declarations. Some tools also ship as
-Omarchy packages, and the mise shims deliberately outrank them. See
-[docs/package-lists/mise.md](docs/package-lists/mise.md) for why.
+Runtimes and global CLI tools are declared in plain TOML under
+[`dot_config/mise/conf.d/`](dot_config/mise/conf.d/) and resolved by
+`dot_config/mise/mise.lock`, which stays in the source tree. Most versions are
+pinned. The coding agents, `gh` and `usage` float at `latest`, and Rust tracks
+`stable`. Run `mup` to move the floating tools. It refreshes the lock for every
+supported platform and installs from it; review and commit the lock change. The
+mise binary itself is pinned in `.chezmoidata/versions.yaml`.
 
-`run_onchange_after_mise-install.sh.tmpl` installs them and re-runs whenever the
-declarations or the lock change. After adding a tool, refresh the shared lock
-for all target platforms and run `chezmoi apply`.
-
-Most versions are pinned exactly. Rust tracks the stable release channel; the
-coding agents, `gh` and `usage` float at `latest` on purpose. mise holds new
-releases for a day before it will resolve them, and the coding agents opt out of
-that cooldown in `10-dotfiles.toml`. `mise upgrade` skips global config, so
-`mup` is what moves them:
-
-```bash
-mup
-```
-
-`mup`, installed in `~/.local/bin`, refreshes the committed
-`dot_config/mise/mise.lock` for `linux-x64`, `linux-arm64`, `macos-arm64` and
-`windows-x64` whichever machine you run it on, then installs what that lock holds for the
-machine you are on. The lock is one shared artifact and `mise lock` prunes
-whatever a run does not resolve, so a refresh scoped to its own host would drop
-the other platforms' entries. Review and commit the lockfile change afterwards.
-Rust is the one channel-based exception. Its lock entry stays `stable`, and
-rustup resolves that channel when mise installs or updates it.
-
-That lock is repo content rather than a home file. mise
-rewrites a lock in place whenever it installs, so an applied second copy under
-`~/.config/mise` would diverge from the source tree after every install and
-leave `chezmoi status` permanently dirty. The source tree holds the only copy,
-and `mup` and the install script both reach it by setting `MISE_CONFIG_DIR`.
-The applied `conf.d` files still drive the interactive shell's own tool
-resolution.
-
-The mise binary is pinned in `.chezmoidata/versions.yaml` and installed into
-`~/.local/bin` on every host by `run_before_00-install-mise.sh.tmpl`. Bump the
-version and both checksums there, then apply on each host. Omarchy's own
-`mise-bin` package stays installed, but the pinned copy is the one that runs.
-`mise self-update` is disabled. See
-[docs/package-lists/mise.md](docs/package-lists/mise.md#installation-and-updates).
+[docs/package-lists/mise.md](docs/package-lists/mise.md) covers the lock, the
+release cooldown, the overlap with Omarchy packages and how to update mise.
 
 ## Shell
 
@@ -199,50 +153,7 @@ adapters. The tests record both blocked commands and known advisory limits.
 
 ## Remote Jupyter
 
-Shell startup exports `JUPYTER_BIND_HOST`, `JUPYTER_ENV_NAME` and
-`JUPYTER_PORT`, binding JupyterLab to `127.0.0.1:8888` inside the `jupyter`
-environment. Override any of them per machine in `~/.config/shell/extras.sh`.
-
-`jupyter-remote-lab` runs `jupyter lab` through `micromamba run -n jupyter` or
-`conda run -n jupyter`, so the notebook server starts inside that environment
-without an interactive shell activation step.
-
-Create the managed environments before first use. The installer builds and
-smoke-tests a staging environment before it moves an existing one. It keeps
-backups of the old environment and kernel until the replacement and its new
-kernel are both ready, and restores them if any replacement step fails.
-
-Each rebuild resolves current package versions from the managed YAML files. The
-repo pins nothing there and tracks no environment lockfile, so environments
-built at different times can differ.
-
-```bash
-install-micromamba-env \
-  ~/local-codex/environments/jupyter_environment.yml \
-  ~/local-codex/environments/analysis_environment.yml
-micromamba run -n jupyter jupyter kernelspec list
-```
-
-Use `jupyter-remote-lab` on the remote host to start a headless lab instance:
-
-```bash
-jupyter-remote-lab --detach --dir ~/local-projects/project
-```
-
-Then create the SSH tunnel from your local machine with the exact port the
-launcher printed, for example:
-
-```bash
-ssh -N -L 8888:127.0.0.1:8888 <ssh-host>
-```
-
-The launcher writes its last runtime metadata to
-`${JUPYTER_REMOTE_ENV_FILE:-~/.local/state/jupyter-remote/current.env}`. Run
-`jupyter_remote_load_env` to load that runtime state back into your current
-shell after launching with overrides like `--port`.
-
-For a custom token, put the token in a mode-0600 file and pass its path with
-`--token-file`. The launcher copies it into its mode-0700 state directory and
-passes only the file path to Jupyter. After stopping the server, remove the
-token file named by `JUPYTER_REMOTE_TOKEN_FILE` and any old logs that contain
-tokenized startup URLs.
+`jupyter-remote-lab` starts a headless JupyterLab inside the managed `jupyter`
+environment, bound to localhost for an SSH tunnel.
+[docs/jupyter.md](docs/jupyter.md) covers building the environments, launching
+and tokens.

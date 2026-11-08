@@ -23,7 +23,9 @@ The lock is never copied into `$HOME`. An apply symlinks
 `~/.config/mise/mise.lock` to the source copy instead, because mise names locked
 pipx installs after their `uv.lock` sidecar. Without that link, interactive
 `mise` cannot find them, reports them missing and reinstalls them each time
-they run.
+they run. With `lockfile = true`, the link also makes interactive shells resolve
+floating declarations to the locked versions, the same ones the apply hook and
+`mup` install.
 
 The shared `lockfile_platforms` setting limits automatic locking and plain
 `mise lock` to those targets. `mup` also passes explicit platform flags.
@@ -37,13 +39,6 @@ Use `mise token github` to check the selected source with the token masked.
 An existing `MISE_GITHUB_TOKEN`, `GITHUB_API_TOKEN`, or `GITHUB_TOKEN` takes
 precedence over the credential command. Authentication helps with API rate
 limits; connection timeouts may still need separate investigation.
-
-The lock controls the apply hook and `mup` installations. Normal shells read
-the applied declarations without that source-tree lock, so a `latest`
-declaration can select a newer version already installed on the machine. Removing
-a conflicting stock config restores the managed declarations but does not pin
-floating tools to the lock at runtime. Check the effective selection with
-`mise ls --current` and `mise which <command>` after migration.
 
 ## Overlap with Omarchy packages
 
@@ -76,7 +71,8 @@ captured during the Omarchy VM cold-start review.
 If it warns, inspect the preserved file and move any declarations or settings
 you still want into `10-dotfiles.toml`, then remove the conflicting file. A
 different stock release still needs review; the migration never deletes a file
-based on its location alone.
+based on its location alone. Check the effective selection afterwards with
+`mise ls --current` and `mise which <command>`.
 
 ## Installation and updates
 
@@ -150,10 +146,8 @@ changes nothing by default. Review the list, then run `mise-untracked --remove`
 to uninstall all of it after a confirmation prompt (`--yes` skips the prompt and
 is required without a terminal), or use `mise uninstall <tool>@<version>` for
 only the versions you choose.
-Avoid blanket `mise prune --tools` cleanup: normal global config can mark a
-locked version as unused when a floating declaration selects a newer installed
-version. The next apply that runs the install hook would install the locked
-version again. The drift report changes nothing.
+Prefer it to `mise prune --tools`, because it also keeps every version the
+source lock retains. The drift report changes nothing.
 
 mise hides releases younger than a day, so a compromised publish has time to be
 pulled before it lands here. The coding agents ship several times a day, which
